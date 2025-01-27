@@ -1,6 +1,7 @@
 import './reporte_editor.css';
+import React from 'react';
 
-function ReporteEditor() {
+const ReporteEditor:React.FC = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sección del Formulario */}

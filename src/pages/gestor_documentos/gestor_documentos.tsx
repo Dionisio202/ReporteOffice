@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 // src/pages/GestorDocumentos.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Importamos el hook useNavigate
@@ -122,3 +123,10 @@ const GestorDocumentos = () => {
 };
 
 export default GestorDocumentos;
+=======
+const GestorReportes = () => {
+  return <h1>Gestor de Reportes</h1>;
+};
+
+export default GestorReportes;
+>>>>>>> Stashed changes

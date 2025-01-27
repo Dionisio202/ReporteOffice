@@ -1,0 +1,24 @@
+.contenedorprincipal {
+    display: flex;
+    flex-direction: row; /* Organiza los elementos en fila */
+    justify-content: space-between; /* Espacio entre el menú y la tabla */
+    padding: 20px;
+  }
+  
+  .contenedormenu {
+    width: 25%; /* El menú ocupa el 25% del espacio disponible */
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(151, 65, 231, 0.1);
+    border-radius: 15px;
+    padding: 10px;
+  }
+  
+  .contenedortabla {
+    flex: 1; /* La tabla ocupa el espacio restante */
+    margin-left: 20px; /* Añadir espacio entre el menú y la tabla */
+  }
+  
+  .tabla {
+    min-width: 650px; /* Asegura que la tabla tenga un ancho mínimo */
+  }
+  
