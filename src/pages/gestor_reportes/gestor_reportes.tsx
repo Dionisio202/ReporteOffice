@@ -15,11 +15,11 @@ const GestorReportes = () => {
     <div className="flex flex-col w-full">
       {/* Título mejorado para la página */}
       <div className="flex items-center justify-between w-full">
-        <button
+      <button
           onClick={handleHome}
-          className="bg-[#931D21] text-white rounded-lg shadow-md overflow-x-auto mb-6"
-          >
-          &lt; Volver
+          className="w-1/4 bg-[#931D21] text-white rounded-lg shadow-md overflow-x-auto mb-6"
+        >
+          &lt; Atrás
         </button>
         <h1 className="text-3xl font-semibold text-center text-gray-800 my-6 tracking-wide shadow-sm w-full">
           Reportes POA 2025

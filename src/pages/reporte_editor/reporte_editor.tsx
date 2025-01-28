@@ -1,10 +1,12 @@
 import './reporte_editor.css';
 import React from 'react';
+
 const ReporteEditor:React.FC = () => {
   return (
 
+    
     <div className="flex min-h-screen bg-gray-100">
-      
+  
 
       <div className="w-1/3 p-6 bg-white shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-black-600">Formulario</h2>
