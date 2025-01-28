@@ -1,9 +1,8 @@
-<<<<<<< Updated upstream
-// src/pages/GestorDocumentos.js
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Importamos el hook useNavigate
-import Search from "@/components/search/Search";
-import Filters from "@/components/reports/Filters";
+import Search from "../../components/search/Search";
+import Filters from "../../components/reports/Filters";
 
 const GestorDocumentos = () => {
   const navigate = useNavigate(); // Inicializamos el hook useNavigate
@@ -41,9 +40,16 @@ const GestorDocumentos = () => {
   return (
     <div className="p-6 bg-gray-50">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <button onClick={handleHome} className="text-blue-600 hover:underline text-sm">&lt; Volver</button>
-        <h1 className="text-3xl font-semibold text-gray-700">Documentos DINNOVA</h1>
+      <div className="flex items-center justify-between w-full">
+        <button
+          onClick={handleHome}
+          className="text-blue-600 hover:underline text-sm"
+        >
+          &lt; Volver
+        </button>
+        <h1 className="text-3xl font-semibold text-center text-gray-800 my-6 tracking-wide shadow-sm w-full">
+         DOCUMENTOS DINNOVA
+        </h1>
       </div>
 
       {/* Filtros y Tabla */}
@@ -123,10 +129,3 @@ const GestorDocumentos = () => {
 };
 
 export default GestorDocumentos;
-=======
-const GestorReportes = () => {
-  return <h1>Gestor de Reportes</h1>;
-};
-
-export default GestorReportes;
->>>>>>> Stashed changes

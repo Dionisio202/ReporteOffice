@@ -2,13 +2,15 @@ import React, { useState, FormEvent } from "react";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 import "./login.css";
-import Header from "../../components/header/Header";
-import Footer from "../../components/footer/Footer";
+
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [correo, setCorreo] = useState("");
   const [contrasenia, setContrasenia] = useState("");
+
+  const navigate = useNavigate(); // Usa useNavigate para redireccionar
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -17,19 +19,30 @@ const Login: React.FC = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
+    // Correo y contraseña estáticos
+    const correoEstatico = "usuario@dinnova.com";
+    const contraseniaEstatica = "admin123";
+
     if (!correo || !contrasenia) {
       toast.error("Por favor, completa todos los campos.");
       return;
     }
+
+    // Validación con los valores estáticos
+    if (correo === correoEstatico && contrasenia === contraseniaEstatica) {
+      toast.success("Inicio de sesión exitoso!");
+      // Redirige a otra página después del login exitoso
+      navigate("/GestorDocumento");
+    } else {
+      toast.error("Correo o contraseña incorrectos.");
+    }
+
     console.log("Correo:", correo);
     console.log("Contraseña:", contrasenia);
-
-    toast.success("Inicio de sesión exitoso!");
   };
 
   return (
     <div>
-      <Header />
       <div className="contenedorPrincipal">
         <div className="contenedorLoguin">
           <div className="portadasLoguin">
@@ -56,31 +69,35 @@ const Login: React.FC = () => {
                     required
                   />
                 </div>
+
                 <div className="contenedorIngreso">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="contrasenia"
-                    name="contrasenia"
-                    className="ingreso"
-                    placeholder="Contraseña"
-                    value={contrasenia}
-                    onChange={(e) => setContrasenia(e.target.value)}
-                    maxLength={25}
-                    minLength={4}
-                    required
-                  />
-                  {showPassword ? (
-                    <BsEyeSlash
-                      className="iconoIngreso"
-                      onClick={togglePasswordVisibility}
+                  <div className="campoContrasena">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="contrasenia"
+                      name="contrasenia"
+                      className="ingreso"
+                      placeholder="Contraseña"
+                      value={contrasenia}
+                      onChange={(e) => setContrasenia(e.target.value)}
+                      maxLength={25}
+                      minLength={4}
+                      required
                     />
-                  ) : (
-                    <BsEye
-                      className="iconoIngreso"
-                      onClick={togglePasswordVisibility}
-                    />
-                  )}
+                    {showPassword ? (
+                      <BsEyeSlash
+                        className="iconoIngreso"
+                        onClick={togglePasswordVisibility}
+                      />
+                    ) : (
+                      <BsEye
+                        className="iconoIngreso"
+                        onClick={togglePasswordVisibility}
+                      />
+                    )}
+                  </div>
                 </div>
+
                 <p className="linkRecuperar">¿Olvidaste tu contraseña?</p>
                 <button type="submit" className="botonVerde">
                   Iniciar sesión
@@ -95,7 +112,6 @@ const Login: React.FC = () => {
         </div>
         <ToastContainer />
       </div>
-      <Footer />
     </div>
   );
 };

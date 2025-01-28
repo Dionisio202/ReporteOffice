@@ -12,10 +12,10 @@ const App = () => {
     <main className="flex-grow p-6 space-y-4">
     <Router>
       <Routes>
-        <Route path="/" element={<GestorReportes />} />
-        <Route path="/GestorDocumentos" element={<GestorDocumentos />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/GestorDocumento" element={<GestorDocumentos />} />
         <Route path="/ReporteEditor" element={<ReporteEditor />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/GestorReporte" element={<GestorReportes />} />
       </Routes>
     </Router>
     </main>

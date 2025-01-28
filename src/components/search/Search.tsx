@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Search = ({ search, setSearch, year, setYear }) => {
   return (
     <div className="col-span-9 flex flex-col">
