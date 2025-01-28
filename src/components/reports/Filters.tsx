@@ -1,10 +1,25 @@
 import React from "react";
 
-const Filters: React.FC = () => {
+const Filters = ({ documentType, handleTypeChange }) => {
   return (
-    <div className="bg-gray-100 p-4 rounded shadow">
-      <h3 className="text-lg font-bold mb-2">Filtros</h3>
-      <p className="text-sm">Aquí puedes aplicar los filtros para tus reportes.</p>
+    <div className="bg-white p-4 rounded-lg shadow-md border border-gray-300">
+      <h2 className="text-lg font-semibold text-gray-700 mb-4">Tipo de Documento</h2>
+      <div className="space-y-3">
+        {Object.keys(documentType).map((type) => (
+          <div key={type} className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id={type}
+              checked={documentType[type]}
+              onChange={() => handleTypeChange(type)}
+              className="h-5 w-5 border-gray-300 text-blue-500 focus:ring-blue-500"
+            />
+            <label htmlFor={type} className="text-sm text-gray-600">
+              {type}
+            </label>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

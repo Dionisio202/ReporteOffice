@@ -1,9 +1,10 @@
+import './reporte_editor.css';
 import React from 'react';
-import './index.css';
-
-function App() {
+const ReporteEditor:React.FC = () => {
   return (
+
     <div className="flex min-h-screen bg-gray-100">
+      
       {/* Sección del Formulario */}
       <div className="w-1/3 p-6 bg-white shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-blue-600">Formulario</h2>
@@ -71,4 +72,4 @@ function App() {
   );
 }
 
-export default App;
+export default ReporteEditor;
