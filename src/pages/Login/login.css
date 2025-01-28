@@ -64,7 +64,7 @@
   align-items: center;
   text-align: center;
   margin-bottom: 25px;
-  color: #16a085; /* Color verde turquesa más vibrante */
+  color: #931D21; /* Color verde turquesa más vibrante */
 }
 
 .encabezadoLoguin img {
@@ -102,7 +102,7 @@
 }
 
 .formularioLoguin form input:focus {
-  border-color: #16a085; /* Borde verde vibrante */
+  border-color: #931D21; /* Borde verde vibrante */
   box-shadow: 0 0 8px rgba(22, 160, 133, 0.3);
   background-color: #ffffff; /* Fondo blanco cuando está enfocado */
 }
@@ -128,7 +128,7 @@
 }
 
 .formularioLoguin form p:hover {
-  color: #16a085; /* Cambio de color en hover */
+  color: #931D21; /* Cambio de color en hover */
   transform: scale(1.05);
 }
 
@@ -136,7 +136,7 @@
 .botonVerde {
   width: 100%;
   padding: 12px 18px;
-  background-color: #16a085; /* Fondo verde vibrante */
+  background-color: #931D21; /* Fondo verde vibrante */
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -147,7 +147,7 @@
 }
 
 .botonVerde:hover {
-  background-color: #1abc9c; /* Fondo más oscuro en hover */
+  background-color: #931D21; /* Fondo más oscuro en hover */
 }
 
 /* Estilo para la opción de registrarse */
@@ -165,7 +165,7 @@
 }
 
 .registrate .palabra:hover {
-  color: #16a085; /* Cambio de color en hover */
+  color: #931D21; /* Cambio de color en hover */
   transform: scale(1.1);
 }
 
@@ -188,4 +188,6 @@
   .formularioLoguin {
     padding: 0;
   }
+ 
+
 }

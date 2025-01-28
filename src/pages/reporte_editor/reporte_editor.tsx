@@ -7,7 +7,7 @@ const ReporteEditor:React.FC = () => {
       
 
       <div className="w-1/3 p-6 bg-white shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-blue-600">Formulario</h2>
+        <h2 className="text-2xl font-bold mb-6 text-black-600">Formulario</h2>
         <form>
           <div className="mb-4">
             <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
@@ -44,8 +44,8 @@ const ReporteEditor:React.FC = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
-          >
+            className="w-full bg-[#931D21] text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition"
+            >
             Enviar
           </button>
         </form>
@@ -54,7 +54,7 @@ const ReporteEditor:React.FC = () => {
       {/* Sección del Documento */}
       <div className="w-2/3 p-6 bg-gray-50 flex items-center justify-center">
         <div className="w-full h-full border border-gray-300 shadow-md bg-white p-4">
-          <h2 className="text-2xl font-bold text-blue-600 mb-4">Vista Previa del Documento</h2>
+          <h2 className="text-2xl font-bold text-black-600 mb-4">Vista Previa del Documento</h2>
           {/* Mostrar el documento usando Microsoft Office Viewer */}
           <iframe
             src="https://view.officeapps.live.com/op/view.aspx?src=https://ruta-completa-a-tu-documento.docx"

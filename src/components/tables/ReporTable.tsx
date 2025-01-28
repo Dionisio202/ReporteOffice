@@ -41,7 +41,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ filters }) => {
     <div className="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-300">
       <table className="w-full table-auto border-collapse">
         <thead>
-          <tr className="bg-gray-300 text-gray-800">
+          <tr className="bg-[#931D21] text-white text-sm font-semibold">
             <th className="px-6 py-3 text-left text-sm font-medium">Nombre</th>
             <th className="px-6 py-3 text-left text-sm font-medium">Periodo</th>
             <th className="px-2 py-3 text-left text-sm font-medium">Acciones</th>
@@ -96,7 +96,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ filters }) => {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 disabled:opacity-50 transition duration-200"
+            className="flex items-center px-4 py-2 bg-[#931D21] text-white text-sm font-medium rounded-lg hover:bg-[#931D21] disabled:opacity-50 transition duration-200"
           >
             <span className="mr-2">Anterior</span>
           </button>
@@ -108,7 +108,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ filters }) => {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 disabled:opacity-50 transition duration-200"
+            className="flex items-center px-4 py-2 bg-[#931D21] text-white text-sm font-medium rounded-lg hover:bg-[#931D21] disabled:opacity-50 transition duration-200"
           >
             <span className="ml-2">Siguiente</span>
           </button>

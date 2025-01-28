@@ -119,7 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onFilterChange }) => {
       {/* Botón para limpiar el filtro */}
       <button
         onClick={clearFilters}
-        className="w-full p-2 bg-blue-500 text-white text-sm font-medium rounded-lg shadow-md hover:bg-red-600 transition duration-300 flex justify-center items-center"
+        className="w-full p-2 bg-[#931D21] text-white text-sm font-medium rounded-lg shadow-md hover:bg-gray-400 transition duration-300 flex justify-center items-center"
       >
         <FaTimesCircle className="mr-2 w-5 h-5" /> Limpiar Filtro
       </button>
@@ -148,7 +148,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onFilterChange }) => {
         {/* Botón para generar el reporte */}
         <button
           disabled={!selectedAction} // Deshabilitar si no hay acción seleccionada
-          className={`w-full p-3 ${selectedAction ? "bg-green-500" : "bg-gray-300"} text-white rounded-lg shadow-md hover:bg-green-600 transition duration-300 flex justify-center items-center`}
+          className={`w-full p-3 ${selectedAction ? "bg-[#931D21]" : "bg-gray-300"} text-white rounded-lg shadow-md hover:bg-[#931D21] transition duration-300 flex justify-center items-center`}
         >
           <FaFileDownload className="mr-2 w-5 h-5" /> Generar Reporte
         </button>

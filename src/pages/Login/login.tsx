@@ -56,6 +56,7 @@ const Login: React.FC = () => {
             <div className="formularioLoguin">
               <form onSubmit={handleSubmit}>
                 <div className="contenedorIngreso">
+                 
                   <input
                     type="email"
                     id="correo"
@@ -98,15 +99,11 @@ const Login: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="linkRecuperar">¿Olvidaste tu contraseña?</p>
                 <button type="submit" className="botonVerde">
                   Iniciar sesión
                 </button>
               </form>
-              <div className="registrate">
-                <p>No tienes cuenta?</p>
-                Regístrate!!
-              </div>
+              
             </div>
           </div>
         </div>

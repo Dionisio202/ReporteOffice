@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom"; // Importamos el hook useNavigat
 import Search from "../../components/search/Search";
 import Filters from "../../components/reports/Filters";
 
+import { FaEye, FaEdit, FaDownload } from "react-icons/fa";
+
 const GestorDocumentos = () => {
   const navigate = useNavigate(); // Inicializamos el hook useNavigate
 
   const [search, setSearch] = useState("");
   const [year, setYear] = useState("2025");
-  const [documentType, setDocumentType] = useState({ PEDI: false, PAC: false, POA: false, Todos: true});
+  const [documentType, setDocumentType] = useState({ PEDI: false, PAC: false, POA: false, Todos: true });
 
   const documentos = [
     { nombre: "POA 2025-signed-signed", año: "2025", tipo: "POA" },
@@ -29,7 +31,7 @@ const GestorDocumentos = () => {
       (documentType["Todos"] || documentType[doc.tipo]) // Si "Todos" está marcado, no se filtra por tipo
   );
 
-  
+
   const handleEdit = () => {
     navigate("/ReporteEditor");
   };
@@ -43,12 +45,12 @@ const GestorDocumentos = () => {
       <div className="flex items-center justify-between w-full">
         <button
           onClick={handleHome}
-          className="text-blue-600 hover:underline text-sm"
+          className="bg-[#931D21] text-white rounded-lg shadow-md overflow-x-auto mb-6"
         >
           &lt; Volver
         </button>
         <h1 className="text-3xl font-semibold text-center text-gray-800 my-6 tracking-wide shadow-sm w-full">
-         DOCUMENTOS DINNOVA
+          DOCUMENTOS DINNOVA
         </h1>
       </div>
 
@@ -67,7 +69,7 @@ const GestorDocumentos = () => {
           <div className="bg-white rounded-lg shadow-md overflow-x-auto mb-6">
             <table className="w-full table-auto border-separate border-spacing-0">
               <thead>
-                <tr className="bg-gray-200 text-gray-600 text-sm font-semibold">
+                <tr className="bg-[#931D21] text-white text-sm font-semibold">
                   <th className="py-3 px-6 text-left">Nombre</th>
                   <th className="py-3 px-6 text-left">Año</th>
                   <th className="py-3 px-6 text-left">Tipo</th>
@@ -87,23 +89,22 @@ const GestorDocumentos = () => {
                       <td className="py-3 px-6 text-center">
                         <div className="flex items-center justify-center space-x-3">
                           <button
-                            className="text-blue-500 hover:text-blue-700"
                             title="Ver"
+                            className="text-blue-500 hover:text-blue-700 flex items-center space-x-2 py-1 px-3 rounded-md hover:bg-blue-50 transition duration-200"
                           >
-                            👁️
+                            <FaEye className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={handleEdit} 
-                            className="text-yellow-500 hover:text-yellow-700"
                             title="Editar"
+                            className="text-yellow-500 hover:text-yellow-700 flex items-center space-x-2 py-1 px-3 rounded-md hover:bg-yellow-50 transition duration-200"
                           >
-                            ✏️
+                            <FaEdit className="w-4 h-4" />
                           </button>
                           <button
-                            className="text-green-500 hover:text-green-700"
                             title="Descargar"
+                            className="text-green-500 hover:text-green-700 flex items-center space-x-2 py-1 px-3 rounded-md hover:bg-green-50 transition duration-200"
                           >
-                            ⬇️
+                            <FaDownload className="w-4 h-4" />
                           </button>
                         </div>
                       </td>

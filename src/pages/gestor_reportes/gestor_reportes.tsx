@@ -17,8 +17,8 @@ const GestorReportes = () => {
       <div className="flex items-center justify-between w-full">
         <button
           onClick={handleHome}
-          className="text-blue-600 hover:underline text-sm"
-        >
+          className="bg-[#931D21] text-white rounded-lg shadow-md overflow-x-auto mb-6"
+          >
           &lt; Volver
         </button>
         <h1 className="text-3xl font-semibold text-center text-gray-800 my-6 tracking-wide shadow-sm w-full">
