@@ -96,6 +96,7 @@ const GestorDocumentos = () => {
                           </button>
                           <button
                             title="Editar"
+                            onClick={handleEdit}
                             className="text-yellow-500 hover:text-yellow-700 flex items-center space-x-2 py-1 px-3 rounded-md hover:bg-yellow-50 transition duration-200"
                           >
                             <FaEdit className="w-4 h-4" />
