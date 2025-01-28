@@ -1,7 +1,32 @@
 import React from 'react';
+import { DocumentEditor } from '@onlyoffice/document-editor-react';
 import './index.css';
 
-function App() {
+function onDocumentReady(event: any) {
+  console.log('Documento cargado correctamente', event);
+}
+
+function onLoadComponentError(errorCode: any, errorDescription: any) {
+  console.error('Error al cargar el componente');
+  switch (errorCode) {
+    case -1: // Unknown error loading component
+      console.error('Error desconocido:', errorDescription);
+      break;
+
+    case -2: // Error loading DocsAPI from the document server
+      console.error('Error al cargar DocsAPI desde el servidor de documentos:', errorDescription);
+      break;
+
+    case -3: // DocsAPI is not defined
+      console.error('DocsAPI no está definido:', errorDescription);
+      break;
+
+    default:
+      console.error(`Código de error no manejado (${errorCode}):`, errorDescription);
+  }
+}
+
+export default function App() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sección del Formulario */}
@@ -54,21 +79,27 @@ function App() {
       <div className="w-2/3 p-6 bg-gray-50 flex items-center justify-center">
         <div className="w-full h-full border border-gray-300 shadow-md bg-white p-4">
           <h2 className="text-2xl font-bold text-blue-600 mb-4">Vista Previa del Documento</h2>
-          {/* Mostrar el documento usando Microsoft Office Viewer */}
-          <iframe
-            src="https://view.officeapps.live.com/op/view.aspx?src=https://ruta-completa-a-tu-documento.docx"
-            className="w-full h-full border rounded-md"
-            title="Vista del Documento Word"
-            onError={(e) => {
-              const target = e.target as HTMLIFrameElement; // Cast explícito al tipo correcto
-              target.style.display = 'none';
-              alert('No se pudo cargar el documento. Intenta con un archivo PDF o un enlace válido.');
+          <DocumentEditor
+            id="docxEditor"
+            documentServerUrl="http://localhost"
+            config={{
+              document: {
+                fileType: 'docx',
+                key: 'unique-document-key',
+                title: 'Documento de Prueba.docx',
+                url: 'http://host.docker.internal:3000/api/document',
+              },
+              documentType: 'word',
+              editorConfig: {
+                mode: 'edit',
+                callbackUrl: 'http://host.docker.internal:3000/api/save-document',
+              },
             }}
-          ></iframe>
+            events_onDocumentReady={onDocumentReady}
+            onLoadComponentError={onLoadComponentError}
+          />
         </div>
       </div>
     </div>
   );
 }
-
-export default App;
