@@ -5,7 +5,7 @@ const ReporteEditor:React.FC = () => {
 
     <div className="flex min-h-screen bg-gray-100">
       
-      {/* Sección del Formulario */}
+
       <div className="w-1/3 p-6 bg-white shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-blue-600">Formulario</h2>
         <form>
