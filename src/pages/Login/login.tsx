@@ -1,16 +1,18 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom"; // Importa useNavigate
-import "./login.css";
+import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
+import "./login.css"; // Asegúrate de que tienes el archivo de estilo correspondiente
+
+const socket = io("http://192.168.95.55:3001"); // Asegúrate de que la URL coincida con tu backend
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [correo, setCorreo] = useState("");
-  const [contrasenia, setContrasenia] = useState("");
-
-  const navigate = useNavigate(); // Usa useNavigate para redireccionar
+  const [email, setEmail] = useState("");  // Campo de correo actualizado a 'email'
+  const [password, setPassword] = useState("");  // Campo de contraseña
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -19,96 +21,98 @@ const Login: React.FC = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    // Correo y contraseña estáticos
-    const correoEstatico = "usuario@dinnova.com";
-    const contraseniaEstatica = "admin123";
-
-    if (!correo || !contrasenia) {
+    // Verificación de que el email y la contraseña no estén vacíos
+    if (!email || !password) {
       toast.error("Por favor, completa todos los campos.");
       return;
     }
 
-    // Validación con los valores estáticos
-    if (correo === correoEstatico && contrasenia === contraseniaEstatica) {
-      toast.success("Inicio de sesión exitoso!");
-      // Redirige a otra página después del login exitoso
-      navigate("/GestorDocumento");
-    } else {
-      toast.error("Correo o contraseña incorrectos.");
-    }
-
-    console.log("Correo:", correo);
-    console.log("Contraseña:", contrasenia);
+    // Emitir evento de login al backend con los datos del email y la contraseña
+    socket.emit("login", { email, password });
   };
 
+  useEffect(() => {
+    // Escuchar evento de éxito de login
+    socket.on("login_success", (data) => {
+      toast.success("Inicio de sesión exitoso!");
+      localStorage.setItem("token", data.token); // Guardar el token para futuras peticiones
+      localStorage.setItem("expiresAt", data.expiresAt); // Guardar la expiración del token
+      navigate("/GestorDocumento"); // Redirige al gestor de documentos o la página privada
+    });
+
+    // Escuchar evento de error de login
+    socket.on("login_error", (message) => {
+      toast.error(message);
+    });
+
+    // Limpiar la suscripción al desmontar el componente
+    return () => {
+      socket.off("login_success");
+      socket.off("login_error");
+    };
+  }, [navigate]); // Dependencia para que el efecto se ejecute solo una vez al montar
+
   return (
-    <div>
-      <div className="contenedorPrincipal">
-        <div className="contenedorLoguin">
-          <div className="portadasLoguin">
-            <div className="porta"></div>
+    <div className="contenedorPrincipal">
+      <div className="contenedorLoguin">
+        <div className="portadasLoguin">
+          <div className="porta"></div>
+        </div>
+        <div className="contenedorFormularioLoguin">
+          <div className="encabezadoLoguin">
+            <img src="../../assets/img/logoUTA.png" alt="Logo DINNOVA" />
+            <h1>Bienvenido a DINNOVA</h1>
           </div>
-          <div className="contenedorFormularioLoguin">
-            <div className="encabezadoLoguin">
-              <img src="../../assets/img/logoUTA.png" alt="Logo DINNOVA" />
-              <h1>Bienvenido a DINNOVA</h1>
-            </div>
-            <div className="formularioLoguin">
-              <form onSubmit={handleSubmit}>
-                <div className="contenedorIngreso">
-                 
+          <div className="formularioLoguin">
+            <form onSubmit={handleSubmit}>
+              {/* Campo de email */}
+              <div className="contenedorIngreso">
+                <input
+                  type="email"  // Asegúrate de que el tipo sea email para validación automática
+                  id="email"  // Cambié 'correo' por 'email'
+                  name="email"  // Cambié 'correo' por 'email'
+                  className="ingreso"
+                  placeholder="Correo"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  maxLength={50}
+                  minLength={4}
+                  required
+                />
+              </div>
+
+              {/* Campo de contraseña */}
+              <div className="contenedorIngreso">
+                <div className="campoContrasena">
                   <input
-                    type="email"
-                    id="correo"
-                    name="correo"
+                    type={showPassword ? "text" : "password"}
+                    id="password"  // Cambié 'contrasenia' por 'password'
+                    name="password"  // Cambié 'contrasenia' por 'password'
                     className="ingreso"
-                    placeholder="Correo"
-                    value={correo}
-                    onChange={(e) => setCorreo(e.target.value)}
-                    maxLength={50}
+                    placeholder="Contraseña"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    maxLength={25}
                     minLength={4}
                     required
                   />
+                  {showPassword ? (
+                    <BsEyeSlash className="iconoIngreso" onClick={togglePasswordVisibility} />
+                  ) : (
+                    <BsEye className="iconoIngreso" onClick={togglePasswordVisibility} />
+                  )}
                 </div>
+              </div>
 
-                <div className="contenedorIngreso">
-                  <div className="campoContrasena">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      id="contrasenia"
-                      name="contrasenia"
-                      className="ingreso"
-                      placeholder="Contraseña"
-                      value={contrasenia}
-                      onChange={(e) => setContrasenia(e.target.value)}
-                      maxLength={25}
-                      minLength={4}
-                      required
-                    />
-                    {showPassword ? (
-                      <BsEyeSlash
-                        className="iconoIngreso"
-                        onClick={togglePasswordVisibility}
-                      />
-                    ) : (
-                      <BsEye
-                        className="iconoIngreso"
-                        onClick={togglePasswordVisibility}
-                      />
-                    )}
-                  </div>
-                </div>
-
-                <button type="submit" className="botonVerde">
-                  Iniciar sesión
-                </button>
-              </form>
-              
-            </div>
+              {/* Botón de submit */}
+              <button type="submit" className="botonVerde">
+                Iniciar sesión
+              </button>
+            </form>
           </div>
         </div>
-        <ToastContainer />
       </div>
+      <ToastContainer />
     </div>
   );
 };
