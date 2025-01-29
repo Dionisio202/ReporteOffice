@@ -1,40 +1,38 @@
 import React, { useState } from "react";
-import { FaEye, FaEdit, FaDownload } from "react-icons/fa"; // Importamos los iconos de Font Awesome
+import Modal from "react-modal";
+import { FaEye, FaEdit, FaDownload } from "react-icons/fa";
+import { Document, Page, pdfjs } from "react-pdf";
 
-interface ReportTableProps {
-  filters: string[]; // Recibimos los filtros como prop
-}
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-const ReportTable: React.FC<ReportTableProps> = ({ filters }) => {
+const ReportTable = () => {
   const reports = [
-    { name: "Reporte_Trimestre1", period: "T1" },
-    { name: "Reporte_Trimestre2", period: "T2" },
-    { name: "Reporte_Trimestre3", period: "T3" },
-    { name: "Reporte_Semestre1", period: "S1" },
-    { name: "Reporte_Semestre2", period: "S2" },
-    { name: "Reporte_Trimestre4", period: "T4" },
-    { name: "Reporte_Trimestre5", period: "T5" },
-    { name: "Reporte_Trimestre6", period: "T6" },
-    { name: "Reporte_Trimestre7", period: "T7" },
-    { name: "Reporte_Trimestre8", period: "T8" },
-    // Agrega más datos si es necesario
+    { name: "Reporte_Trimestre1", period: "T1", file: "/sample.pdf" },
+    { name: "Reporte_Trimestre2", period: "T2", file: "/sample.pdf" },
   ];
 
-  const reportsPerPage = 5; // Número de reportes por página
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
-  // Filtramos los informes basados en los filtros seleccionados
-  const filteredReports = reports.filter((report) =>
-    filters.length > 0 ? filters.includes(report.period) : true
-  );
+  const handlePreview = (report) => {
+    setSelectedReport(report);
+    setIsPreviewOpen(true);
+  };
 
-  const totalPages = Math.ceil(filteredReports.length / reportsPerPage); // Total de páginas
+  const handleEdit = (report) => {
+    setSelectedReport(report);
+    setIsEditOpen(true);
+  };
 
-  const startIndex = (currentPage - 1) * reportsPerPage;
-  const currentReports = filteredReports.slice(startIndex, startIndex + reportsPerPage);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  const handleDownload = (report) => {
+    const link = document.createElement("a");
+    link.href = report.file;
+    link.download = report.name + ".pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -48,89 +46,50 @@ const ReportTable: React.FC<ReportTableProps> = ({ filters }) => {
           </tr>
         </thead>
         <tbody>
-          {currentReports.length > 0 ? (
-            currentReports.map((report, index) => (
-              <tr
-                key={index}
-                className="border-t hover:bg-gray-50 transition duration-300"
-              >
-                <td className="px-6 py-4 text-sm font-medium text-gray-800">{report.name}</td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-800">{report.period}</td>
-                <td className="px-2 py-4">
-                  <div className="flex space-x-2 justify-center">
-                    <button
-                      title="Ver"
-                      className="text-blue-500 hover:text-blue-700 flex items-center space-x-2 py-1 px-3 rounded-md hover:bg-blue-50 transition duration-200"
-                    >
-                      <FaEye className="w-4 h-4" />
-                    </button>
-                    <button
-                      title="Editar"
-                      className="text-yellow-500 hover:text-yellow-700 flex items-center space-x-2 py-1 px-3 rounded-md hover:bg-yellow-50 transition duration-200"
-                    >
-                      <FaEdit className="w-4 h-4" />
-                    </button>
-                    <button
-                      title="Descargar"
-                      className="text-green-500 hover:text-green-700 flex items-center space-x-2 py-1 px-3 rounded-md hover:bg-green-50 transition duration-200"
-                    >
-                      <FaDownload className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={3} className="px-6 py-4 text-center text-gray-500 text-sm">
-                No se encontraron informes para los períodos seleccionados.
+          {reports.map((report) => (
+            <tr key={report.name} className="border-t hover:bg-gray-50">
+              <td className="px-6 py-4 text-sm font-medium">{report.name}</td>
+              <td className="px-6 py-4 text-sm font-medium">{report.period}</td>
+              <td className="px-2 py-4 flex space-x-2">
+                <button
+                  onClick={() => handlePreview(report)}
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  <FaEye />
+                </button>
+                <button
+                  onClick={() => handleEdit(report)}
+                  className="text-yellow-500 hover:text-yellow-700"
+                >
+                  <FaEdit />
+                </button>
+                <button
+                  onClick={() => handleDownload(report)}
+                  className="text-green-500 hover:text-green-700"
+                >
+                  <FaDownload />
+                </button>
               </td>
             </tr>
-          )}
+          ))}
         </tbody>
       </table>
 
-      {/* Paginador Mejorado */}
-      <div className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="flex items-center px-4 py-2 bg-[#931D21] text-white text-sm font-medium rounded-lg hover:bg-[#931D21] disabled:opacity-50 transition duration-200"
-          >
-            <span className="mr-2">Anterior</span>
-          </button>
+      {/* Modal de Previsualización */}
+      <Modal isOpen={isPreviewOpen} onRequestClose={() => setIsPreviewOpen(false)}>
+        <h2>Previsualización: {selectedReport?.name}</h2>
+        <Document file={selectedReport?.file}>
+          <Page pageNumber={1} />
+        </Document>
+        <button onClick={() => setIsPreviewOpen(false)}>Cerrar</button>
+      </Modal>
 
-          <span className="text-sm text-gray-600">
-            Página {currentPage} de {totalPages}
-          </span>
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="flex items-center px-4 py-2 bg-[#931D21] text-white text-sm font-medium rounded-lg hover:bg-[#931D21] disabled:opacity-50 transition duration-200"
-          >
-            <span className="ml-2">Siguiente</span>
-          </button>
-        </div>
-
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => handlePageChange(1)}
-            disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50 transition duration-200"
-          >
-            Primero
-          </button>
-          <button
-            onClick={() => handlePageChange(totalPages)}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50 transition duration-200"
-          >
-            Último
-          </button>
-        </div>
-      </div>
+      {/* Modal de Edición */}
+      <Modal isOpen={isEditOpen} onRequestClose={() => setIsEditOpen(false)}>
+        <h2>Editar Reporte</h2>
+        <input type="text" defaultValue={selectedReport?.name} className="border p-2" />
+        <button onClick={() => setIsEditOpen(false)}>Guardar</button>
+      </Modal>
     </div>
   );
 };
