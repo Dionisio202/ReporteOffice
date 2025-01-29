@@ -10,6 +10,8 @@ const GestorDocumentos = () => {
   const [year, setYear] = useState("2025");
   const [documentType, setDocumentType] = useState({ PEDI: false, PAC: false, POA: false, Todos: true });
   const [downloadDropdown, setDownloadDropdown] = useState(null);
+  const [showModal, setShowModal] = useState(false);  // Estado para manejar el modal
+  const [currentDoc, setCurrentDoc] = useState(null);  // Estado para almacenar el documento actual
 
   const documentos = [
     { nombre: "POA 2025-signed-signed", año: "2025", tipo: "POA" },
@@ -56,6 +58,18 @@ const GestorDocumentos = () => {
     navigate("/");
   };
 
+  // Maneja la apertura del modal para ver el archivo
+  const handleView = (doc) => {
+    setCurrentDoc(doc);
+    setShowModal(true);
+  };
+
+  // Cierra el modal
+  const closeModal = () => {
+    setShowModal(false);
+    setCurrentDoc(null);
+  };
+
   return (
     <div className="p-6 bg-gray-50">
       <div className="flex items-center justify-between w-full">
@@ -98,7 +112,7 @@ const GestorDocumentos = () => {
                       <td className="py-3 px-6 text-left">{doc.tipo}</td>
                       <td className="py-3 px-6 text-center relative">
                         <div className="flex items-center justify-center space-x-3">
-                          <button title="Ver" className="text-blue-500 hover:text-blue-700">
+                          <button title="Ver" className="text-blue-500 hover:text-blue-700" onClick={() => handleView(doc)}>
                             <FaEye className="w-4 h-4" />
                           </button>
                           <button title="Editar" onClick={handleEdit} className="text-yellow-500 hover:text-yellow-700">
@@ -132,6 +146,17 @@ const GestorDocumentos = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal para ver el archivo */}
+      {showModal && currentDoc && (
+        <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg max-w-4xl w-full">
+            <button onClick={closeModal} className="absolute top-2 right-2 text-red-500">Cerrar</button>
+            <h2 className="text-xl font-semibold mb-4">Vista Previa del Documento</h2>
+            <iframe src={currentDoc.archivo} width="100%" height="600px" title="Document Preview"></iframe>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
