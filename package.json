@@ -16,8 +16,11 @@
     "@mui/styles": "^6.4.1",
     "@react-pdf-viewer/core": "^3.12.0",
     "@tailwindcss/vite": "^4.0.0",
+    "docxtemplater": "^3.58.4",
     "file-saver": "^2.0.5",
+    "jspdf": "^2.5.2",
     "mammoth": "^1.9.0",
+    "pizzip": "^3.1.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.4.0",
@@ -27,11 +30,8 @@
     "react-select": "^5.10.0",
     "react-table": "^7.8.0",
     "react-toastify": "^11.0.3",
-<<<<<<< HEAD
-    "socket.io-client": "^4.8.1"
-=======
+    "socket.io-client": "^4.8.1",
     "xlsx": "^0.18.5"
->>>>>>> 388469ab66626b830672c10a46950e021e3229e8
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
