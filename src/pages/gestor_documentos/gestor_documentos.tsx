@@ -1,19 +1,21 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; 
 import { useNavigate } from "react-router-dom";
 import Search from "../../components/search/Search";
 import Filters from "../../components/reports/Filters";
-import { FaEye, FaEdit, FaDownload } from "react-icons/fa";
+import Format from "../../components/reports/Format";
+import { FaEye, FaTrash, FaDownload } from "react-icons/fa";
 import { jsPDF } from "jspdf";
 
 const GestorDocumentos = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [year, setYear] = useState("2025");
-  const [documentType, setDocumentType] = useState({ PEDI: false, PAC: false, POA: false, Todos: false });
+  const [documentType, setDocumentType] = useState({ POA: false });
   const [showModal, setShowModal] = useState(false);  
   const [currentDoc, setCurrentDoc] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // Para mostrar el contenedor de confirmación
 
-  const documentos = [
+  const [documentos, setDocumentos] = useState([
     { nombre: "POA 2025-signed-signed", año: "2025", tipo: "POA" },
     { nombre: "Reporte Anual 2024", año: "2025", tipo: "POA" },
     { nombre: "Informe PEDI 2025", año: "2025", tipo: "PEDI" },
@@ -21,15 +23,14 @@ const GestorDocumentos = () => {
     {
       nombre: "Emprendimiento",
       año: "2025",
-      tipo: "POA",
-      archivo: "https://drive.google.com/file/d/1IPNeP3N_Hdr9CXahd3AQ8gn_cpkZz2jZ/preview"
+      tipo: "POA"
     }
-  ];
+  ]);
 
   const resetFilters = () => {
     setSearch("");
     setYear("2025");
-    setDocumentType({ PEDI: false, PAC: false, POA: false, Todos: false });
+    setDocumentType({ POA: false });
   };
 
   const handleTypeChange = () => {
@@ -45,22 +46,43 @@ const GestorDocumentos = () => {
       (documentType["Todos"] || documentType[doc.tipo])
   );
 
-  const getDriveDownloadLink = (fileUrl) => {
-    const fileIdMatch = fileUrl.match(/[-\w]{25,}/);
-    if (fileIdMatch) {
-      const fileId = fileIdMatch[0];
-      return `https://drive.google.com/uc?export=download&id=${fileId}`;
+  const handleDownload = () => {
+    if (currentDoc) {
+      const doc = new jsPDF();
+      
+      const content = document.getElementById("format-content");
+  
+      // Verificar si el contenido existe, de lo contrario, se generará un PDF vacío
+      if (content) {
+        // Usamos el método html() para capturar el contenido visual del modal
+        doc.html(content, {
+          callback: function (doc) {
+            doc.save(`${currentDoc.nombre}.pdf`);
+          },
+          margin: [10, 10, 10, 10], // Márgenes del documento
+          autoPaging: true, // Paginación automática
+          x: 10,
+          y: 10,
+        });
+      } else {
+        // Si no se encontró el contenido, generamos un PDF vacío con el nombre
+        doc.text(`Documento: ${currentDoc.nombre}`, 10, 10); // Esto asegura que se descargue el archivo vacío
+        doc.save(`${currentDoc.nombre}.pdf`);
+      }
+    } else {
+      console.log("No se ha seleccionado un documento para descargar.");
     }
-    return fileUrl;
   };
+  
+  
+  
+  
+  
 
-  const handleDownload = (doc) => {
-    const filePath = getDriveDownloadLink(doc.archivo);
-    window.location.href = filePath;
-  };
-
-  const handleEdit = () => {
-    navigate("/ReporteEditor");
+  const handleDelete = () => {
+    // Filtramos el documento eliminado de la lista de documentos
+    setDocumentos(documentos.filter(d => d.nombre !== currentDoc.nombre));
+    setShowDeleteConfirm(false); // Cerramos el contenedor de confirmación
   };
 
   const handleHome = () => {
@@ -72,13 +94,19 @@ const GestorDocumentos = () => {
   };
 
   const handleView = (doc) => {
-    setCurrentDoc(doc);
-    setShowModal(true);
-  };
+  console.log(doc);  // Verifica si el documento es el correcto
+  setCurrentDoc(doc);
+  setShowModal(true);
+};
+
 
   const closeModal = () => {
     setShowModal(false);
     setCurrentDoc(null);
+  };
+
+  const closeDeleteConfirm = () => {
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -130,13 +158,13 @@ const GestorDocumentos = () => {
                           <button title="Ver" className="text-blue-500 hover:text-blue-700" onClick={() => handleView(doc)}>
                             <FaEye className="w-4 h-4" />
                           </button>
-                          <button title="Editar" onClick={handleEdit} className="text-yellow-500 hover:text-yellow-700">
-                            <FaEdit className="w-4 h-4" />
+                          <button title="Eliminar" onClick={() => { setCurrentDoc(doc); setShowDeleteConfirm(true); }} className="text-red-500 hover:text-red-700">
+                            <FaTrash className="w-4 h-4" />
                           </button>
                           <button
                             title="Descargar"
                             className="text-green-500 hover:text-green-700"
-                            onClick={() => handleDownload(doc)}
+                            onClick={handleDownload}
                           >
                             <FaDownload className="w-4 h-4" />
                           </button>
@@ -155,12 +183,30 @@ const GestorDocumentos = () => {
         </div>
       </div>
 
-      {showModal && currentDoc && (
-        <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg max-w-4xl w-full">
-            <button onClick={closeModal} className="absolute top-2 right-2 text-red-500">Cerrar</button>
-            <h2 className="text-xl font-semibold mb-4">Vista Previa del Documento</h2>
-            <iframe src={currentDoc.archivo} width="100%" height="600px" title="Document Preview"></iframe>
+      {/* Modal para visualizar el formato */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg w-2/3 max-w-4xl">
+            <button onClick={closeModal} className="absolute top-2 right-2 text-red-500 text-lg">
+              X
+            </button>
+            {/* Asignamos el ID para capturar el contenido */}
+            <div id="format-content">
+              <Format doc={currentDoc} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contenedor de confirmación de eliminación */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg w-1/3">
+            <p className="text-gray-800 mb-4">¿Estás seguro de que deseas eliminar el documento: {currentDoc?.nombre}?</p>
+            <div className="flex justify-between">
+              <button onClick={handleDelete} className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600">Eliminar</button>
+              <button onClick={closeDeleteConfirm} className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600">Cancelar</button>
+            </div>
           </div>
         </div>
       )}
