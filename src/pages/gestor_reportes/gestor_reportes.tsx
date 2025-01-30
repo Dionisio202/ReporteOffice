@@ -2,7 +2,10 @@ import Sidebar from "../../components/sidebar/slidebar";
 import ReportTable from "../../components/tables/ReporTable";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-const GestorReportes = () => {
+interface Filters {
+  filters: string[];
+}
+const GestorReportes: React.FC = () => {
   const [filters, setFilters] = useState<string[]>([]);
   const navigate = useNavigate();
   const handleFilterChange = (selectedPeriods: string[]) => {

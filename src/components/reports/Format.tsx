@@ -90,7 +90,7 @@ const Format = () => {
               </tr>
             ))
           ) : (
-            <tr>
+            <tr>a
               <td colSpan="12" className="text-center py-4 text-gray-500">⌛ Cargando actividad...</td>
             </tr>
           )}

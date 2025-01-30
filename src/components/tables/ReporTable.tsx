@@ -1,32 +1,42 @@
-import React, { useState } from "react";
-import Modal from "react-modal";
-import { FaEye, FaEdit, FaDownload } from "react-icons/fa";
-import { Document, Page, pdfjs } from "react-pdf";
+import React from "react";
+import { FaEdit, FaDownload } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// Definir la interfaz para los objetos report
+interface Report {
+  id: number;
+  name: string;
+  period: string;
+  file: string;
+}
 
-const ReportTable = () => {
-  const reports = [
-    { name: "Reporte_Trimestre1", period: "T1", file: "/sample.pdf" },
-    { name: "Reporte_Trimestre2", period: "T2", file: "/sample.pdf" },
+// Definir las propiedades del componente para recibir filtros
+interface ReportTableProps {
+  filters: string[];
+}
+
+const ReportTable: React.FC<ReportTableProps> = ({ filters }) => {
+  // Reportes de ejemplo
+  const reports: Report[] = [
+    { id: 1, name: "Reporte_Trimestre1", period: "T1", file: "/sample.pdf" },
+    { id: 2, name: "Reporte_Trimestre2", period: "T2", file: "/sample.pdf" },
+    { id: 3, name: "Reporte_Trimestre3", period: "T3", file: "/sample.pdf" },
+    { id: 4, name: "Reporte_Trimestre4", period: "T4", file: "/sample.pdf" },
   ];
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedReport, setSelectedReport] = useState(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
+  const navigate = useNavigate(); // Declarar useNavigate aquí
 
-  const handlePreview = (report) => {
-    setSelectedReport(report);
-    setIsPreviewOpen(true);
+  // Función para filtrar los reportes según los filtros seleccionados
+  const filteredReports = reports.filter((report) =>
+    filters.length > 0 ? filters.includes(report.period) : true
+  );
+
+  // Tipo explícito para el parámetro 'report' que es de tipo 'Report'
+  const handleEdit = (report: Report) => {
+    navigate(`/ReporteEditor`); // Redirigir al hacer clic en editar
   };
 
-  const handleEdit = (report) => {
-    setSelectedReport(report);
-    setIsEditOpen(true);
-  };
-
-  const handleDownload = (report) => {
+  const handleDownload = (report: Report) => {
     const link = document.createElement("a");
     link.href = report.file;
     link.download = report.name + ".pdf";
@@ -46,19 +56,13 @@ const ReportTable = () => {
           </tr>
         </thead>
         <tbody>
-          {reports.map((report) => (
-            <tr key={report.name} className="border-t hover:bg-gray-50">
+          {filteredReports.map((report) => (
+            <tr key={report.id} className="border-t hover:bg-gray-50">
               <td className="px-6 py-4 text-sm font-medium">{report.name}</td>
               <td className="px-6 py-4 text-sm font-medium">{report.period}</td>
               <td className="px-2 py-4 flex space-x-2">
                 <button
-                  onClick={() => handlePreview(report)}
-                  className="text-blue-500 hover:text-blue-700"
-                >
-                  <FaEye />
-                </button>
-                <button
-                  onClick={() => handleEdit(report)}
+                  onClick={() => handleEdit(report)} // Redirigir al hacer clic en editar
                   className="text-yellow-500 hover:text-yellow-700"
                 >
                   <FaEdit />
@@ -74,22 +78,6 @@ const ReportTable = () => {
           ))}
         </tbody>
       </table>
-
-      {/* Modal de Previsualización */}
-      <Modal isOpen={isPreviewOpen} onRequestClose={() => setIsPreviewOpen(false)}>
-        <h2>Previsualización: {selectedReport?.name}</h2>
-        <Document file={selectedReport?.file}>
-          <Page pageNumber={1} />
-        </Document>
-        <button onClick={() => setIsPreviewOpen(false)}>Cerrar</button>
-      </Modal>
-
-      {/* Modal de Edición */}
-      <Modal isOpen={isEditOpen} onRequestClose={() => setIsEditOpen(false)}>
-        <h2>Editar Reporte</h2>
-        <input type="text" defaultValue={selectedReport?.name} className="border p-2" />
-        <button onClick={() => setIsEditOpen(false)}>Guardar</button>
-      </Modal>
     </div>
   );
 };
