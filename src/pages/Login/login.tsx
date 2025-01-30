@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import "./login.css"; // Asegúrate de que tienes el archivo de estilo correspondiente
 
-const socket = io("http://192.168.95.55:3001"); // Asegúrate de que la URL coincida con tu backend
+const socket = io("http://localhost:3001"); // Asegúrate de que la URL coincida con tu backend
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
