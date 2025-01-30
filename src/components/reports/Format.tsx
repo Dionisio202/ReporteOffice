@@ -1,10 +1,9 @@
-// src/components/Format.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logoUTA from "../../assets/img/logoUTA.png";
 import DataFetcher from "./DataFetcher";
 
-// Definir el tipo de los datos que estamos recibiendo
+// Definir el tipo de los datos
 interface Actividad {
   nombre_actividad: string;
   indicador_actividad: string;
@@ -21,16 +20,13 @@ interface Actividad {
 
 const Format: React.FC = () => {
   const [actividad, setActividad] = useState<Actividad[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // Para manejar la carga
-  const [error, setError] = useState<string | null>(null); // Para manejar errores
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const goBack = () => {
     navigate("/GestorDocumento");
   };
-
-  // Verificar si los datos se están trayendo correctamente
-  console.log("Datos de actividad:", actividad);
 
   return (
     <div className="relative">
@@ -53,7 +49,7 @@ const Format: React.FC = () => {
         </div>
 
         <div className="overflow-x-auto mt-6">
-          <table className="w-full border min-w-[900px]">
+          <table className="w-full border min-w-[1200px]">
             <thead>
               <tr className="bg-[#931D21] text-white">
                 <th className="border px-2 py-1">Actividad</th>
@@ -93,9 +89,7 @@ const Format: React.FC = () => {
                     <td className="border px-2 py-1">${act.gastos_t_humanos}</td>
                     <td className="border px-2 py-1">${act.gasto_b_capital}</td>
                     <td className="border px-2 py-1">${act.total_actividad}</td>
-                    <td className="border px-2 py-1">
-                      {Array.isArray(act.responsables) ? act.responsables.join(", ") : "N/A"}
-                    </td>
+                    <td className="border px-2 py-1">{act.responsables.join(", ")}</td>
                   </tr>
                 ))
               ) : (
@@ -108,8 +102,7 @@ const Format: React.FC = () => {
         </div>
       </div>
 
-      {/* Componente DataFetcher que maneja la obtención de datos */}
-      <DataFetcher setActividad={setActividad} />
+      <DataFetcher setActividad={setActividad} setLoading={setLoading} setError={setError} />
     </div>
   );
 };
