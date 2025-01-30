@@ -46,7 +46,7 @@ const ReporteEditor:React.FC = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-[#931D21] text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition"
+            className="w-full bg-[#931D21] text-white font-bold py-2 px-4 rounded-md hover:bg-[#931D21] transition"
             >
             Enviar
           </button>

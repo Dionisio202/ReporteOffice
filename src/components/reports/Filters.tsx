@@ -1,9 +1,11 @@
 import React from "react";
+import { FaTimesCircle } from "react-icons/fa"; // Icono para limpiar filtros
 
-const Filters = ({ documentType, handleTypeChange }) => {
+const Filters = ({ documentType, handleTypeChange, clearFilters }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md border border-gray-300">
       <h2 className="text-lg font-semibold text-gray-700 mb-4">Tipo de Documento</h2>
+      
       <div className="space-y-3">
         {Object.keys(documentType).map((type) => (
           <div key={type} className="flex items-center space-x-2">
@@ -20,6 +22,7 @@ const Filters = ({ documentType, handleTypeChange }) => {
           </div>
         ))}
       </div>
+
     </div>
   );
 };

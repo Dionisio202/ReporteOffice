@@ -8,15 +8,15 @@ const GestorReportes = () => {
   const handleFilterChange = (selectedPeriods: string[]) => {
     setFilters(selectedPeriods);
   };
-  const handleHome = () => {
-    navigate("/");
+  const handleDocument = () => {
+    navigate("/GestorDocumento");
   };
   return (
     <div className="flex flex-col w-full">
       {/* Título mejorado para la página */}
       <div className="flex items-center justify-between w-full">
       <button
-          onClick={handleHome}
+          onClick={handleDocument}
           className="w-1/4 bg-[#931D21] text-white rounded-lg shadow-md overflow-x-auto mb-6"
         >
           &lt; Atrás
