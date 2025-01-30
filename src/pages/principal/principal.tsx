@@ -4,8 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart
 import Card from "../../components/cards/card";
 import CardContent from "../../components/cards/cardcontent";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../../components/tables/table";
-import Button from "../../components/UI/button";
-import { CheckCircle, AlertCircle, XCircle, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 
 const COLORS = {
   red: "#d9534f",
@@ -26,15 +25,9 @@ const initialTableData = [
   { name: "POA 2024", progress: "100%", status: "green" },
 ];
 
-const Principal:React.FC = () => {
+const Principal: React.FC = () => {
   const [data, setData] = useState(initialData);
   const [tableData, setTableData] = useState(initialTableData);
-
-  const handleChangeStatus = (index, newStatus) => {
-    const updatedTable = [...tableData];
-    updatedTable[index].status = newStatus;
-    setTableData(updatedTable);
-  };
 
   const pieData = Object.keys(COLORS).map((status) => ({
     name: status.toUpperCase(),
@@ -44,11 +37,12 @@ const Principal:React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-      <nav className="bg-blue-600 text-white p-4 rounded-lg shadow-md w-full text-center font-semibold text-lg">
-        Dashboard de Documentos
+      <nav className="bg-blue-950 text-white p-4 rounded-lg shadow-md w-full text-center font-semibold text-lg">
+        Reportes
       </nav>
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-6xl mt-6">
-        <Card className="w-full">
+        <Card className="col-span-1 lg:col-span-2 w-full">
           <CardContent>
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <FileText /> Estado de Documentos
@@ -62,7 +56,7 @@ const Principal:React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tableData.map((row, index) => (
+                {tableData.map((row) => (
                   <TableRow key={row.name}>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.progress}</TableCell>
@@ -73,17 +67,6 @@ const Principal:React.FC = () => {
                         "bg-green-500": row.status === "green",
                         "bg-red-500": row.status === "red",
                       })}></span>
-                      <div className="flex gap-2 ml-4">
-                        <Button variant="outline" onClick={() => handleChangeStatus(index, "green")}>
-                          <CheckCircle className="text-green-500" />
-                        </Button>
-                        <Button variant="outline" onClick={() => handleChangeStatus(index, "yellow")}>
-                          <AlertCircle className="text-yellow-500" />
-                        </Button>
-                        <Button variant="outline" onClick={() => handleChangeStatus(index, "red")}>
-                          <XCircle className="text-red-500" />
-                        </Button>
-                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -91,6 +74,7 @@ const Principal:React.FC = () => {
             </Table>
           </CardContent>
         </Card>
+
         <Card>
           <CardContent>
             <h2 className="text-xl font-semibold mb-4">Estado General</h2>
@@ -105,20 +89,21 @@ const Principal:React.FC = () => {
             </PieChart>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardContent>
+            <h2 className="text-xl font-semibold mb-4">Avance de Documentos</h2>
+            <LineChart width={600} height={300} data={data} className="w-full">
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="year" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="progress" stroke="#8884d8" />
+            </LineChart>
+          </CardContent>
+        </Card>
       </div>
-      <Card className="mt-6 w-full max-w-6xl">
-        <CardContent>
-          <h2 className="text-xl font-semibold mb-4">Avance de Documentos</h2>
-          <LineChart width={600} height={300} data={data} className="w-full">
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="year" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="progress" stroke="#8884d8" />
-          </LineChart>
-        </CardContent>
-      </Card>
     </div>
   );
 };
