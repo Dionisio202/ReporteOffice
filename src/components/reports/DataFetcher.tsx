@@ -1,55 +1,64 @@
-// src/components/DataFetcher.tsx
-import { useEffect } from "react";
-import { io, Socket } from "socket.io-client";
+// DataFetcher.tsx
+import { useEffect, useState } from 'react';
+import io from 'socket.io-client';
 
-// Definir el tipo de los datos que esperamos recibir
-interface Actividad {
-  nombre_actividad: string;
-  indicador_actividad: string;
-  proyeccion_actividad: string;
-  t1: string;
-  t2: string;
-  t3: string;
-  t4: string;
-  gastos_t_humanos: number;
-  gasto_b_capital: number;
-  total_actividad: number;
-  responsables: string[];
-}
+const DataFetcher = () => {
+  const [poaData, setPoaData] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-interface DataFetcherProps {
-  setActividad: React.Dispatch<React.SetStateAction<Actividad[]>>;
-}
+  const fetchPoaData = async () => {
+    try {
+      // Conexión al servidor WebSocket en localhost:3001
+      const socket = io('http://localhost:3001'); // Cambia aquí a la URL de tu servidor WebSocket
+      socket.emit('get_poa', (response: any) => {
+        if (response.success) {
+          const formattedData = formatPoaData(response.data);
+          setPoaData(formattedData);
+        } else {
+          setError('Error al obtener datos de POA');
+        }
+      });
+    } catch (err) {
+      setError('Error al conectarse al servidor');
+    }
+  };
 
-const socket: Socket = io("http://localhost:3001");
+  // Formatea los datos recibidos de la base de datos
+  const formatPoaData = (data: any[]) => {
+    return data.map(item => ({
+      nombre_actividad: item.nombre_actividad,
+      indicador_actividad: item.indicador_actividad,
+      proyeccion_actividad: item.proyeccion_actividad,
+      t1: item.t1,
+      t2: item.t2,
+      t3: item.t3,
+      t4: item.t4,
+      gastos_t_humanos: item.gastos_t_humanos,
+      gasto_b_capital: item.gasto_b_capital,
+      total_actividad: item.total_actividad,
+      responsables: JSON.parse(item.responsables),
+    }));
+  };
 
-const DataFetcher: React.FC<DataFetcherProps> = ({ setActividad }) => {
   useEffect(() => {
-    socket.on("connect", () => {
-      console.log(`✅ Conectado al servidor con ID: ${socket.id}`);
-      socket.emit("get_poa");
-    });
+    fetchPoaData();
+  }, []);
 
-    socket.on("poa_response", (response) => {
-      console.log("📡 Respuesta del servidor:", response);
-      if (response?.success && Array.isArray(response.data)) {
-        setActividad(response.data); // Establecer los datos
-      } else {
-        console.error("❌ Error en la respuesta del servidor:", response);
-      }
-    });
-
-    socket.on("connect_error", (err) => {
-      console.error("❌ Error de conexión:", err);
-    });
-
-    return () => {
-      socket.off("poa_response");
-      socket.disconnect();
-    };
-  }, [setActividad]);
-
-  return null;
+  return (
+    <div>
+      {error ? (
+        <p>{error}</p>
+      ) : (
+        <ul>
+          {poaData.map((poa, index) => (
+            <li key={index}>
+              {poa.nombre_actividad} - {poa.indicador_actividad}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 };
 
 export default DataFetcher;
