@@ -45,18 +45,19 @@ const GestorDocumentos = () => {
       doc.año === year &&
       (documentType["Todos"] || documentType[doc.tipo])
   );
-
+  
   const handleDownload = () => {
     if (currentDoc) {
       const doc = new jsPDF();
       
       const content = document.getElementById("format-content");
   
-      // Verificar si el contenido existe, de lo contrario, se generará un PDF vacío
+      // Verificar si el contenido existe
       if (content) {
         // Usamos el método html() para capturar el contenido visual del modal
         doc.html(content, {
           callback: function (doc) {
+            // Cuando se genera el PDF, lo guardamos con el nombre del documento
             doc.save(`${currentDoc.nombre}.pdf`);
           },
           margin: [10, 10, 10, 10], // Márgenes del documento
@@ -65,8 +66,8 @@ const GestorDocumentos = () => {
           y: 10,
         });
       } else {
-        // Si no se encontró el contenido, generamos un PDF vacío con el nombre
-        doc.text(`Documento: ${currentDoc.nombre}`, 10, 10); // Esto asegura que se descargue el archivo vacío
+        // Si no se encuentra el contenido, generamos un PDF vacío
+        doc.text(`Documento: ${currentDoc.nombre}`, 10, 10);
         doc.save(`${currentDoc.nombre}.pdf`);
       }
     } else {
@@ -74,11 +75,6 @@ const GestorDocumentos = () => {
     }
   };
   
-  
-  
-  
-  
-
   const handleDelete = () => {
     // Filtramos el documento eliminado de la lista de documentos
     setDocumentos(documentos.filter(d => d.nombre !== currentDoc.nombre));
