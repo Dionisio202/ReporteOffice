@@ -5,6 +5,7 @@ import GestorReportes from './pages/gestor_reportes/gestor_reportes';
 import ReporteEditor from './pages/reporte_editor/reporte_editor';
 import GestorDocumentos from './pages/gestor_documentos/gestor_documentos';
 import Login from './pages/Login/login';
+import Principal from './pages/principal/principal';
 const App = () => {
   return (
     <div className="flex flex-col min-h-screen">
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/GestorDocumento" element={<GestorDocumentos />} />
         <Route path="/ReporteEditor" element={<ReporteEditor />} />
         <Route path="/GestorReporte" element={<GestorReportes />} />
+        <Route path="/Principal" element={<Principal />} />
       </Routes>
     </Router>
     </main>
