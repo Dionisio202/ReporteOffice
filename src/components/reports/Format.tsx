@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 import logoUTA from "../../assets/img/logoUTA.png";
 import DataFetcher from "./DataFetcher";
 
@@ -28,6 +30,73 @@ const Format: React.FC = () => {
     navigate("/GestorDocumento");
   };
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+  
+    // Agregar encabezado con la información de la universidad
+    doc.setFontSize(14);
+doc.text("UNIVERSIDAD TÉCNICA DE AMBATO", 105, 20, { align: "center" });
+doc.setFontSize(12);
+doc.text("DIRECCIÓN DE INNOVACIÓN Y EMPRENDIMIENTO", 105, 25, { align: "center" });
+doc.text("PLAN OPERATIVO ANUAL 2025", 105, 30, { align: "center" });
+
+    // Agregar el logo de la universidad en la parte superior izquierda y derecha
+    doc.addImage(logoUTA, "PNG", 10, 5, 40, 40); // Logo izquierdo
+    doc.addImage(logoUTA, "PNG", 160, 5, 40, 40); // Logo derecho
+  
+    
+    // Títulos de la tabla
+    const tableColumn = [
+      "Actividad",
+      "Indicador",
+      "Línea Base",
+      "Proyección",
+      "T1",
+      "T2",
+      "T3",
+      "T4",
+      "Gasto T. Humanos",
+      "Gasto B. Capital",
+      "Total",
+      "Responsable"
+    ];
+  
+    // Filas de la tabla
+    const tableRows = actividad.map((act) => [
+      act.nombre_actividad,
+      act.indicador_actividad,
+      "0.00",
+      act.proyeccion_actividad,
+      act.t1,
+      act.t2,
+      act.t3,
+      act.t4,
+      `$${act.gastos_t_humanos}`,
+      `$${act.gasto_b_capital}`,
+      `$${act.total_actividad}`,
+      act.responsables.join(", ")
+    ]);
+  
+    // Agregar la tabla al PDF
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 40, // Ajusta la posición de inicio de la tabla
+      headStyles: {
+        fillColor: [147, 29, 33], // Color de fondo con el valor RGB del rojo #931D21
+        textColor: [255, 255, 255], // Texto en blanco para los encabezados
+        
+        fontStyle: 'bold'
+      },
+      bodyStyles: {
+        fontSize: 10
+      }
+    });
+  
+    // Descargar el PDF
+    doc.save("plan_operativo_anual.pdf");
+  };
+  
   return (
     <div className="relative">
       <button
@@ -36,7 +105,9 @@ const Format: React.FC = () => {
       >
         Atrás
       </button>
-
+      
+      
+      
       <div className="max-w-5xl mx-auto p-6 border shadow-lg">
         <div className="max-w-5xl mx-auto p-6 shadow-lg flex items-center justify-between">
           <img src={logoUTA} alt="Logo UTA" className="h-20 sm:h-40" />
@@ -69,11 +140,11 @@ const Format: React.FC = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="12" className="text-center py-4 text-gray-500">⌛ Cargando actividad...</td>
+                  <td colSpan={12} className="text-center py-4 text-gray-500">⌛ Cargando actividad...</td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan="12" className="text-center py-4 text-red-500">{error}</td>
+                  <td colSpan={12} className="text-center py-4 text-red-500">{error}</td>
                 </tr>
               ) : actividad.length > 0 ? (
                 actividad.map((act, index) => (
@@ -94,15 +165,20 @@ const Format: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="12" className="text-center py-4 text-gray-500">No hay actividades disponibles</td>
+                  <td colSpan={12} className="text-center py-4 text-gray-500">No hay actividades disponibles</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
-
       <DataFetcher setActividad={setActividad} setLoading={setLoading} setError={setError} />
+      <button
+        onClick={downloadPDF}
+        className="absolute  h-10 bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-800"
+      >
+        Descargar PDF
+      </button>
     </div>
   );
 };
