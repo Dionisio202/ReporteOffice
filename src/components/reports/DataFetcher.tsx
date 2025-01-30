@@ -1,4 +1,4 @@
-
+// src/components/DataFetcher.tsx
 import { useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 

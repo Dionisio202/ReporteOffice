@@ -47,39 +47,44 @@ const GestorDocumentos = () => {
   );
   
   const handleDownload = () => {
-    if (currentDoc) {
-      const doc = new jsPDF();
-      
-      const content = document.getElementById("format-content");
+  console.log("Descargando documento:", currentDoc); // Verifica si el documento es el correcto
   
-      // Verificar si el contenido existe
-      if (content) {
-        // Usamos el método html() para capturar el contenido visual del modal
-        doc.html(content, {
-          callback: function (doc) {
-            // Cuando se genera el PDF, lo guardamos con el nombre del documento
-            doc.save(`${currentDoc.nombre}.pdf`);
-          },
-          margin: [10, 10, 10, 10], // Márgenes del documento
-          autoPaging: true, // Paginación automática
-          x: 10,
-          y: 10,
-        });
-      } else {
-        // Si no se encuentra el contenido, generamos un PDF vacío
-        doc.text(`Documento: ${currentDoc.nombre}`, 10, 10);
-        doc.save(`${currentDoc.nombre}.pdf`);
-      }
+  if (currentDoc) {
+    const doc = new jsPDF();
+    
+    const content = document.getElementById("format-content");
+
+    // Verificar si el contenido existe
+    if (content) {
+      // Usamos el método html() para capturar el contenido visual del modal
+      doc.html(content, {
+        callback: function (doc) {
+          // Cuando se genera el PDF, lo guardamos con el nombre del documento
+          doc.save(`${currentDoc.nombre}.pdf`);
+        },
+        margin: [10, 10, 10, 10], // Márgenes del documento
+        autoPaging: true, // Paginación automática
+        x: 10,
+        y: 10,
+      });
     } else {
-      console.log("No se ha seleccionado un documento para descargar.");
+      // Si no se encuentra el contenido, generamos un PDF vacío
+      doc.text(`Documento: ${currentDoc.nombre}`, 10, 10);
+      doc.save(`${currentDoc.nombre}.pdf`);
     }
-  };
+  } else {
+    console.log("No se ha seleccionado un documento para descargar.");
+  }
+};
+
   
   const handleDelete = () => {
     // Filtramos el documento eliminado de la lista de documentos
     setDocumentos(documentos.filter(d => d.nombre !== currentDoc.nombre));
+    setCurrentDoc(null);  // Limpiar el documento actual para evitar problemas con la descarga
     setShowDeleteConfirm(false); // Cerramos el contenedor de confirmación
   };
+  
 
   const handleHome = () => {
     navigate("/");
