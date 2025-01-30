@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Search from "../../components/search/Search";
 import Filters from "../../components/reports/Filters";
 import Format from "../../components/reports/Format";
-import { FaEye, FaTrash, FaDownload } from "react-icons/fa";
-import { jsPDF } from "jspdf";
+import { FaEye, FaTrash } from "react-icons/fa";
+
 
 const GestorDocumentos = () => {
   const navigate = useNavigate();
@@ -18,13 +18,7 @@ const GestorDocumentos = () => {
   const [documentos, setDocumentos] = useState([
     { nombre: "POA 2025-signed-signed", año: "2025", tipo: "POA" },
     { nombre: "Reporte Anual 2024", año: "2025", tipo: "POA" },
-    { nombre: "Informe PEDI 2025", año: "2025", tipo: "PEDI" },
-    { nombre: "Reporte PAC 2024", año: "2024", tipo: "POA"},
-    {
-      nombre: "Emprendimiento",
-      año: "2025",
-      tipo: "POA"
-    }
+    
   ]);
 
   const resetFilters = () => {
@@ -45,37 +39,6 @@ const GestorDocumentos = () => {
       doc.año === year &&
       (documentType["Todos"] || documentType[doc.tipo])
   );
-  
-  const handleDownload = () => {
-  console.log("Descargando documento:", currentDoc); // Verifica si el documento es el correcto
-  
-  if (currentDoc) {
-    const doc = new jsPDF();
-    
-    const content = document.getElementById("format-content");
-
-    // Verificar si el contenido existe
-    if (content) {
-      // Usamos el método html() para capturar el contenido visual del modal
-      doc.html(content, {
-        callback: function (doc) {
-          // Cuando se genera el PDF, lo guardamos con el nombre del documento
-          doc.save(`${currentDoc.nombre}.pdf`);
-        },
-        margin: [10, 10, 10, 10], // Márgenes del documento
-        autoPaging: true, // Paginación automática
-        x: 10,
-        y: 10,
-      });
-    } else {
-      // Si no se encuentra el contenido, generamos un PDF vacío
-      doc.text(`Documento: ${currentDoc.nombre}`, 10, 10);
-      doc.save(`${currentDoc.nombre}.pdf`);
-    }
-  } else {
-    console.log("No se ha seleccionado un documento para descargar.");
-  }
-};
 
   
   const handleDelete = () => {
@@ -165,13 +128,7 @@ const GestorDocumentos = () => {
                           <button title="Eliminar" onClick={() => { setCurrentDoc(doc); setShowDeleteConfirm(true); }} className="text-red-500 hover:text-red-700">
                             <FaTrash className="w-4 h-4" />
                           </button>
-                          <button
-                            title="Descargar"
-                            className="text-green-500 hover:text-green-700"
-                            onClick={handleDownload}
-                          >
-                            <FaDownload className="w-4 h-4" />
-                          </button>
+                          
                         </div>
                       </td>
                     </tr>
