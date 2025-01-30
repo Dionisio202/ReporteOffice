@@ -92,6 +92,9 @@ const GestorDocumentos = () => {
   const handleReport = () => {
     navigate("/GestorReporte");
   };
+  const handleFormat = () => {
+    navigate("/Formato");
+  };
 
   const handleView = (doc) => {
   console.log(doc);  // Verifica si el documento es el correcto
@@ -155,7 +158,7 @@ const GestorDocumentos = () => {
                       <td className="py-3 px-6 text-left">{doc.tipo}</td>
                       <td className="py-3 px-6 text-center relative">
                         <div className="flex items-center justify-center space-x-3">
-                          <button title="Ver" className="text-blue-500 hover:text-blue-700" onClick={() => handleView(doc)}>
+                          <button title="Ver" className="text-blue-500 hover:text-blue-700" onClick={handleFormat}>
                             <FaEye className="w-4 h-4" />
                           </button>
                           <button title="Eliminar" onClick={() => { setCurrentDoc(doc); setShowDeleteConfirm(true); }} className="text-red-500 hover:text-red-700">

@@ -6,6 +6,8 @@ import ReporteEditor from './pages/reporte_editor/reporte_editor';
 import GestorDocumentos from './pages/gestor_documentos/gestor_documentos';
 import Login from './pages/Login/login';
 import Principal from './pages/principal/principal';
+import Format from "./components/reports/Format";
+
 const App = () => {
   return (
     <div className="flex flex-col min-h-screen">
@@ -18,6 +20,7 @@ const App = () => {
         <Route path="/ReporteEditor" element={<ReporteEditor />} />
         <Route path="/GestorReporte" element={<GestorReportes />} />
         <Route path="/Principal" element={<Principal />} />
+        <Route path="/Formato" element={<Format />} />
       </Routes>
     </Router>
     </main>
