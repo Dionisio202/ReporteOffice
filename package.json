@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^6.4.1",
     "@mui/styles": "^6.4.1",
+    "@onlyoffice/document-editor-react": "^1.5.1",
     "@react-pdf-viewer/core": "^3.12.0",
     "@tailwindcss/vite": "^4.0.0",
     "docxtemplater": "^3.58.4",
