@@ -58,6 +58,16 @@ export default function UploadForm() {
     <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
       <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
         <h1 className="text-xl font-bold text-center mb-4">Formulario de Registro</h1>
+        
+        <div className="mb-4">
+          <label className="block font-semibold">Ingrese el código del memorando generado</label>
+          <input 
+            type="text" 
+            className="w-full border p-2 rounded mt-1" 
+            value={memoCode} 
+            onChange={(e) => setMemoCode(e.target.value)}
+          />
+        </div>
 
         <div 
           className="border-2 border-dashed border-gray-400 rounded-lg p-6 flex flex-col items-center mb-4 w-full cursor-pointer bg-gray-50 text-center" 
@@ -76,28 +86,7 @@ export default function UploadForm() {
           {preview && <img src={preview} alt="Vista previa" className="mt-2 max-w-full h-32 object-cover border border-gray-300 rounded-lg shadow-sm" />}
         </div>
 
-        <div className="mb-4">
-          <label className="block font-semibold">Ingrese el código del memorando generado</label>
-          <input 
-            type="text" 
-            className="w-full border p-2 rounded mt-1" 
-            value={memoCode} 
-            onChange={(e) => setMemoCode(e.target.value)}
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block font-semibold">Comentario</label>
-          <textarea 
-            className="w-full border p-2 rounded mt-1" 
-            rows="3" 
-            value={comment} 
-            onChange={(e) => setComment(e.target.value)}
-          ></textarea>
-        </div>
-
-        
-        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Siguiente</button>
+        <button type="submit" className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-gray-400">Siguiente</button>
       </form>
     </div>
   );
