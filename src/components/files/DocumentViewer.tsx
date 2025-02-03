@@ -31,7 +31,6 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title }) =
   return (
     <div className="flex flex-col h-screen bg-gray-100 items-center justify-center p-6">
       <div className="w-full max-w-6xl border border-gray-300 shadow-md bg-white p-4 flex flex-col h-full">
-        <h2 className="text-2xl font-bold text-black-600 mb-4">{title}</h2>
 
         {/* Contenedor del Editor asegurando altura completa */}
         <div className="flex-grow w-full h-full">
@@ -44,12 +43,12 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title }) =
                   fileType: 'docx',
                   key: keyDocument,
                   title: title,
-                  url: 'http://host.docker.internal:3000/api/document',
+                  url: 'http://host.docker.internal:3001/api/document',
                 },
                 documentType: 'word',
                 editorConfig: {
                   mode: 'edit',
-                  callbackUrl: 'http://host.docker.internal:3000/api/save-document',
+                  callbackUrl: 'http://host.docker.internal:3001/api/save-document',
                 },
               }}
               events_onDocumentReady={onDocumentReady}

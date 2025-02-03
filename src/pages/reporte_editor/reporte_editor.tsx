@@ -29,7 +29,6 @@ const ReporteEditor: React.FC = () => {
       {/* Sección del Documento */}
       <div className="w-2/3 p-6  bg-gray-50 flex items-center justify-center">
         <div className="w-full h-full border border-gray-300 shadow-md bg-white p-4">
-          <h2 className="text-2xl font-bold text-black-600 mb-4">Vista Previa del Documento</h2>
           
           {/* Llamando al componente DocumentViewer */}
           <DocumentViewer keyDocument="unique-document-key3" title="Documento de Prueba.docx" />
