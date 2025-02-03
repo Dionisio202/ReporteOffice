@@ -85,7 +85,7 @@ export default function App() {
             config={{
               document: {
                 fileType: 'docx',
-                key: 'unique-document-key',
+                key: 'unique-document-key3',
                 title: 'Documento de Prueba.docx',
                 url: 'http://host.docker.internal:3000/api/document',
               },
