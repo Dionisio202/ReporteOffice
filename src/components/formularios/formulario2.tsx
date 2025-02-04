@@ -1,24 +1,38 @@
 import { useState } from "react";
 import { EmailInput } from "./components/EmailInput";
-import FileViewer from "./components/FileViewer";
+import DocumentViewer from "../files/DocumentViewer";// Importa el DocumentViewer
 
-// Simulamos documentos precargados estáticamente
+// Simulamos documentos precargados estáticamente (solo .docx)
 const staticDocuments = {
-  solicitud: "/path/to/solicitud.pdf",  // Ruta del archivo PDF
-  datos: "/path/to/datos.docx",        // Ruta del archivo Word
+  datos: {
+    key: "fdti", // Clave única para el documento
+    title: "Documento de Datos", // Título del documento
+    nombre: "Formato_datos_informativos_autores.docx", // Nombre del documento para la API
+  },
+  otroDocumento: {
+    key: "fsr",
+    title: "Documento de registro",
+    nombre: "Formato_solicitud_registro.docx", // Nombre del documento para la API
+  },
 };
 
 export default function WebPage() {
-  const [selectedDocument, setSelectedDocument] = useState<File | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<{
+    key: string;
+    title: string;
+    nombre: string;
+  } | null>(null);
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set()); // Set para almacenar documentos seleccionados
-  const [emails, setEmails] = useState<string>("");  // Estado para los correos electrónicos
+  const [emails, setEmails] = useState<string>(""); // Estado para los correos electrónicos
 
   // Función para seleccionar el documento a visualizar
   const handleViewDocument = (documentType: keyof typeof staticDocuments) => {
-    const filePath = staticDocuments[documentType];
-    // Crear un objeto File de manera estática (se asume que los archivos existen)
-    const file = new File([new Blob()], filePath, { type: "application/pdf" });  // Cambia el tipo según el archivo
-    setSelectedDocument(file);
+    const document = staticDocuments[documentType];
+    setSelectedDocument({
+      key: document.key,
+      title: document.title,
+      nombre: document.nombre,
+    });
   };
 
   // Función para manejar el cambio del checkbox
@@ -34,17 +48,16 @@ export default function WebPage() {
     });
   };
 
-  // Lista ordenada de documentos
+  // Lista ordenada de documentos (solo .docx)
   const documentList = [
-    { type: "solicitud", label: "Documento de Solicitud", icon: "fas fa-file-pdf text-red-500" },
     { type: "datos", label: "Documento de Datos", icon: "fas fa-file-word text-blue-500" },
+    { type: "otroDocumento", label: "Otro Documento", icon: "fas fa-file-word text-blue-500" },
   ];
 
   return (
     <div className="flex w-full h-screen p-4 bg-gray-200">
       {/* Container for the table, email input, and document viewer */}
       <div className="flex w-full flex-col md:flex-row gap-4 mt-4">
-
         {/* Left half - Table and Email Input */}
         <div className="w-full md:w-1/2 space-y-4">
           {/* Tabla de documentos */}
@@ -90,7 +103,11 @@ export default function WebPage() {
         {/* Right half - Document Viewer */}
         <div className="w-full md:w-1/2 pl-6 mt-4">
           {selectedDocument ? (
-            <FileViewer file={selectedDocument} />
+            <DocumentViewer
+              keyDocument={selectedDocument.key}
+              title={selectedDocument.title}
+              documentName={selectedDocument.nombre} // Pasamos el nombre del documento
+            />
           ) : (
             <p className="text-center text-gray-500">Selecciona un documento para visualizarlo</p>
           )}

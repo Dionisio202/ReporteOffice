@@ -4,6 +4,7 @@ import { DocumentEditor } from '@onlyoffice/document-editor-react';
 interface DocumentViewerProps {
   keyDocument: string;
   title: string;
+  documentName: string; // Nueva prop para el nombre del documento
 }
 
 const onDocumentReady = (event: any) => {
@@ -27,7 +28,9 @@ const onLoadComponentError = (errorCode: any, errorDescription: any) => {
   }
 };
 
-const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title }) => {
+const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title, documentName }) => {
+  const documentUrl = `http://host.docker.internal:3001/api/document?nombre=${encodeURIComponent(documentName)}`;
+
   return (
     <div className="flex flex-col h-screen bg-gray-100 items-center justify-center p-6">
       <div className="w-full max-w-6xl border border-gray-300 shadow-md bg-white p-4 flex flex-col h-full">
@@ -43,7 +46,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title }) =
                   fileType: 'docx',
                   key: keyDocument,
                   title: title,
-                  url: 'http://host.docker.internal:3001/api/document',
+                  url: documentUrl, // Usamos la URL con el nombre del documento
                 },
                 documentType: 'word',
                 editorConfig: {
