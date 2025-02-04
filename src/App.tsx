@@ -17,6 +17,10 @@ import Formulario2 from "./components/formularios/formulario2";
 import Formulario6 from "./components/formularios/Formulario6";
 import Formulario9 from "./components/formularios/Formulario9";
 import Formulario11 from "./components/formularios/formulario11";
+import Formulario17 from "./components/formularios/formulario17";
+import Formulario19 from "./components/formularios/formulario19";
+import Formulario20 from "./components/formularios/formulario20";
+import Formulario21 from "./components/formularios/formulario21";
 const App = () => {
   return (
     <div className="flex flex-col min-h-screen">
@@ -40,8 +44,10 @@ const App = () => {
             <Route path = "/Formulario6" element={<Formulario6/>}/>
             <Route path = "/Formulario9" element={<Formulario9/>}/>
             <Route path = "/Formulario11" element={<Formulario11/>}/>
-
-          
+            <Route path = "/Formulario17" element={<Formulario17/>}/>
+            <Route path = "/Formulario19" element={<Formulario19/>}/>
+            <Route path = "/Formulario20" element={<Formulario20/>}/>
+            <Route path = "/Formulario21" element={<Formulario21/>}/>
           </Routes>
         </Router>
       </main>
