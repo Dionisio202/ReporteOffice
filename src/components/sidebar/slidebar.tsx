@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaCheckCircle, FaTimesCircle, FaFileDownload } from "react-icons/fa"; // Importamos los iconos
+import {FaTimesCircle, FaFileDownload } from "react-icons/fa"; // Importamos los iconos
 
 interface SidebarProps {
   onFilterChange: (selectedPeriods: string[]) => void;
