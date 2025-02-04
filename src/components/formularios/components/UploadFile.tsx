@@ -1,35 +1,45 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-const FileUpload = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+interface UploadFileProps {
+  onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const UploadFile: React.FC<UploadFileProps> = ({ onFileChange }) => {
+  const [fileName, setFileName] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setPreview(URL.createObjectURL(selectedFile));
-    }
+    setFileName(selectedFile ? selectedFile.name : "");
+    onFileChange(event);
   };
 
   return (
-    <div className="border-2 border-dashed border-gray-400 rounded-lg p-4 flex flex-col items-center mb-4 max-w-sm mx-auto">
-      <input 
-        type="file" 
-        onChange={handleFileChange} 
-        className="hidden" 
-        id="file-upload" 
-      />
-      <label 
-        htmlFor="file-upload" 
-        className="cursor-pointer font-semibold text-blue-600 hover:text-blue-800"
-      >
-        Elegir archivo
+    <div className="mb-4">
+      <label htmlFor="file-upload" className="block font-semibold text-gray-700">
+        Subir archivo
       </label>
-      {file && <p className="mt-2 text-xs text-gray-700">Archivo seleccionado: {file.name}</p>}
-      {preview && <img src={preview} alt="Vista previa" className="mt-2 max-w-full h-24 object-cover" />}
+      <div className="relative mt-2">
+        <input
+          id="file-upload"
+          type="file"
+          className="hidden"
+          onChange={handleFileChange}
+          accept=".pdf,.doc,.docx,.jpg,.png"
+        />
+        <label
+          htmlFor="file-upload"
+          className="flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-3 cursor-pointer hover:border-gray-500 transition"
+        >
+          <span className="text-gray-600">{fileName || "Seleccionar archivo..."}</span>
+        </label>
+      </div>
+      {fileName && (
+        <p className="mt-2 text-sm text-gray-500">
+          Archivo seleccionado: <span className="font-medium">{fileName}</span>
+        </p>
+      )}
     </div>
   );
 };
 
-export default FileUpload;
+export default UploadFile;
