@@ -4,9 +4,9 @@ import { Send } from "lucide-react";
 import { useState } from "react";
 
 export function EmailInput() {
-  const [email, setEmail] = useState<string>("");  // Almacena el correo electrónico actual
-  const [emailList, setEmailList] = useState<string[]>([]);  // Almacena la lista de correos electrónicos
-  const [error, setError] = useState<string>("");  // Para mostrar errores de validación
+  const [email, setEmail] = useState<string>(""); // Almacena el correo electrónico actual
+  const [emailList, setEmailList] = useState<string[]>([]); // Almacena la lista de correos electrónicos
+  const [error, setError] = useState<string>(""); // Para mostrar errores de validación
 
   // Expresión regular para validar el formato del correo electrónico
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -14,7 +14,7 @@ export function EmailInput() {
   // Maneja el cambio de valor en el campo de correo electrónico
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
-    setError("");  // Limpiar el mensaje de error al escribir
+    setError(""); // Limpiar el mensaje de error al escribir
   };
 
   // Añade el correo a la lista de correos electrónicos si es válido
@@ -22,7 +22,7 @@ export function EmailInput() {
     if (emailRegex.test(email)) {
       if (!emailList.includes(email)) {
         setEmailList([...emailList, email]);
-        setEmail("");  // Limpiar el campo de entrada después de agregar
+        setEmail(""); // Limpiar el campo de entrada después de agregar
       } else {
         setError("Este correo ya ha sido agregado.");
       }
@@ -46,11 +46,17 @@ export function EmailInput() {
     }
   };
 
+  // Lógica para avanzar a la siguiente página
+  const handleNext = () => {
+    alert("Avanzando a la siguiente página...");
+    // Aquí puedes agregar la lógica para navegar a otra página
+  };
+
   return (
     <Card className="w-full md:w-1/2 p-6 bg-white shadow-lg rounded-lg">
       <h2 className="font-bold text-lg text-gray-800 mb-4">Ingreso de Correo Electrónico</h2>
 
-      <div className="mt-5">
+      <div className="mt-4">
         <label htmlFor="email" className="block font-semibold text-sm text-gray-700 mb-2">
           Dirección de Correo Electrónico:
         </label>
@@ -69,7 +75,7 @@ export function EmailInput() {
 
       {/* Botón para agregar correo */}
       <Button
-        className="mt-4 w-full flex items-center justify-center gap-2 bg-[#931D21] text-white rounded-lg p-2 hover:bg-[#7a1619] transition-colors duration-300"
+        className="mt-4 w-full flex items-center justify-center gap-2 bg-[#931D21] text-white rounded-lg p-2 hover:border-y-orange-600 transition-colors duration-300"
         onClick={handleAddEmail}
         disabled={!email}
       >
@@ -104,6 +110,16 @@ export function EmailInput() {
       >
         <Send size={16} /> Enviar
       </Button>
+
+      {/* Botón "Siguiente" al final, centrado */}
+      <div className="flex justify-center mt-6">
+        <Button
+          className="bg-blue-600 text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
+          onClick={handleNext}
+        >
+          Siguiente
+        </Button>
+      </div>
     </Card>
   );
 }
