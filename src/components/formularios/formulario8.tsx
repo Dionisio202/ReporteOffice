@@ -4,9 +4,9 @@ import CardContainer from "./components/CardContainer";
 export default function MemoCodeForm() {
   const [memoCode, setMemoCode] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Código del memorando:", memoCode);
+    console.log("Código de Memorando:");
   };
 
   return (

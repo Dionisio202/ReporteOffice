@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { LucideIcon } from "lucide-react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "outline" | "ghost";
+  variant?: "primary" | "secondary" | "danger" | "outline" | "ghost" | "custom";
   size?: "sm" | "md" | "lg";
   icon?: LucideIcon;
 }
@@ -25,22 +25,9 @@ const Button: React.FC<ButtonProps> = ({
     lg: "px-6 py-3 text-lg",
   };
 
-  const variantStyles = {
-    primary: "bg-blue-600 text-white hover:bg-blue-700",
-    secondary: "bg-gray-600 text-white hover:bg-gray-700",
-    danger: "bg-red-600 text-white hover:bg-red-700",
-    outline: "border border-gray-400 text-gray-600 hover:bg-gray-100",
-    ghost: "text-gray-600 hover:bg-gray-200",
-  };
-
   return (
     <button
-      className={clsx(
-        baseStyles,
-        sizeStyles[size],
-        variantStyles[variant],
-        className
-      )}
+      className={clsx(baseStyles, sizeStyles[size], className)}
       {...props}
     >
       {Icon && <Icon className="w-5 h-5" />}

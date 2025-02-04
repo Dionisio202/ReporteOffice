@@ -1,26 +1,29 @@
 import React, { useState } from "react";
 
 interface UploadFileProps {
-  onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onFileChange: (file: File | null) => void;
 }
 
 const UploadFile: React.FC<UploadFileProps> = ({ onFileChange }) => {
   const [fileName, setFileName] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
+    const selectedFile = event.target.files?.[0] ?? null;
     setFileName(selectedFile ? selectedFile.name : "");
-    onFileChange(event);
+    onFileChange(selectedFile);
   };
 
   return (
     <div className="mb-4">
-      <label htmlFor="file-upload" className="block font-semibold text-gray-700">
+      <label
+        htmlFor="file-upload"
+        className="block font-semibold text-gray-700"
+      >
         Subir archivo
       </label>
       <div className="relative mt-2">
         <input
-          id="file-upload"
+          id="file-upload" // Asegúrate de que el id coincida con el htmlFor
           type="file"
           className="hidden"
           onChange={handleFileChange}
@@ -30,7 +33,9 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileChange }) => {
           htmlFor="file-upload"
           className="flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-3 cursor-pointer hover:border-gray-500 transition"
         >
-          <span className="text-gray-600">{fileName || "Seleccionar archivo..."}</span>
+          <span className="text-gray-600">
+            {fileName || "Seleccionar archivo..."}
+          </span>
         </label>
       </div>
       {fileName && (

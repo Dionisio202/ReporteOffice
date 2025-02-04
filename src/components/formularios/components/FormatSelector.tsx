@@ -11,7 +11,10 @@ type FormatSelectorProps = Readonly<{
   onCheckboxChange: (format: "solicitud" | "datos") => void;
 }>;
 
-export function FormatSelector({ selectedFormats, onCheckboxChange }: FormatSelectorProps) {
+export function FormatSelector({
+  selectedFormats,
+  onCheckboxChange,
+}: FormatSelectorProps) {
   return (
     <Card className="w-1/2 p-4 bg-white shadow-md">
       <h2 className="font-bold text-lg">Formatos</h2>

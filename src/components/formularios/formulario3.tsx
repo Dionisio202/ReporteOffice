@@ -2,17 +2,19 @@ import { useState } from "react";
 import UploadFile from "./components/UploadFile";
 
 export default function UploadForm() {
-  const [selectedType, setSelectedType] = useState<string>("");
-  const [memoCode, setMemoCode] = useState<string>("");
-  const [comment, setComment] = useState<string>("");
+  // Definimos los hooks de estado para los campos del formulario
+  const [memoCode, setMemoCode] = useState("");
+  const [comment, setComment] = useState("");
+  const [selectedType, setSelectedType] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0] || null;
+  // Función que maneja el cambio de archivo
+  const handleFileChange = (selectedFile: File | null) => {
     setFile(selectedFile);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  // Función que maneja el envío del formulario
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     console.log("Datos enviados:", { memoCode, comment, selectedType, file });
   };
@@ -45,7 +47,9 @@ export default function UploadForm() {
 
         {/* Campo de comentario */}
         <div className="mb-4">
-          <label htmlFor="comment" className="block font-semibold">Comentario</label>
+          <label htmlFor="comment" className="block font-semibold">
+            Comentario
+          </label>
           <textarea
             id="comment"
             className="w-full border p-2 rounded mt-1"
@@ -58,7 +62,9 @@ export default function UploadForm() {
 
         {/* Selector de tipo de registro */}
         <div className="mb-4">
-          <label htmlFor="selectedType" className="block font-semibold">Tipo Registro</label>
+          <label htmlFor="selectedType" className="block font-semibold">
+            Tipo Registro
+          </label>
           <select
             id="selectedType"
             className="w-full border p-2 rounded mt-1"
@@ -67,11 +73,21 @@ export default function UploadForm() {
             required
           >
             <option value="">Seleccione un tipo de registro</option>
-            <option value="obras_literarias">Registro de Obra Literarias</option>
-            <option value="obras_artisticas">Registro de Obras Artísticas y Musicales</option>
-            <option value="obras_audiovisuales">Registro de Obras Audiovisuales</option>
-            <option value="registro_software">Registro de Programas de Ordenador (Software)</option>
-            <option value="programas_radio">Registro de Publicaciones Periódicas y Programas de Radio</option>
+            <option value="obras_literarias">
+              Registro de Obra Literarias
+            </option>
+            <option value="obras_artisticas">
+              Registro de Obras Artísticas y Musicales
+            </option>
+            <option value="obras_audiovisuales">
+              Registro de Obras Audiovisuales
+            </option>
+            <option value="registro_software">
+              Registro de Programas de Ordenador (Software)
+            </option>
+            <option value="programas_radio">
+              Registro de Publicaciones Periódicas y Programas de Radio
+            </option>
             <option value="fonogramas">Registro de Fonogramas</option>
           </select>
         </div>
