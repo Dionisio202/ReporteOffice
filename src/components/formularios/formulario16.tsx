@@ -1,135 +1,86 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import CardContainer from "./components/CardContainer";
 
 export default function DocumentForm() {
-  const [memoCode, setMemoCode] = useState("");
-  const [selectedDocuments, setSelectedDocuments] = useState({
-    solicitud: false,
-    comprobantePago: false,
-    curPogo: false,
-    contratoCesion: false,
-    accionPersonal: false,
-    copiaCedula: false,
-    rucUTA: false,
+  const [memoCode, setMemoCode] = useState<string>("");
+  const [checkedState, setCheckedState] = useState<Record<string, boolean>>({
+    checkbox1: false,
+    checkbox2: false,
+    checkbox3: false,
+    checkbox4: false,
+    checkbox5: false,
+    checkbox6: false,
+    checkbox7: false,
   });
 
-  const handleMemoCodeChange = (event) => {
+  const handleMemoCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMemoCode(event.target.value);
   };
 
-  const handleDocumentChange = (event) => {
-    const { name, checked } = event.target;
-    setSelectedDocuments((prevState) => ({
+  const handleCheckboxChange = (name: string, value: boolean) => {
+    setCheckedState((prevState) => ({
       ...prevState,
-      [name]: checked,
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("Código del memorando:", memoCode);
-    console.log("Documentos seleccionados:", selectedDocuments);
+    console.log("Checkboxes seleccionados:", checkedState);
   };
 
   return (
-    <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
-      <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
-        <h1 className="text-xl font-bold text-center mb-4">Formulario de Documentos</h1>
-
-        <div className="flex mb-4">
-          <label className="block font-semibold w-full">Código del Memorando:</label>
-          <input 
-            type="text" 
-            className="w-1/2 border p-2 rounded mt-1 ml-4" 
-            value={memoCode} 
+    <CardContainer title="Formulario de Documentos">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+        {/* Código del Memorando */}
+        <div className="flex flex-col">
+          <label htmlFor="memoCode" className="block font-semibold">
+            Código del Memorando:
+          </label>
+          <input
+            id="memoCode"
+            type="text"
+            className="border p-2 rounded mt-1"
+            value={memoCode}
             onChange={handleMemoCodeChange}
           />
         </div>
 
-        <div className="mb-4">
-          <h2 className="font-semibold text-lg">Entregables expediente</h2>
-          <div className="flex flex-col mt-2">
-            <div className="flex items-center">
-              <input 
+        {/* Entregables */}
+        <div className="flex flex-col space-y-4">
+          {[
+            { id: "checkbox1", label: "Solicitud" },
+            { id: "checkbox2", label: "Comprobante de Pago" },
+            { id: "checkbox3", label: "CUR de Pago" },
+            { id: "checkbox4", label: "Contrato de Cesión de Derechos" },
+            { id: "checkbox5", label: "Acción de Personal de Representante Legal" },
+            { id: "checkbox6", label: "Copia de Cédula de Representante Legal" },
+            { id: "checkbox7", label: "RUC UTA" },
+          ].map(({ id, label }) => (
+            <div key={id} className="flex items-center">
+              <input
+                id={id}
                 type="checkbox"
-                name="solicitud"
-                checked={selectedDocuments.solicitud}
-                onChange={handleDocumentChange}
-                id="solicitud"
+                checked={checkedState[id]}
+                onChange={(e) => handleCheckboxChange(id, e.target.checked)}
                 className="mr-2"
               />
-              <label htmlFor="solicitud">Solicitud</label>
+              <label htmlFor={id} className="cursor-pointer">
+                {label}
+              </label>
             </div>
-            <div className="flex items-center">
-              <input 
-                type="checkbox"
-                name="comprobantePago"
-                checked={selectedDocuments.comprobantePago}
-                onChange={handleDocumentChange}
-                id="comprobantePago"
-                className="mr-2"
-              />
-              <label htmlFor="comprobantePago">Comprobante de pago</label>
-            </div>
-            <div className="flex items-center">
-              <input 
-                type="checkbox"
-                name="curPogo"
-                checked={selectedDocuments.curPogo}
-                onChange={handleDocumentChange}
-                id="curPogo"
-                className="mr-2"
-              />
-              <label htmlFor="curPogo">CUR de Pogo</label>
-            </div>
-            <div className="flex items-center">
-              <input 
-                type="checkbox"
-                name="contratoCesion"
-                checked={selectedDocuments.contratoCesion}
-                onChange={handleDocumentChange}
-                id="contratoCesion"
-                className="mr-2"
-              />
-              <label htmlFor="contratoCesion">Contrato de cesión de derechos</label>
-            </div>
-            <div className="flex items-center">
-              <input 
-                type="checkbox"
-                name="accionPersonal"
-                checked={selectedDocuments.accionPersonal}
-                onChange={handleDocumentChange}
-                id="accionPersonal"
-                className="mr-2"
-              />
-              <label htmlFor="accionPersonal">Acción de personal del Representante legal</label>
-            </div>
-            <div className="flex items-center">
-              <input 
-                type="checkbox"
-                name="copiaCedula"
-                checked={selectedDocuments.copiaCedula}
-                onChange={handleDocumentChange}
-                id="copiaCedula"
-                className="mr-2"
-              />
-              <label htmlFor="copiaCedula">Copia de cédula del Representante legal</label>
-            </div>
-            <div className="flex items-center">
-              <input 
-                type="checkbox"
-                name="rucUTA"
-                checked={selectedDocuments.rucUTA}
-                onChange={handleDocumentChange}
-                id="rucUTA"
-                className="mr-2"
-              />
-              <label htmlFor="rucUTA">RUC UTA</label>
-            </div>
-          </div>
+          ))}
         </div>
 
-        <button type="submit" className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-gray-400">Siguiente</button>
+        {/* Botón de envío */}
+        <button
+          type="submit"
+          className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
+        >
+          Siguiente
+        </button>
       </form>
-    </div>
+    </CardContainer>
   );
 }

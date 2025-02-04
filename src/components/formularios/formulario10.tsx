@@ -1,4 +1,5 @@
 import { useState } from "react";
+import CardContainer from "./components/CardContainer";
 
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
@@ -20,10 +21,9 @@ export default function ConfirmationScreen() {
   };
 
   return (
-    <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
-      <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
-        <h1 className="text-xl font-bold text-center mb-4">Formulario 10</h1>
-        
+    <CardContainer title="Formulario 10">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+        {/* Checkbox para documentos */}
         <div className="mb-4">
           <div className="flex items-center">
             <input
@@ -49,8 +49,14 @@ export default function ConfirmationScreen() {
           </div>
         </div>
 
-        <button type="submit" className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-gray-400">Siguiente</button>
+        {/* Botón de enviar */}
+        <button
+          type="submit"
+          className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
+        >
+          Siguiente
+        </button>
       </form>
-    </div>
+    </CardContainer>
   );
 }

@@ -14,7 +14,9 @@ import Login from "./pages/Login/login";
 import Principal from "./pages/principal/principal";
 import Format from "./components/reports/Format";
 import Formulario2 from "./components/formularios/formulario2";
-
+import Formulario6 from "./components/formularios/Formulario6";
+import Formulario9 from "./components/formularios/Formulario9";
+import Formulario11 from "./components/formularios/formulario11";
 const App = () => {
   return (
     <div className="flex flex-col min-h-screen">
@@ -35,6 +37,11 @@ const App = () => {
             <Route path="/Formulario10" element={<Formulario10 />} />
             <Route path="/Formulario16" element={<Formulario16 />} />
             <Route path="/Formulario2" element={<Formulario2 />} />
+            <Route path = "/Formulario6" element={<Formulario6/>}/>
+            <Route path = "/Formulario9" element={<Formulario9/>}/>
+            <Route path = "/Formulario11" element={<Formulario11/>}/>
+
+          
           </Routes>
         </Router>
       </main>

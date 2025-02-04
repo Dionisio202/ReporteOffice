@@ -1,4 +1,6 @@
 import { useState } from "react";
+import CardContainer from "./components/CardContainer";
+import Checkbox from "./components/Checkbox"; // Importamos el componente Checkbox
 
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
@@ -6,52 +8,46 @@ export default function ConfirmationScreen() {
     acta: false,
   });
 
-  const handleChange = (event) => {
-    const { name, checked } = event.target;
+  const handleChange = (name: string, checked: boolean) => {
     setSelectedDocuments((prevState) => ({
       ...prevState,
       [name]: checked,
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("Documentos confirmados:", selectedDocuments);
   };
 
   return (
-    <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
-      <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
-        <h1 className="text-xl font-bold text-center mb-4">Confirmación de Firma</h1>
-        <p className="text-lg mb-4">Confirmación de firma en los documentos de:</p>
+    <CardContainer title="Confirmación de Firma">
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+        <p className="text-lg">Confirmación de firma en los documentos de:</p>
 
-        <div className="mb-4">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name="contrato"
-              checked={selectedDocuments.contrato}
-              onChange={handleChange}
-              id="contrato"
-              className="mr-2"
-            />
-            <label htmlFor="contrato" className="font-semibold">Contrato de Cesión de Derechos de Patrimoniales</label>
-          </div>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name="acta"
-              checked={selectedDocuments.acta}
-              onChange={handleChange}
-              id="acta"
-              className="mr-2"
-            />
-            <label htmlFor="acta" className="font-semibold">Acta de Participación</label>
-          </div>
+        {/* Sección de checkboxes */}
+        <div className="space-y-3">
+          <Checkbox
+            label="Contrato de Cesión de Derechos Patrimoniales"
+            value={selectedDocuments.contrato}
+            onChange={(checked) => handleChange("contrato", checked)}
+          />
+
+          <Checkbox
+            label="Acta de Participación"
+            value={selectedDocuments.acta}
+            onChange={(checked) => handleChange("acta", checked)}
+          />
         </div>
 
-        <button type="submit" className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-gray-400">Siguiente</button>
+        {/* Botón Siguiente */}
+        <button
+          type="submit"
+          className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
+        >
+          Siguiente
+        </button>
       </form>
-    </div>
+    </CardContainer>
   );
 }

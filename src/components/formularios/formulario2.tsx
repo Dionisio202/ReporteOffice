@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { FormatSelector } from "./components/FormatSelector";
-import DocumentViewer from "../files/DocumentViewer";
 import { EmailInput } from "./components/EmailInput";
-
+import FileViewer from "./components/FileViewer";
 interface Formats {
   solicitud: boolean;
   datos: boolean;
@@ -37,10 +36,7 @@ export default function WebPage() {
 
         {/* DocumentViewer in the right column */}
         <div className="md:w-1/2 md:pl-0">
-          <DocumentViewer
-            keyDocument="unique-document-key3"
-            title="Documento de Prueba.docx"
-          />
+        <FileViewer/>
         </div>
       </div>
     </div>
