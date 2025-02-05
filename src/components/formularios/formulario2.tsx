@@ -83,7 +83,7 @@ export default function WebPage() {
                       />
                       <button
                         onClick={() => handleViewDocument(doc.type)}
-                        className="bg-[#931D21] text-white py-1 px-4 rounded hover:bg-blue-500 transition duration-300"
+                        className="bg-[#931D21] text-white py-1 px-4 rounded hover:bg-gray-400 transition duration-300"
                       >
                         Visualizar
                       </button>
