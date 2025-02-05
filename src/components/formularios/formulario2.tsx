@@ -55,11 +55,11 @@ export default function WebPage() {
   ];
 
   return (
-    <div className="flex w-full h-screen p-4 bg-gray-200">
+    <div className="flex w-full h-screen p-2 bg-gray-200">
       {/* Container for the table, email input, and document viewer */}
       <div className="flex w-full flex-col md:flex-row gap-4 mt-4">
         {/* Left half - Table and Email Input */}
-        <div className="w-full md:w-1/2 space-y-4">
+        <div className="w-full md:w-1/3 space-y-4">
           {/* Tabla de documentos */}
           <div className="w-full overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
@@ -95,13 +95,13 @@ export default function WebPage() {
           </div>
 
           {/* Formulario para ingresar correos */}
-          <div className="mt-8">
+          <div className="mt-8 md:w-8/4">
             <EmailInput />
           </div>
         </div>
 
         {/* Right half - Document Viewer */}
-        <div className="w-full md:w-1/2 pl-6 mt-4">
+        <div className="w-full md:w-2/3 pl-6 mt-4">
           {selectedDocument ? (
             <DocumentViewer
               keyDocument={selectedDocument.key}
