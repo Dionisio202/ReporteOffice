@@ -1,32 +1,34 @@
 import { useState } from "react";
-import { EmailInput } from "./components/EmailInput";
-import DocumentViewer from "../files/DocumentViewer";// Importa el DocumentViewer
+import DropdownCard from "./components/DropdownCard";
+import DocumentViewer from "../files/DocumentViewer"; // Asegúrate de importar DocumentViewer correctamente
 
-// Simulamos documentos precargados estáticamente (solo .docx)
+// Simulamos documentos precargados estáticamente
 const staticDocuments = {
-  datos: {
-    key: "fdti", // Clave única para el documento
-    title: "Documento de Datos", // Título del documento
-    nombre: "Formato_datos_informativos_autores.docx", // Nombre del documento para la API
+  "Contrato Cesion de Derechos": {
+    key: "contract-001",
+    title: "Contrato Cesión de Derechos",
+    nombre: "Contrato_Cesion_Derechos.pdf",
   },
-  otroDocumento: {
-    key: "fsr",
-    title: "Documento de registro",
-    nombre: "Formato_solicitud_registro.docx", // Nombre del documento para la API
+  "Acta de Participación": {
+    key: "act-001",
+    title: "Acta de Participación",
+    nombre: "Acta_Participacion.pdf",
   },
 };
 
-export default function WebPage() {
+export default function Formulario6() {
+  // Estado para almacenar el documento seleccionado
   const [selectedDocument, setSelectedDocument] = useState<{
     key: string;
     title: string;
     nombre: string;
   } | null>(null);
-  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set()); // Set para almacenar documentos seleccionados
-  const [emails, setEmails] = useState<string>(""); // Estado para los correos electrónicos
+
+  // Estado para almacenar las opciones seleccionadas (checkbox)
+  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
 
   // Función para seleccionar el documento a visualizar
-  const handleViewDocument = (documentType: keyof typeof staticDocuments) => {
+  const handleViewDocument = (documentType: string) => {
     const document = staticDocuments[documentType];
     setSelectedDocument({
       key: document.key,
@@ -48,19 +50,18 @@ export default function WebPage() {
     });
   };
 
-  // Lista ordenada de documentos (solo .docx)
+  // Lista ordenada de documentos (solo .pdf o .docx)
   const documentList = [
-    { type: "datos", label: "Documento de Datos", icon: "fas fa-file-word text-blue-500" },
-    { type: "otroDocumento", label: "Otro Documento", icon: "fas fa-file-word text-blue-500" },
+    { type: "Contrato Cesion de Derechos", label: "Contrato Cesión de Derechos" },
+    { type: "Acta de Participación", label: "Acta de Participación" },
   ];
 
   return (
     <div className="flex w-full h-screen p-2 bg-gray-200">
-      {/* Container for the table, email input, and document viewer */}
       <div className="flex w-full flex-col md:flex-row gap-4 mt-4">
-        {/* Left half - Table and Email Input */}
+        {/* Menú en la mitad izquierda */}
         <div className="w-full md:w-1/3 space-y-4">
-          {/* Tabla de documentos */}
+          {/* Menú desplegable de documentos */}
           <div className="w-full overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
               <thead>
@@ -93,14 +94,9 @@ export default function WebPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Formulario para ingresar correos */}
-          <div className="mt-8 md:w-8/4">
-            <EmailInput />
-          </div>
         </div>
 
-        {/* Right half - Document Viewer */}
+        {/* Área del documento en la mitad derecha */}
         <div className="w-full md:w-2/3 pl-6 mt-4">
           {selectedDocument ? (
             <DocumentViewer
