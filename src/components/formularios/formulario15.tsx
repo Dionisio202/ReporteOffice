@@ -17,7 +17,12 @@ export default function WebPage() {
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4 w-full">
       {/* Checkbox */}
-      <div className="flex flex-col items-center mb-4">
+      
+
+      {/* Contenedor del documento - Ocupa toda la pantalla */}
+      <div className="w-full h-[calc(100vh-150px)] bg-white shadow-lg rounded-lg p-4 flex flex-col items-center">
+        <h1 className="text-xl font-bold mb-2">Comprobante de Pago</h1>
+        <div className="flex flex-col items-center mb-4">
         <input
           type="checkbox"
           id="curRecibido"
@@ -29,10 +34,6 @@ export default function WebPage() {
           CUR de Pago Recibido
         </label>
       </div>
-
-      {/* Contenedor del documento - Ocupa toda la pantalla */}
-      <div className="w-full h-[calc(100vh-150px)] bg-white shadow-lg rounded-lg p-4 flex flex-col items-center">
-        <h1 className="text-xl font-bold mb-2">Comprobante de Pago</h1>
         <div className="w-full h-full border border-gray-300 rounded-lg overflow-hidden">
           <DocumentViewer
             keyDocument="default"
