@@ -1,46 +1,46 @@
 import { useState } from "react";
 import DocumentViewer from "../files/DocumentViewer"; // Importa tu componente DocumentViewer
-
+import CardContainer from "./components/CardContainer";
+import Checkbox from "./components/Checkbox";
 export default function WebPage() {
-  const [checklist, setChecklist] = useState({
-    curRecibido: false, // Estado del checkbox
+  const [checkedState, setCheckedState] = useState({
+    checkbox1: false,
   });
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, checked } = e.target;
-    setChecklist((prevState) => ({
-      ...prevState,
-      [id]: checked,
-    }));
+  const handleCheckboxChange = (checkboxName: string, newValue: boolean) => {
+    setCheckedState({
+      ...checkedState,
+      [checkboxName]: newValue,
+    });
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4 w-full">
-      {/* Checkbox */}
-      
-
-      {/* Contenedor del documento - Ocupa toda la pantalla */}
-      <div className="w-full h-[calc(100vh-150px)] bg-white shadow-lg rounded-lg p-4 flex flex-col items-center">
-        <h1 className="text-xl font-bold mb-2">Comprobante de Pago</h1>
-        <div className="flex flex-col items-center mb-4">
-        <input
-          type="checkbox"
-          id="curRecibido"
-          className="h-5 w-5 mr-2"
-          checked={checklist.curRecibido}
-          onChange={handleCheckboxChange}
-        />
-        <label htmlFor="curRecibido" className="text-gray-700 text-lg font-medium">
-          CUR de Pago Recibido
-        </label>
-      </div>
-        <div className="w-full h-full border border-gray-300 rounded-lg overflow-hidden">
-          <DocumentViewer
-            keyDocument="default"
-            title="Documento del Comprobante"
-            documentName="Formato_datos_informativos_autores.docx"
+      {/* CardContainer con la sección de registro */}
+      <CardContainer title="Recepción">
+        <div className="flex flex-col space-y-4">
+          <Checkbox
+            label="CUR de Pago Recibido"
+            value={checkedState.checkbox1}
+            onChange={(newValue) => handleCheckboxChange("checkbox1", newValue)}
           />
         </div>
+
+        {/* Botón Enviar */}
+        <div className="mt-6 text-center">
+          <button className="bg-[#931D21] hover:bg-[#7A171A] text-white py-3 px-8 rounded-lg font-semibold hover:scale-105 transition-transform duration-300">
+            Enviar
+          </button>
+        </div>
+      </CardContainer>
+
+      {/* Visor de Documento */}
+      <div className="w-full h-full border border-gray-300 rounded-lg overflow-hidden mt-6">
+        <DocumentViewer
+          keyDocument="default"
+          title="Documento del Comprobante"
+          documentName="Formato_datos_informativos_autores.docx"
+        />
       </div>
 
       {/* Botón Siguiente */}
