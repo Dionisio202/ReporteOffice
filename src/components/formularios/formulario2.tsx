@@ -1,19 +1,20 @@
 import { useState } from "react";
 import { EmailInput } from "./components/EmailInput";
-import DocumentViewer from "../files/DocumentViewer";// Importa el DocumentViewer
+import DocumentViewer from "../files/DocumentViewer"; // Importa el DocumentViewer
 
 // Simulamos documentos precargados estáticamente (solo .docx)
 const staticDocuments = {
   datos: {
-    key: "fdti", // Clave única para el documento
-    title: "Documento de Datos", // Título del documento
-    nombre: "Formato_datos_informativos_autores.docx", // Nombre del documento para la API
+    key: "jfda-001",
+    title: "Formato_datos_informativos_autores",
+    nombre: "jfda-001.docx",
   },
   otroDocumento: {
-    key: "fsr",
-    title: "Documento de registro",
-    nombre: "Formato_solicitud_registro.docx", // Nombre del documento para la API
+    key: "jfsr-001",
+    title: "Formato_solicitud_registro",
+    nombre: "jfsr-001.docx",
   },
+  //j de de jimmy - 
 };
 
 export default function WebPage() {
@@ -22,10 +23,10 @@ export default function WebPage() {
     title: string;
     nombre: string;
   } | null>(null);
-  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set()); // Set para almacenar documentos seleccionados
-  const [emails, setEmails] = useState<string>(""); // Estado para los correos electrónicos
+  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+  const [emails, setEmails] = useState<string>("");
 
-  // Función para seleccionar el documento a visualizar
+  // Seleccionar documento a visualizar
   const handleViewDocument = (documentType: keyof typeof staticDocuments) => {
     const document = staticDocuments[documentType];
     setSelectedDocument({
@@ -35,30 +36,28 @@ export default function WebPage() {
     });
   };
 
-  // Función para manejar el cambio del checkbox
+  // Marcar o desmarcar documento
   const handleCheckboxChange = (documentType: string) => {
     setSelectedDocs((prev) => {
       const newSelectedDocs = new Set(prev);
       if (newSelectedDocs.has(documentType)) {
-        newSelectedDocs.delete(documentType); // Desmarcar el checkbox
+        newSelectedDocs.delete(documentType);
       } else {
-        newSelectedDocs.add(documentType); // Marcar el checkbox
+        newSelectedDocs.add(documentType);
       }
       return newSelectedDocs;
     });
   };
 
-  // Lista ordenada de documentos (solo .docx)
   const documentList = [
-    { type: "datos", label: "Documento de Datos", icon: "fas fa-file-word text-blue-500" },
-    { type: "otroDocumento", label: "Otro Documento", icon: "fas fa-file-word text-blue-500" },
+    { type: "datos", label: "Documento de Datos" },
+    { type: "otroDocumento", label: "Otro Documento" },
   ];
 
   return (
     <div className="flex w-full h-screen p-2 bg-gray-200">
-      {/* Container for the table, email input, and document viewer */}
       <div className="flex w-full flex-col md:flex-row gap-4 mt-4">
-        {/* Left half - Table and Email Input */}
+        {/* Panel Izquierdo - Tabla de documentos y correos */}
         <div className="w-full md:w-1/3 space-y-4">
           {/* Tabla de documentos */}
           <div className="w-full overflow-x-auto">
@@ -74,13 +73,14 @@ export default function WebPage() {
                   <tr key={doc.type} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-2">{doc.label}</td>
                     <td className="px-4 py-2 flex items-center space-x-4">
-                      {/* Checkbox para seleccionar documento */}
+                      {/* Checkbox */}
                       <input
                         type="checkbox"
                         checked={selectedDocs.has(doc.type)}
                         onChange={() => handleCheckboxChange(doc.type)}
                         className="h-4 w-4"
                       />
+                      {/* Botón para visualizar */}
                       <button
                         onClick={() => handleViewDocument(doc.type)}
                         className="bg-[#931D21] text-white py-1 px-4 rounded hover:bg-blue-500 transition duration-300"
@@ -94,19 +94,21 @@ export default function WebPage() {
             </table>
           </div>
 
-          {/* Formulario para ingresar correos */}
+          {/* Input de correos */}
           <div className="mt-8 md:w-8/4">
             <EmailInput />
           </div>
         </div>
 
-        {/* Right half - Document Viewer */}
+        {/* Panel Derecho - Visor de documentos */}
         <div className="w-full md:w-2/3 pl-6 mt-4">
           {selectedDocument ? (
             <DocumentViewer
               keyDocument={selectedDocument.key}
               title={selectedDocument.title}
-              documentName={selectedDocument.nombre} // Pasamos el nombre del documento
+              documentName={selectedDocument.nombre}
+              mode="edit"
+              callbackUrl="http://host.docker.internal:3001/api/save-document"
             />
           ) : (
             <p className="text-center text-gray-500">Selecciona un documento para visualizarlo</p>

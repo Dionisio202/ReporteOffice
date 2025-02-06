@@ -5,6 +5,8 @@ interface DocumentViewerProps {
   keyDocument: string;
   title: string;
   documentName: string; // Nueva prop para el nombre del documento
+  mode?: 'edit' | 'view'; // Modo de visualización del documento
+  callbackUrl?: string; // Hacer que callbackUrl sea opcional
 }
 
 const onDocumentReady = (event: any) => {
@@ -28,32 +30,34 @@ const onLoadComponentError = (errorCode: any, errorDescription: any) => {
   }
 };
 
-const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title, documentName }) => {
+const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title, documentName, mode, callbackUrl }) => {
   const documentUrl = `http://host.docker.internal:3001/api/document?nombre=${encodeURIComponent(documentName)}`;
+
+  // Configuración de ONLYOFFICE con callbackUrl opcional
+  const config: any = {
+    document: {
+      fileType: 'docx',
+      key: keyDocument,
+      title: title,
+      url: documentUrl,
+    },
+    documentType: 'word',
+    editorConfig: {
+      mode: mode || 'view',
+      ...(callbackUrl && { callbackUrl }) // Solo incluir si callbackUrl está definida
+    },
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 items-center justify-center p-6">
       <div className="w-full max-w-6xl border border-gray-300 shadow-md bg-white p-4 flex flex-col h-full">
-
         {/* Contenedor del Editor asegurando altura completa */}
         <div className="flex-grow w-full h-full">
           <div className="w-full h-full">
             <DocumentEditor
               id="docxEditor"
               documentServerUrl="http://localhost"
-              config={{
-                document: {
-                  fileType: 'docx',
-                  key: keyDocument,
-                  title: title,
-                  url: documentUrl, // Usamos la URL con el nombre del documento
-                },
-                documentType: 'word',
-                editorConfig: {
-                  mode: 'edit',
-                  callbackUrl: 'http://host.docker.internal:3001/api/save-document',
-                },
-              }}
+              config={config} // Pasamos la configuración dinámica
               events_onDocumentReady={onDocumentReady}
               onLoadComponentError={onLoadComponentError}
             />
