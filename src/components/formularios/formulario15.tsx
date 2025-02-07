@@ -1,54 +1,59 @@
 import { useState } from "react";
-import DocumentViewer from "../files/DocumentViewer"; // Importa tu componente DocumentViewer
-import CardContainer from "./components/CardContainer";
-import Checkbox from "./components/Checkbox";
-export default function WebPage() {
-  const [checkedState, setCheckedState] = useState({
-    checkbox1: false,
-  });
+import DropdownCard from "./components/DropdownCard"; // Importamos el componente DropdownCard
+import DocumentViewer from "../files/DocumentViewer"; // Asegúrate de importar DocumentViewer correctamente
 
-  const handleCheckboxChange = (checkboxName: string, newValue: boolean) => {
-    setCheckedState({
-      ...checkedState,
-      [checkboxName]: newValue,
+// Simulamos documentos precargados estáticamente
+const staticDocuments = {
+  "Validación de Transferencias": {
+    key: "validacion-001",
+    title: "Contrato Cesión de Derechos",
+    nombre: "Contrato_Cesion_Derechos.pdf",
+  }
+};
+
+export default function Formulario6() {
+  // Estado para almacenar el documento seleccionado
+  const [selectedDocument, setSelectedDocument] = useState<{
+    key: string;
+    title: string;
+    nombre: string;
+  } | null>(null);
+
+  // Función para seleccionar el documento a visualizar
+  const handleViewDocument = (documentType: keyof typeof staticDocuments) => {
+    const document = staticDocuments[documentType]; // Ahora TypeScript sabe que 'documentType' es una clave válida
+    setSelectedDocument({
+      key: document.key,
+      title: document.title,
+      nombre: document.nombre,
     });
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4 w-full">
-      {/* CardContainer con la sección de registro */}
-      <CardContainer title="Recepción">
-        <div className="flex flex-col space-y-4">
-          <Checkbox
-            label="CUR de Pago Recibido"
-            value={checkedState.checkbox1}
-            onChange={(newValue) => handleCheckboxChange("checkbox1", newValue)}
+    <div className="flex w-full h-screen p-2 bg-gray-200">
+      <div className="flex w-full flex-col md:flex-row gap-4 mt-4">
+        {/* Menú en la mitad izquierda con DropdownCard */}
+        <div className="w-full md:w-1/3 space-y-4">
+          <DropdownCard
+            options={Object.keys(staticDocuments)} // Usamos las claves de staticDocuments
+            onSelect={handleViewDocument} // Actualiza el documento seleccionado
+            defaultLabel="Selecciona un documento"
           />
         </div>
 
-        {/* Botón Enviar */}
-        <div className="mt-6 text-center">
-          <button className="bg-[#931D21] hover:bg-[#7A171A] text-white py-3 px-8 rounded-lg font-semibold hover:scale-105 transition-transform duration-300">
-            Enviar
-          </button>
+        {/* Área del documento en la mitad derecha */}
+        <div className="w-full md:w-2/3 pl-6 mt-4">
+          {selectedDocument ? (
+            <DocumentViewer
+              keyDocument={selectedDocument.key}
+              title={selectedDocument.title}
+              documentName={selectedDocument.nombre} // Pasamos el nombre del documento
+            />
+          ) : (
+            <p className="text-center text-gray-500">Selecciona un documento para visualizarlo</p>
+          )}
         </div>
-      </CardContainer>
-
-      {/* Visor de Documento */}
-      <div className="w-full h-full border border-gray-300 rounded-lg overflow-hidden mt-6">
-        <DocumentViewer
-          keyDocument="default"
-          title="Documento del Comprobante"
-          documentName="Formato_datos_informativos_autores.docx"
-        />
       </div>
-
-      {/* Botón Siguiente */}
-      <button
-        className="mt-4 bg-[#931D21] text-white py-2 px-6 rounded-lg text-lg font-bold hover:bg-gray-400 transition duration-300"
-      >
-        Siguiente
-      </button>
     </div>
   );
 }
