@@ -57,7 +57,7 @@ const App = () => {
           </Routes>
         </Router>
       </main>
-      <Footer />
+   
     </div>
   );
 };

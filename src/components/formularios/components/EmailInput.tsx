@@ -2,11 +2,13 @@ import { Card } from "../../UI/card";
 import Button from "../../UI/button";
 import { Send } from "lucide-react";
 import { useState } from "react";
+import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
 
 export function EmailInput() {
   const [email, setEmail] = useState<string>(""); // Almacena el correo electrónico actual
   const [emailList, setEmailList] = useState<string[]>([]); // Almacena la lista de correos electrónicos
   const [error, setError] = useState<string>(""); // Para mostrar errores de validación
+  const bonita: BonitaUtilities = new BonitaUtilities();
 
   // Expresión regular para validar el formato del correo electrónico
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -49,6 +51,7 @@ export function EmailInput() {
   // Lógica para avanzar a la siguiente página
   const handleNext = () => {
     alert("Avanzando a la siguiente página...");
+    bonita.changeTask()
     // Aquí puedes agregar la lógica para navegar a otra página
   };
 
