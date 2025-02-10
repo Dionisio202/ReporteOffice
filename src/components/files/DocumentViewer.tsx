@@ -52,7 +52,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title, doc
     <div className="flex flex-col h-screen bg-gray-100 items-center justify-center p-6">
       <div className="w-full max-w-6xl border border-gray-300 shadow-md bg-white p-4 flex flex-col h-full">
         {/* Contenedor del Editor asegurando altura completa */}
-        <div className="flex-grow w-full h-full">
+        <div className="flex-grow w-full min-h-[1000px]">
           <div className="w-full h-full">
             <DocumentEditor
               id="docxEditor"

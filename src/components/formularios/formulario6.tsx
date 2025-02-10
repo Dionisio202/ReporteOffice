@@ -7,7 +7,7 @@ import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
 // Simulamos documentos precargados estáticamente
 const staticDocuments = {
   "Contrato Cesion de Derechos": {
-    key: "contract-001",
+    key: "jfda-001",
     title: "Contrato Cesión de Derechos",
     nombre: "Contrato_Cesion_Derechos.pdf",
   },
@@ -42,7 +42,7 @@ export default function Formulario6() {
     // Aquí puedes agregar la lógica para navegar a otra página
   };
   return (
-    <div className="w-full h-screen p-4 bg-gray-200 flex flex-col justify-between">
+    <div className="w-full min-h-[1500px] p-4 bg-gray-200 flex flex-col justify-between">
       {/* Contenedor del DropdownCard en el centro superior */}
       <div className="flex flex-row items-center gap-4 py-6">
         <DropdownCard
