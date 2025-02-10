@@ -42,7 +42,11 @@ export default function Formulario6() {
     // Aquí puedes agregar la lógica para navegar a otra página
   };
   return (
+<<<<<<< HEAD
     <div className="w-full min-h-[1500px] p-4 bg-gray-200 flex flex-col justify-between">
+=======
+    <div className="w-full h-full p-4 bg-gray-200 flex flex-col justify-between">
+>>>>>>> dfcddf628ec0ea56d59f184dfa1a47abb63c17ff
       {/* Contenedor del DropdownCard en el centro superior */}
       <div className="flex flex-row items-center gap-4 py-6">
         <DropdownCard
