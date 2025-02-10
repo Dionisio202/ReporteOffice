@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import UploadFile from "./components/UploadFile"; // Componente para cargar archivos
 import { io } from "socket.io-client";
+import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
 
 // 📌 Conectar WebSocket al puerto 3001
 const socket = io("http://localhost:3001");
@@ -9,6 +10,7 @@ export default function UploadForm() {
   const [memoCode, setMemoCode] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [notificaciones, setNotificaciones] = useState<string[]>([]);
+  const bonita: BonitaUtilities = new BonitaUtilities();
 
   useEffect(() => {
     // 📢 Escuchar notificaciones en tiempo real
@@ -20,7 +22,11 @@ export default function UploadForm() {
       socket.off("nuevoMemorando");
     };
   }, []);
-
+  const handleNext = () => {
+    alert("Avanzando a la siguiente página...");
+    bonita.changeTask()
+    // Aquí puedes agregar la lógica para navegar a otra página
+  };
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -61,7 +67,10 @@ export default function UploadForm() {
 
         <UploadFile onFileChange={setFile} /> {/* Componente para cargar archivo, pero no lo enviamos */}
 
-        <button type="submit" className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-gray-400">
+        <button type="submit" className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-gray-400"
+         onClick={handleNext}
+
+        >
           Siguiente
         </button>
       </form>
