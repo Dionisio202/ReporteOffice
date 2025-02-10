@@ -1,5 +1,6 @@
 import { useState } from "react";
 import UploadFile from "./components/UploadFile";
+import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
 
 export default function UploadForm() {
   // Definimos los hooks de estado para los campos del formulario
@@ -7,6 +8,7 @@ export default function UploadForm() {
   const [comment, setComment] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const bonita: BonitaUtilities = new BonitaUtilities();
 
   // Función que maneja el cambio de archivo
   const handleFileChange = (selectedFile: File | null) => {
@@ -18,7 +20,11 @@ export default function UploadForm() {
     event.preventDefault();
     console.log("Datos enviados:", { memoCode, comment, selectedType, file });
   };
-
+  const handleNext = () => {
+    alert("Avanzando a la siguiente página...");
+    bonita.changeTask()
+    // Aquí puedes agregar la lógica para navegar a otra página
+  };
   return (
     <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
       <form
@@ -96,6 +102,8 @@ export default function UploadForm() {
         <button
           type="submit"
           className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-[#7A171A] transition duration-300"
+          onClick={handleNext}
+
         >
           Siguiente
         </button>
