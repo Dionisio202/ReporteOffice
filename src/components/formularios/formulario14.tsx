@@ -2,10 +2,13 @@ import { useState } from "react";
 import DocumentViewer from "../files/DocumentViewer"; // Importa tu componente DocumentViewer
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox";
+import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+
 export default function Formulario14() {
   const [checkedState, setCheckedState] = useState({
     checkbox1: false,
   });
+  const bonita: BonitaUtilities = new BonitaUtilities();
 
   const handleCheckboxChange = (checkboxName: string, newValue: boolean) => {
     setCheckedState({
@@ -13,6 +16,12 @@ export default function Formulario14() {
       [checkboxName]: newValue,
     });
   };
+  const handleNext = () => {
+    alert("Avanzando a la siguiente página...");
+    bonita.changeTask()
+    // Aquí puedes agregar la lógica para navegar a otra página
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4 w-full">
@@ -46,6 +55,7 @@ export default function Formulario14() {
       {/* Botón Siguiente */}
       <button
         className="mt-4 bg-[#931D21] text-white py-2 px-6 rounded-lg text-lg font-bold hover:bg-gray-400 transition duration-300"
+        onClick={handleNext}
       >
         Siguiente
       </button>

@@ -3,6 +3,7 @@ import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox";
 import { EmailInput } from "./components/EmailInput";
 import FileViewer from "./components/FileViewer";
+import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
 
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
@@ -10,6 +11,7 @@ export default function ConfirmationScreen() {
   });
 
   const [selectedDocument, setSelectedDocument] = useState<File | null>(null);
+  const bonita: BonitaUtilities = new BonitaUtilities();
 
   // Simula la selección de un documento cualquiera
   const handleViewDocument = () => {
@@ -32,6 +34,8 @@ export default function ConfirmationScreen() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("Documentos confirmados:", selectedDocuments);
+    alert("Avanzando a la siguiente página...");
+    bonita.changeTask()
   };
 
   return (
