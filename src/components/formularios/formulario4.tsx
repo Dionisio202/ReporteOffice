@@ -64,12 +64,10 @@ export default function UploadForm() {
             onChange={(e) => setMemoCode(e.target.value)}
           />
         </div>
-
         <UploadFile onFileChange={setFile} /> {/* Componente para cargar archivo, pero no lo enviamos */}
 
         <button type="submit" className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-gray-400"
-         onClick={handleNext}
-
+        onClick={handleNext}
         >
           Siguiente
         </button>
