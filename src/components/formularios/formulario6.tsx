@@ -36,7 +36,7 @@ export default function Formulario6() {
   };
 
   return (
-    <div className="w-full h-screen p-4 bg-gray-200 flex flex-col justify-between">
+    <div className="w-full h-full p-4 bg-gray-200 flex flex-col justify-between">
       {/* Contenedor del DropdownCard en el centro superior */}
       <div className="flex flex-row items-center gap-4 py-6">
         <DropdownCard
