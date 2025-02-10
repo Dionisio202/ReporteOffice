@@ -66,7 +66,9 @@ export default function UploadForm() {
         </div>
         <UploadFile onFileChange={setFile} /> {/* Componente para cargar archivo, pero no lo enviamos */}
 
-        <button type="submit" className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-gray-400">
+        <button type="submit" className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-gray-400"
+        onClick={handleNext}
+        >
           Siguiente
         </button>
       </form>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CardContainer from "./components/CardContainer";
+import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
 
 export default function DocumentForm() {
   const [memoCode, setMemoCode] = useState<string>("");
@@ -12,9 +13,15 @@ export default function DocumentForm() {
     checkbox6: false,
     checkbox7: false,
   });
+  const bonita: BonitaUtilities = new BonitaUtilities();
 
   const handleMemoCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMemoCode(event.target.value);
+  };
+  const handleNext = () => {
+    alert("Avanzando a la siguiente página...");
+    bonita.changeTask()
+    // Aquí puedes agregar la lógica para navegar a otra página
   };
 
   const handleCheckboxChange = (name: string, value: boolean) => {
@@ -77,6 +84,8 @@ export default function DocumentForm() {
         <button
           type="submit"
           className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
+          onClick={handleNext}
+
         >
           Siguiente
         </button>

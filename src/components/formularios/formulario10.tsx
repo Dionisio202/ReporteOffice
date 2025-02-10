@@ -1,11 +1,13 @@
 import { useState } from "react";
 import CardContainer from "./components/CardContainer";
+import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
 
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
     contrato: false,
     acta: false,
   });
+  const bonita: BonitaUtilities = new BonitaUtilities();
 
   const handleChange = (event) => {
     const { name, checked } = event.target;
@@ -18,6 +20,11 @@ export default function ConfirmationScreen() {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log("Documentos confirmados:", selectedDocuments);
+  };
+  const handleNext = () => {
+    alert("Avanzando a la siguiente página...");
+    bonita.changeTask()
+    // Aquí puedes agregar la lógica para navegar a otra página
   };
 
   return (
@@ -53,7 +60,8 @@ export default function ConfirmationScreen() {
         <button
           type="submit"
           className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
-        >
+          onClick={handleNext}
+       >
           Siguiente
         </button>
       </form>

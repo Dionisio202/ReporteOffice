@@ -1,10 +1,12 @@
 import { useState } from "react";
 import DocumentViewer from "../files/DocumentViewer"; // Importa tu componente de visor de documentos
+import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
 
 export default function WebPage() {
   const [codigo, setCodigo] = useState(""); // Código del comprobante
   const [codigoGuardado, setCodigoGuardado] = useState<string | null>(null); // Código guardado después de hacer clic en Siguiente
   const [documento, setDocumento] = useState<string>("Formato_datos_informativos_autores.docx"); // Documento predeterminado
+  const bonita: BonitaUtilities = new BonitaUtilities();
 
   const handleCodigoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCodigo(e.target.value);
@@ -17,6 +19,9 @@ export default function WebPage() {
       // Por ejemplo:
       // fetchDocumentoFromDatabase(codigo).then(setDocumento);
       setCodigo(""); // Limpia el input después de guardar el código
+      bonita.changeTask()
+      alert("Avanzando a la siguiente página...");
+
     }
   };
 

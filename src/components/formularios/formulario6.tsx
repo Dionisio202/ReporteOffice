@@ -2,6 +2,7 @@ import { useState } from "react";
 import DropdownCard from "./components/DropdownCard"; // Importamos el componente DropdownCard
 import DocumentViewer from "../files/DocumentViewer"; // Asegúrate de importar DocumentViewer correctamente
 import Button from "../UI/button"; // Importamos el componente Button
+import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
 
 // Simulamos documentos precargados estáticamente
 const staticDocuments = {
@@ -24,6 +25,7 @@ export default function Formulario6() {
     title: string;
     nombre: string;
   } | null>(null);
+  const bonita: BonitaUtilities = new BonitaUtilities();
 
   // Función para seleccionar el documento a visualizar
   const handleViewDocument = (documentType: keyof typeof staticDocuments) => {
@@ -34,7 +36,11 @@ export default function Formulario6() {
       nombre: document.nombre,
     });
   };
-
+  const handleNext = () => {
+    alert("Avanzando a la siguiente página...");
+    bonita.changeTask()
+    // Aquí puedes agregar la lógica para navegar a otra página
+  };
   return (
     <div className="w-full h-full p-4 bg-gray-200 flex flex-col justify-between">
       {/* Contenedor del DropdownCard en el centro superior */}
@@ -44,7 +50,10 @@ export default function Formulario6() {
           onSelect={handleViewDocument}
           defaultLabel="Selecciona un documento"
         />
-        <Button className="w-40 bg-[#931D21] text-white p-2 rounded hover:bg-[#7A171A] transition duration-300">
+        <Button className="w-40 bg-[#931D21] text-white p-2 rounded hover:bg-[#7A171A] transition duration-300"
+         onClick={handleNext}
+
+        >
           Siguiente
         </Button>
       </div>
