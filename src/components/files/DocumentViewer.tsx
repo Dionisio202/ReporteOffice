@@ -56,7 +56,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title, doc
           <div className="w-full h-full">
             <DocumentEditor
               id="docxEditor"
-              documentServerUrl="http://localhost"
+              documentServerUrl="http://localhost:8080/"
               config={config} // Pasamos la configuración dinámica
               events_onDocumentReady={onDocumentReady}
               onLoadComponentError={onLoadComponentError}
