@@ -1,7 +1,7 @@
 import { useState } from "react";
 import UploadFile from "./components/UploadFile";
 import BonitaUtilities from "../bonita/bonita-utilities.js";
-
+import Button from "../UI/button.js";
 export default function UploadForm() {
   const [memoCode, setMemoCode] = useState("");
   const [productos, setProductos] = useState<
@@ -50,7 +50,11 @@ export default function UploadForm() {
 
     console.log("Datos enviados:", jsonData);
   };
-
+  const handleNext = () => {
+    alert("Avanzando a la siguiente página...");
+    bonita.changeTask();
+    // Aquí puedes agregar la lógica para navegar a otra página
+  };
   return (
     <div className="flex flex-col items-center p-6 bg-gradient-to-r to-gray-100 min-h-screen">
       <form
@@ -241,12 +245,14 @@ export default function UploadForm() {
           ></textarea>
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-[#931D21] text-white p-3 rounded-lg hover:bg-gray-900 transition duration-300"
-        >
-          Siguiente
-        </button>
+        <div className="flex justify-center mt-6">
+          <Button
+            className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
+            onClick={handleNext}
+          >
+            Siguiente
+          </Button>
+        </div>
       </form>
     </div>
   );

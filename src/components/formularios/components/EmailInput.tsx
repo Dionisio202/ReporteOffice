@@ -117,7 +117,7 @@ export function EmailInput() {
       {/* Botón "Siguiente" al final, centrado */}
       <div className="flex justify-center mt-6">
         <Button
-          className="bg-blue-600 text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
+          className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
           onClick={handleNext}
         >
           Siguiente
