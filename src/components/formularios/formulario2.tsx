@@ -55,10 +55,10 @@ export default function WebPage() {
   ];
 
   return (
-    <div className="flex w-full h-screen p-2 bg-gray-200">
-      <div className="flex w-full flex-col md:flex-row gap-4 mt-4">
+    <div className="flex w-full h-full p-2 bg-gray-200">
+      <div className="flex w-full h-full flex-col md:flex-row gap-4 mt-4">
         {/* Panel Izquierdo - Tabla de documentos y correos */}
-        <div className="w-full md:w-1/3 space-y-4">
+        <div className="w-full md:w-1/4 space-y-4">
           {/* Tabla de documentos */}
           <div className="w-full overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
@@ -101,7 +101,7 @@ export default function WebPage() {
         </div>
 
         {/* Panel Derecho - Visor de documentos */}
-        <div className="w-full md:w-2/3 pl-6 mt-4">
+        <div className="w-full h-full md:w-3/4 pl-6 mt-0.5">
           {selectedDocument ? (
             <DocumentViewer
               keyDocument={selectedDocument.key}
