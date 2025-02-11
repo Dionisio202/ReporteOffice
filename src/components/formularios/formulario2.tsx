@@ -50,8 +50,8 @@ export default function WebPage() {
   };
 
   const documentList = [
-    { type: "datos", label: "Documento de Datos" },
-    { type: "otroDocumento", label: "Otro Documento" },
+    { type: "datos", label: "Formato datos informativos de autores" },
+    { type: "otroDocumento", label: "Formato Solicitud de registro" },
   ];
 
   return (
