@@ -1,60 +1,90 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { io } from "socket.io-client";
 import UploadFile from "./components/UploadFile";
 import BonitaUtilities from "../bonita/bonita-utilities.js";
 import Button from "../UI/button.js";
-export default function UploadForm() {
-  const [memoCode, setMemoCode] = useState("");
-  const [productos, setProductos] = useState<
-    { nombre: string; tipo: string }[]
-  >([{ nombre: "", tipo: "" }]);
-  const [facultad, setFacultad] = useState("");
-  const [comment, setComment] = useState("");
-  const [proyectoNombre, setProyectoNombre] = useState("");
-  const [proyectoCodigo, setProyectoCodigo] = useState("");
-  const [autoridadNombre, setAutoridadNombre] = useState(""); // Estado para el nombre de la autoridad
-  const bonita = new BonitaUtilities();
 
-  const handleProductoChange = (
-    index: number,
-    field: "nombre" | "tipo",
-    value: string
-  ) => {
+export default function UploadForm() {
+  const [socket, setSocket] = useState(null); // Estado para la conexión WebSocket
+  const [memoCode, setMemoCode] = useState(""); // Estado para el código del memorando
+  const [productos, setProductos] = useState([{ nombre: "", tipo: "" }]); // Estado para los productos
+  const [facultad, setFacultad] = useState(""); // Estado para la facultad
+  const [proyectoNombre, setProyectoNombre] = useState(""); // Estado para el nombre del proyecto
+  const [proyectoCodigo, setProyectoCodigo] = useState(""); // Estado para el código del proyecto
+  const [autoridadNombre, setAutoridadNombre] = useState(""); // Estado para el nombre de la autoridad
+  const bonita = new BonitaUtilities(); // Instancia de BonitaUtilities
+
+  // Conectar al servidor WebSocket cuando el componente se monta
+  useEffect(() => {
+    const newSocket = io("http://localhost:3001"); // Cambia la URL si es necesario
+    setSocket(newSocket);
+
+    // Manejar la desconexión al desmontar el componente
+    return () => newSocket.disconnect();
+  }, []);
+
+  // Función para manejar cambios en los productos
+  const handleProductoChange = (index, field, value) => {
     const updatedProductos = [...productos];
     updatedProductos[index][field] = value;
     setProductos(updatedProductos);
   };
 
+  // Función para agregar un nuevo producto
   const addProducto = () => {
     setProductos([...productos, { nombre: "", tipo: "" }]);
   };
 
-  const removeProducto = (index: number) => {
+  // Función para eliminar un producto
+  const removeProducto = (index) => {
     const updatedProductos = productos.filter((_, i) => i !== index);
     setProductos(updatedProductos);
   };
 
-  const handleFileChange = (file: File) => {
-    console.log(file);
+  // Función para manejar cambios en el archivo subido
+  const handleFileChange = (file) => {
+    console.log("Archivo subido:", file);
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  // Función para manejar el envío del formulario
+  const handleSubmit = (event) => {
     event.preventDefault();
 
+    // Asegúrate de que el ID de la autoridad sea un número
+    const idAutoridad = 3; // Cambia esto al ID correcto (puedes obtenerlo dinámicamente)
+
+    // Crear el objeto JSON con los datos del formulario
     const jsonData = {
-      id_registro: memoCode,
+      id_registro: 3, // Cambia esto a un valor dinámico si es necesario
       productos: productos,
-      autoridad: { nombre: autoridadNombre, facultad: facultad }, // Agregar autoridad
+      autoridad: idAutoridad, // Envía el ID de la autoridad en lugar del objeto
       proyecto: { nombre: proyectoNombre, codigo: proyectoCodigo },
-      memorando: comment,
+      memorando: memoCode,
     };
 
-    console.log("Datos enviados:", jsonData);
+    // Enviar los datos al backend a través de WebSocket
+    if (socket) {
+      socket.emit("agregar_producto_datos", jsonData, (response) => {
+        if (response.success) {
+          console.log("Datos enviados correctamente:", response.message);
+          alert("Datos enviados correctamente");
+        } else {
+          console.error("Error al enviar datos:", response.message);
+          alert("Error al enviar datos");
+        }
+      });
+    } else {
+      console.error("WebSocket no está conectado");
+      alert("Error: WebSocket no está conectado");
+    }
   };
+
+  // Función para manejar el botón "Siguiente"
   const handleNext = () => {
     alert("Avanzando a la siguiente página...");
     bonita.changeTask();
-    // Aquí puedes agregar la lógica para navegar a otra página
   };
+
   return (
     <div className="flex flex-col items-center p-6 bg-gradient-to-r to-gray-100 min-h-screen">
       <form
@@ -65,14 +95,13 @@ export default function UploadForm() {
           Formulario 3
         </h1>
 
+        {/* Componente para subir archivos */}
         <UploadFile onFileChange={handleFileChange} />
 
+        {/* Campos del formulario */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label
-              htmlFor="memoCode"
-              className="block font-semibold text-gray-900"
-            >
+            <label htmlFor="memoCode" className="block font-semibold text-gray-900">
               Ingrese el código del memorando generado
             </label>
             <input
@@ -86,10 +115,7 @@ export default function UploadForm() {
           </div>
 
           <div>
-            <label
-              htmlFor="facultad"
-              className="block font-semibold text-gray-900"
-            >
+            <label htmlFor="facultad" className="block font-semibold text-gray-900">
               Ingrese la Facultad que emite
             </label>
             <input
@@ -106,10 +132,7 @@ export default function UploadForm() {
         {/* Campos del Proyecto */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label
-              htmlFor="proyectoNombre"
-              className="block font-semibold text-gray-900"
-            >
+            <label htmlFor="proyectoNombre" className="block font-semibold text-gray-900">
               Nombre del Proyecto
             </label>
             <input
@@ -123,10 +146,7 @@ export default function UploadForm() {
           </div>
 
           <div>
-            <label
-              htmlFor="proyectoCodigo"
-              className="block font-semibold text-gray-900"
-            >
+            <label htmlFor="proyectoCodigo" className="block font-semibold text-gray-900">
               Código del Proyecto
             </label>
             <input
@@ -143,10 +163,7 @@ export default function UploadForm() {
         {/* Campos de Autoridad */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label
-              htmlFor="autoridadNombre"
-              className="block font-semibold text-gray-900"
-            >
+            <label htmlFor="autoridadNombre" className="block font-semibold text-gray-900">
               Nombre de la Autoridad
             </label>
             <input
@@ -160,7 +177,7 @@ export default function UploadForm() {
           </div>
         </div>
 
-        {/* Parte de productos */}
+        {/* Lista de Productos */}
         <div className="mb-6">
           <label className="block font-semibold text-gray-900">Productos</label>
           {productos.map((producto, index) => (
@@ -218,6 +235,7 @@ export default function UploadForm() {
               </div>
             </div>
           ))}
+          {/* Botón para agregar un nuevo producto */}
           <button
             type="button"
             className="mt-4 bg-[#931D21] text-white p-2 rounded"
@@ -227,24 +245,7 @@ export default function UploadForm() {
           </button>
         </div>
 
-        {/* Comentario */}
-        <div className="mb-6">
-          <label
-            htmlFor="comment"
-            className="block font-semibold text-gray-900"
-          >
-            Comentario
-          </label>
-          <textarea
-            id="comment"
-            className="w-full border-2 border-gray-500 p-3 rounded-lg mt-2"
-            rows={3}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            required
-          ></textarea>
-        </div>
-
+        {/* Botón para enviar el formulario */}
         <div className="flex justify-center mt-6">
           <Button
             className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"

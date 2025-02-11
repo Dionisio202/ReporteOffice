@@ -2,7 +2,7 @@ import { Card } from "../../UI/card";
 import Button from "../../UI/button";
 import { Send } from "lucide-react";
 import { useState } from "react";
-import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+import BonitaUtilities from '../../bonita/bonita-utilities.js';
 
 export function EmailInput() {
   const [email, setEmail] = useState<string>(""); // Almacena el correo electrónico actual
