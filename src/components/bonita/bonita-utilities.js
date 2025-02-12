@@ -10,7 +10,7 @@ export default class BonitaUtilities {
     this.#TASKINSTANCEID = urlParams.get("id");
 
     this.#BONITATOKEN = this.#getBonitaToken();
-    this.#BONITAURL = "http://localhost:36295/bonita";
+    this.#BONITAURL = "http://localhost:10116/bonita";
     this.#APIURL = `${this.#BONITAURL}/API/bpm`;
   }
 

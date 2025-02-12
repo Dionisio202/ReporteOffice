@@ -253,6 +253,12 @@ export default function UploadForm() {
           >
             Siguiente
           </Button>
+          <Button
+            className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
+            onClick={handleNext}
+          >
+            Guardar
+          </Button>
         </div>
       </form>
     </div>
