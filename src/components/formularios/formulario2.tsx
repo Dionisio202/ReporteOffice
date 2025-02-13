@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { EmailInput } from "./components/EmailInput";
 import DocumentViewer from "../files/DocumentViewer"; // Importa el DocumentViewer
-
+import Title from "./components/TitleProps";
 // Simulamos documentos precargados estáticamente (solo .docx)
 const staticDocuments = {
   datos: {
@@ -57,20 +57,21 @@ export default function WebPage() {
       <div className="flex w-full h-full flex-col md:flex-row gap-4 mt-4">
         {/* Panel Izquierdo - Tabla de documentos y correos */}
         <div className="w-full md:w-1/4 space-y-4">
+        <Title text="Asesoramiento Registro Propiedad Intelectual" size="2xl" className="text-center text-gray-800 mb-4 text-xl" />
           {/* Tabla de documentos */}
           <div className="w-full overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="px-4 py-2 text-left">Documento</th>
-                  <th className="px-4 py-2 text-left">Acción</th>
+                  <th className="px-4 py-1 text-left text-xs">Documento</th>
+                  <th className="px-4 py-1 text-left text-xs">Acción</th>
                 </tr>
               </thead>
               <tbody>
                 {documentList.map((doc) => (
                   <tr key={doc.type} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-2">{doc.label}</td>
-                    <td className="px-4 py-2 flex items-center space-x-4">
+                    <td className="px-4 py-1 text-xs">{doc.label}</td>
+                    <td className="px-4 py-1 text-xs flex items-center space-x-4">
                       {/* Checkbox */}
                       <input
                         type="checkbox"
@@ -93,7 +94,7 @@ export default function WebPage() {
           </div>
 
           {/* Input de correos */}
-          <div className="mt-8 md:w-8/4">
+          <div className="mt-3 md:w-8/4">
             <EmailInput />
           </div>
         </div>
