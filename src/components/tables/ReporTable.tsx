@@ -32,6 +32,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ filters }) => {
   );
 
   // Tipo explícito para el parámetro 'report' que es de tipo 'Report'
+  // @ts-ignore
   const handleEdit = (report: Report) => {
     navigate(`/ReporteEditor`); // Redirigir al hacer clic en editar
   };

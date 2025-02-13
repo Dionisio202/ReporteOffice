@@ -4,10 +4,13 @@ FROM node:18 AS build
 # Configurar el directorio de trabajo
 WORKDIR /app
 
-# Copiar los archivos del frontend
+# Copiar los archivos de configuración
 COPY package.json package-lock.json ./
+
+# Instalar las dependencias
 RUN npm install
 
+# Copiar el resto de los archivos del proyecto
 COPY . .
 
 # Construir la aplicación
