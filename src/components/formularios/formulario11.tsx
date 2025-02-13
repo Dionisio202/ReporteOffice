@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox";
 import Uploadfile from "./components/UploadFile";
-import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+import { BonitaUtilities } from "../bonita/bonita-utilities";
 
 const Formulario11: React.FC = () => {
   const [checkedState, setCheckedState] = useState({
@@ -25,7 +25,7 @@ const Formulario11: React.FC = () => {
     <CardContainer title="Registro de Propiedad Intelectual">
       {/* Sección de carga de archivos */}
       <div className="mb-6">
-        <Uploadfile />
+        <Uploadfile onFileChange={(file) => console.log(file)} />
       </div>
 
       {/* Sección de Checkbox */}

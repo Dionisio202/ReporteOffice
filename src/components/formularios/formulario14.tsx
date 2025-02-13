@@ -2,7 +2,7 @@ import { useState } from "react";
 import DocumentViewer from "../files/DocumentViewer"; // Importa tu componente DocumentViewer
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox";
-import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+import { BonitaUtilities } from "../bonita/bonita-utilities";
 
 export default function Formulario14() {
   const [checkedState, setCheckedState] = useState({

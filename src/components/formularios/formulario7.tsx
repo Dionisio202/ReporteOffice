@@ -1,7 +1,7 @@
 import { useState } from "react";
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox"; // Importamos el componente Checkbox
-import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+import { BonitaUtilities } from "../bonita/bonita-utilities";
 
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({

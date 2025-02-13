@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox";
-import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+import { BonitaUtilities } from "../bonita/bonita-utilities";
 
 const Formulario9: React.FC = () => {
   const [checkedState, setCheckedState] = useState({

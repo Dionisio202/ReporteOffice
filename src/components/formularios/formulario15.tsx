@@ -2,13 +2,19 @@ import { useState } from "react";
 import DropdownCard from "./components/DropdownCard"; // Importamos el componente DropdownCard
 import DocumentViewer from "../files/DocumentViewer"; // Asegúrate de importar DocumentViewer correctamente
 import Button from "../UI/button"; // Importamos el componente Button
-import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+import { BonitaUtilities } from "../bonita/bonita-utilities";
 
-// Simulamos documentos precargados estáticamente
-const staticDocuments = {
+// Definimos un tipo para nuestros documentos
+type StaticDocument = {
+  key: string;
+  title: string;
+  nombre: string;
+};
+
+const staticDocuments: Record<string, StaticDocument> = {
   "Validación de Transferencias": {
     key: "validac-001",
-    title: "Validación ",
+    title: "Validación",
     nombre: "Validación_Transferencias.pdf",
   }
 };
@@ -60,7 +66,6 @@ export default function Formulario6() {
             keyDocument={selectedDocument.key}
             title={selectedDocument.title}
             documentName={selectedDocument.nombre}
-            className="w-full h-full" // Hace que el visor ocupe todo el espacio disponible
           />
         ) : (
           <p className="text-center text-gray-500">

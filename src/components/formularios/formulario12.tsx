@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DocumentViewer from "../files/DocumentViewer"; // Importa tu componente de visor de documentos
-import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+import { BonitaUtilities } from "../bonita/bonita-utilities";
 
 export default function WebPage() {
   const [codigo, setCodigo] = useState(""); // Código del comprobante

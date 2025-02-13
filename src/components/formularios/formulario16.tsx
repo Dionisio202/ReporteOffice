@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CardContainer from "./components/CardContainer";
-import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+import { BonitaUtilities } from "../bonita/bonita-utilities";
 
 export default function DocumentForm() {
   const [memoCode, setMemoCode] = useState<string>("");

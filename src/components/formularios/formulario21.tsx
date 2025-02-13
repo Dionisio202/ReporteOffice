@@ -3,7 +3,7 @@ import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox";
 import { EmailInput } from "./components/EmailInput";
 import FileViewer from "./components/FileViewer";
-import { BonitaUtilities } from '../bonita/bonita-utilities';
+import { BonitaUtilities } from "../bonita/bonita-utilities";
 
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
@@ -31,11 +31,11 @@ export default function ConfirmationScreen() {
     }));
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault(); // Opcional: Evita el comportamiento por defecto del botón
     console.log("Documentos confirmados:", selectedDocuments);
     alert("Avanzando a la siguiente página...");
-    bonita.changeTask()
+    bonita.changeTask();
   };
 
   return (
@@ -76,7 +76,7 @@ export default function ConfirmationScreen() {
 
           {/* ▶️ Botón Siguiente */}
           <button
-            type="submit"
+            type="button" // Cambia el tipo a "button"
             className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-3 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
             onClick={handleSubmit}
           >
