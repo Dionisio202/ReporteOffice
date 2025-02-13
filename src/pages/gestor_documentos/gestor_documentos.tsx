@@ -4,15 +4,17 @@ import Search from "../../components/search/Search";
 import Filters from "../../components/reports/Filters";
 import Format from "../../components/reports/Format";
 import { FaEye, FaTrash } from "react-icons/fa";
-
+import { DocumentInterface } from "../../interfaces/document.interface";
 
 const GestorDocumentos = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [year, setYear] = useState("2025");
-  const [documentType, setDocumentType] = useState({ POA: false });
+  const [documentType, setDocumentType] = useState({ POA: false, Todos: false });
   const [showModal, setShowModal] = useState(false);  
-  const [currentDoc, setCurrentDoc] = useState(null);
+
+  
+  const [currentDoc, setCurrentDoc] = useState<DocumentInterface | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // Para mostrar el contenedor de confirmación
 
   const [documentos, setDocumentos] = useState([
@@ -24,11 +26,11 @@ const GestorDocumentos = () => {
   const resetFilters = () => {
     setSearch("");
     setYear("2025");
-    setDocumentType({ POA: false });
+    setDocumentType({ POA: false, Todos: false });
   };
 
   const handleTypeChange = () => {
-    setDocumentType((prev) => ({ POA: !prev.POA }));
+    setDocumentType((prev) => ({ ...prev, POA: !prev.POA }));
   };
 
   const isDisabled = !documentType["POA"];
@@ -37,13 +39,15 @@ const GestorDocumentos = () => {
     (doc) =>
       doc.nombre.toLowerCase().includes(search.toLowerCase()) &&
       doc.año === year &&
-      (documentType["Todos"] || documentType[doc.tipo])
+      (documentType["Todos"] || documentType[doc.tipo as keyof typeof documentType])
   );
 
   
   const handleDelete = () => {
     // Filtramos el documento eliminado de la lista de documentos
-    setDocumentos(documentos.filter(d => d.nombre !== currentDoc.nombre));
+    if (currentDoc) {
+      setDocumentos(documentos.filter(d => d.nombre !== currentDoc.nombre));
+    }
     setCurrentDoc(null);  // Limpiar el documento actual para evitar problemas con la descarga
     setShowDeleteConfirm(false); // Cerramos el contenedor de confirmación
   };
@@ -60,11 +64,11 @@ const GestorDocumentos = () => {
     navigate("/Formato");
   };
 
-  const handleView = (doc) => {
-  console.log(doc);  // Verifica si el documento es el correcto
-  setCurrentDoc(doc);
-  setShowModal(true);
-};
+//   const handleView = (doc) => {
+//   console.log(doc);  // Verifica si el documento es el correcto
+//   setCurrentDoc(doc);
+//   setShowModal(true);
+// };
 
 
   const closeModal = () => {

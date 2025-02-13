@@ -5,5 +5,6 @@ export interface DocumentType {
   export interface FiltersProps {
     documentType: DocumentType;
     handleTypeChange: (type: string) => void;
-    clearFilters: () => void;
+    clearFilters?: () => void;
+    disabled?: boolean;
   }

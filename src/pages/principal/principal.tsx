@@ -6,6 +6,8 @@ import CardContent from "../../components/cards/cardcontent";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../../components/tables/table";
 import { FileText } from "lucide-react";
 
+type ColorKey = 'red' | 'yellow' | 'green' | 'gray';
+
 const COLORS = {
   red: "#d9534f",
   yellow: "#f0ad4e",
@@ -13,26 +15,40 @@ const COLORS = {
   gray: "#d3d3d3",
 };
 
-const initialData = [
+interface ChartData {
+  year: string;
+  progress: number;
+  label: string;
+  color: string;
+  status: ColorKey;
+}
+
+interface TableData {
+  name: string;
+  progress: string;
+  status: ColorKey;
+}
+const initialData: ChartData[] = [
   { year: "POA 2025", progress: 10, label: "1 actividad", color: COLORS.red, status: "red" },
   { year: "POA 2025", progress: 40, label: "3 actividad", color: COLORS.yellow, status: "yellow" },
   { year: "POA 2024", progress: 100, label: "Completo", color: COLORS.green, status: "green" },
 ];
 
-const initialTableData = [
+const initialTableData: TableData[] = [
   { name: "POA 2026", progress: "-", status: "gray" },
   { name: "POA 2025", progress: "40%", status: "yellow" },
   { name: "POA 2024", progress: "100%", status: "green" },
 ];
 
 const Principal: React.FC = () => {
-  const [data, setData] = useState(initialData);
-  const [tableData, setTableData] = useState(initialTableData);
-
+  //const [data, setData] = useState<ChartData[]>(initialData);
+  //const [tableData, setTableData] = useState<TableData[]>(initialTableData);
+  const [data] = useState<ChartData[]>(initialData);
+  const [tableData] = useState<TableData[]>(initialTableData);
   const pieData = Object.keys(COLORS).map((status) => ({
     name: status.toUpperCase(),
     value: tableData.filter((d) => d.status === status).length,
-    color: COLORS[status],
+    color: COLORS[status as ColorKey],
   }));
 
   return (

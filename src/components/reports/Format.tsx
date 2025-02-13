@@ -6,8 +6,13 @@ import logoUTA from "../../assets/img/logoUTA.png";
 import DataFetcher from "./DataFetcher";
 import { PDFConfig, TableStyles } from "../../interfaces/format.interface";
 import { Actividad } from '../../interfaces/actividad.interface';
+import { DocumentInterface } from "../../interfaces/document.interface";
 
-const Format: React.FC = () => {
+interface FormatProps {
+  doc?: DocumentInterface | null;
+}
+
+const Format: React.FC<FormatProps> = () => {
   const [actividad, setActividad] = useState<Actividad[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
