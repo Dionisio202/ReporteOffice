@@ -1,12 +1,12 @@
+// src/components/Checkbox/Checkbox.tsx
 import React from 'react';
+import { CheckboxProps } from '../../../interfaces/checkbox.interface';
 
-interface CheckboxProps {
-  label: string;           // Etiqueta que aparece al lado del checkbox
-  value: boolean;          // Estado actual del checkbox
-  onChange: (value: boolean) => void; // Función para manejar cambios
-}
-
-const Checkbox: React.FC<CheckboxProps> = ({ label, value, onChange }) => {
+const Checkbox: React.FC<CheckboxProps> = ({ 
+  label, 
+  value, 
+  onChange 
+}) => {
   return (
     <div className="flex flex-col space-y-2">
       <div className="flex items-center space-x-2">

@@ -1,38 +1,28 @@
-// DataFetcher.tsx
+// src/components/DataFetcher/DataFetcher.tsx
 import { useEffect } from 'react';
 import io from 'socket.io-client';
+import { 
+  Actividad, 
+  DataFetcherProps, 
+  ServerResponse, 
+  RawActivityData 
+} from '../../interfaces/actividad.interface';
 
-interface Actividad {
-  nombre_actividad: string;
-  indicador_actividad: string;
-  proyeccion_actividad: string;
-  t1: number;
-  t2: number;
-  t3: number;
-  t4: number;
-  gastos_t_humanos: number;
-  gasto_b_capital: number;
-  total_actividad: number;
-  responsables: string[]; // Aquí almacenaremos solo los nombres
-}
-
-interface DataFetcherProps {
-  setActividad: React.Dispatch<React.SetStateAction<Actividad[]>>;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
-}
-
-const DataFetcher: React.FC<DataFetcherProps> = ({ setActividad, setLoading, setError }) => {
+const DataFetcher: React.FC<DataFetcherProps> = ({ 
+  setActividad, 
+  setLoading, 
+  setError 
+}) => {
   useEffect(() => {
     const fetchPoaData = async () => {
       try {
-        const socket = io('http://localhost:3001'); // Cambia esto si es necesario
+        const socket = io('http://localhost:3001');
         setLoading(true);
-        
-        socket.emit('get_poa', (response: any) => {
+
+        socket.emit('get_poa', (response: ServerResponse) => {
           console.log('Respuesta del servidor:', response);
           if (response.success) {
-            const formattedData = response.data.map((item: any) => ({
+            const formattedData = response.data.map((item: RawActivityData) => ({
               nombre_actividad: item.nombre_actividad,
               indicador_actividad: item.indicador_actividad,
               proyeccion_actividad: item.proyeccion_actividad,

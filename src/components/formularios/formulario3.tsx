@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client"; // Importa Socket
 import UploadFile from "./components/UploadFile";
-import BonitaUtilities from "../bonita/bonita-utilities.js";
+import { BonitaUtilities } from '../bonita/bonita-utilities';
 import Button from "../UI/button.js";
 
+// Definir la interfaz para el objeto Producto
+interface Producto {
+  nombre: string;
+  tipo: string;
+}
+
 export default function UploadForm() {
-  const [socket, setSocket] = useState(null); // Estado para la conexión WebSocket
+  const [socket, setSocket] = useState<Socket | null>(null); // Estado para la conexión WebSocket
   const [memoCode, setMemoCode] = useState(""); // Estado para el código del memorando
-  const [productos, setProductos] = useState([{ nombre: "", tipo: "" }]); // Estado para los productos
+  const [productos, setProductos] = useState<Producto[]>([{ nombre: "", tipo: "" }]); // Estado para los productos
   const [facultad, setFacultad] = useState(""); // Estado para la facultad
   const [proyectoNombre, setProyectoNombre] = useState(""); // Estado para el nombre del proyecto
   const [proyectoCodigo, setProyectoCodigo] = useState(""); // Estado para el código del proyecto
@@ -20,11 +26,19 @@ export default function UploadForm() {
     setSocket(newSocket);
 
     // Manejar la desconexión al desmontar el componente
-    return () => newSocket.disconnect();
+    return () => {
+      if (newSocket) {
+        newSocket.disconnect(); // Llama a disconnect sin retornar nada
+      }
+    };
   }, []);
 
   // Función para manejar cambios en los productos
-  const handleProductoChange = (index, field, value) => {
+  const handleProductoChange = (
+    index: number,
+    field: keyof Producto, // Solo permite "nombre" o "tipo"
+    value: string
+  ) => {
     const updatedProductos = [...productos];
     updatedProductos[index][field] = value;
     setProductos(updatedProductos);
@@ -36,18 +50,18 @@ export default function UploadForm() {
   };
 
   // Función para eliminar un producto
-  const removeProducto = (index) => {
+  const removeProducto = (index: number) => {
     const updatedProductos = productos.filter((_, i) => i !== index);
     setProductos(updatedProductos);
   };
 
   // Función para manejar cambios en el archivo subido
-  const handleFileChange = (file) => {
+  const handleFileChange = (file: File | null) => {
     console.log("Archivo subido:", file);
   };
 
   // Función para manejar el envío del formulario
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
     // Asegúrate de que el ID de la autoridad sea un número
@@ -64,7 +78,7 @@ export default function UploadForm() {
 
     // Enviar los datos al backend a través de WebSocket
     if (socket) {
-      socket.emit("agregar_producto_datos", jsonData, (response) => {
+      socket.emit("agregar_producto_datos", jsonData, (response: { success: boolean; message: string }) => {
         if (response.success) {
           console.log("Datos enviados correctamente:", response.message);
           alert("Datos enviados correctamente");

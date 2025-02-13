@@ -1,6 +1,7 @@
 import React from "react";
+import { SearchProps } from "../../interfaces/search.interface";
 
-const Search = ({ search, setSearch, year, setYear }) => {
+const Search: React.FC<SearchProps> = ({ search, setSearch, year, setYear }) => {
   return (
     <div className="col-span-9 flex flex-col">
       <div className="flex items-center space-x-4 mb-4">

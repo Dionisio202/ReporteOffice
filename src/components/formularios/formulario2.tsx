@@ -37,7 +37,7 @@ export default function WebPage() {
   };
 
   // Marcar o desmarcar documento
-  const handleCheckboxChange = (documentType: string) => {
+  const handleCheckboxChange = (documentType: keyof typeof staticDocuments) => {
     setSelectedDocs((prev) => {
       const newSelectedDocs = new Set(prev);
       if (newSelectedDocs.has(documentType)) {
@@ -77,12 +77,12 @@ export default function WebPage() {
                       <input
                         type="checkbox"
                         checked={selectedDocs.has(doc.type)}
-                        onChange={() => handleCheckboxChange(doc.type)}
+                        onChange={() => handleCheckboxChange(doc.type as keyof typeof staticDocuments)}
                         className="h-4 w-4"
                       />
                       {/* Botón para visualizar */}
                       <button
-                        onClick={() => handleViewDocument(doc.type)}
+                        onClick={() => handleViewDocument(doc.type as keyof typeof staticDocuments)}
                         className="bg-[#931D21] text-white py-1 px-4 rounded hover:bg-blue-500 transition duration-300"
                       >
                         Visualizar

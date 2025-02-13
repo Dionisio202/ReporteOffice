@@ -3,7 +3,7 @@ import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox";
 import { EmailInput } from "./components/EmailInput";
 import FileViewer from "./components/FileViewer";
-import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+import { BonitaUtilities } from '../bonita/bonita-utilities';
 
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({

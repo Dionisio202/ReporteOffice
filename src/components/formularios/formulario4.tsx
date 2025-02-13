@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import UploadFile from "./components/UploadFile"; // Componente para cargar archivos
 import { io } from "socket.io-client";
-import BonitaUtilities from '/src/components/bonita/bonita-utilities.js';
+import { BonitaUtilities } from '../bonita/bonita-utilities';
 
 // 📌 Conectar WebSocket al puerto 3001
 const socket = io("http://localhost:3001");
