@@ -1,5 +1,4 @@
-
-export function Send({ size = 16 }: { size?: number }) {
+export function Send({ size = 16 }: { readonly size?: number }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
