@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
-import Footer from "./components/footer/Footer";
 import Formulario3 from "./components/formularios/formulario3";
 import Formulario4 from "./components/formularios/formulario4";
 import Formulario7 from "./components/formularios/formulario7";
@@ -14,8 +13,8 @@ import Login from "./pages/Login/login";
 import Principal from "./pages/principal/principal";
 import Format from "./components/reports/Format";
 import Formulario2 from "./components/formularios/formulario2";
-import Formulario6 from "./components/formularios/Formulario6";
-import Formulario9 from "./components/formularios/Formulario9";
+import Formulario6 from "./components/formularios/formulario6";
+import Formulario9 from "./components/formularios/formulario9";
 import Formulario11 from "./components/formularios/formulario11";
 import Formulario12 from "./components/formularios/formulario12";
 import Formulario14 from "./components/formularios/formulario14";

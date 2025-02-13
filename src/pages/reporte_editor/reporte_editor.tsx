@@ -31,7 +31,7 @@ const ReporteEditor: React.FC = () => {
         <div className="w-full h-full border border-gray-300 shadow-md bg-white p-4">
           
           {/* Llamando al componente DocumentViewer */}
-          <DocumentViewer keyDocument="unique-document-key3" title="Documento de Prueba.docx" />
+          <DocumentViewer keyDocument="unique-document-key3" title="Documento de Prueba.docx" documentName='Documento de prueba' />
         </div>
       </div>
     </div>

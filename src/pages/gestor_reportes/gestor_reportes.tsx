@@ -2,9 +2,9 @@ import Sidebar from "../../components/sidebar/slidebar";
 import ReportTable from "../../components/tables/ReporTable";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-interface Filters {
-  filters: string[];
-}
+// interface Filters {
+//   filters: string[];
+// }
 const GestorReportes: React.FC = () => {
   const [filters, setFilters] = useState<string[]>([]);
   const navigate = useNavigate();

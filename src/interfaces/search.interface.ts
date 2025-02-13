@@ -3,4 +3,5 @@ export interface SearchProps {
     setSearch: (value: string) => void;
     year: string;
     setYear: (value: string) => void;
+    disabled?: boolean;
   }

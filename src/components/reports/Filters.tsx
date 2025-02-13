@@ -5,7 +5,7 @@ import { FiltersProps } from "../../interfaces/filters.interface";
 const Filters: React.FC<FiltersProps> = ({
   documentType,
   handleTypeChange,
-  clearFilters,
+  //,clearFilters
 }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md border border-gray-300">
