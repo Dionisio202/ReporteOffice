@@ -49,10 +49,14 @@ export function EmailInput() {
   };
 
   // Lógica para avanzar a la siguiente página
-  const handleNext = () => {
-    alert("Avanzando a la siguiente página...");
-    bonita.changeTask();
-    // Aquí puedes agregar la lógica para navegar a otra página
+  const handleNext = async () => {
+    try {
+      await bonita.changeTask(); 
+      alert("Avanzando a la siguiente página...");
+    } catch (error) {
+      console.error("Error al cambiar la tarea:", error);
+      alert("Ocurrió un error al intentar avanzar.");
+    }
   };
 
   return (

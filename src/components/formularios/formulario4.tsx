@@ -90,8 +90,17 @@ export default function UploadForm() {
         </div>
 
         {/* Componente para cargar archivo, pero no lo enviamos */}
-        <UploadFile onFileChange={setFile} />
-
+        
+        <UploadFile
+          id="intellectual-property-file"
+          onFileChange={(file) =>
+            handleFileChange(
+              file,
+              "Solicitud de Registro de Propiedad Intelectual"
+            )
+          }
+          label="Cargar Solicitud de registro de propiedad intelectual"
+        />
         <button
           type="button" // Cambiado a "button" para evitar enviar el formulario
           className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-red-600"
