@@ -24,8 +24,6 @@ export default function WebPage() {
     nombre: string;
   } | null>(null);
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
-  const [emails, setEmails] = useState<string>("");
-
   // Seleccionar documento a visualizar
   const handleViewDocument = (documentType: keyof typeof staticDocuments) => {
     const document = staticDocuments[documentType];

@@ -2,7 +2,7 @@ import { Card } from "../../UI/card";
 import Button from "../../UI/button";
 import { Send } from "lucide-react";
 import { useState } from "react";
-import { BonitaUtilities } from '../../bonita/bonita-utilities';
+import { BonitaUtilities } from "../../bonita/bonita-utilities";
 
 export function EmailInput() {
   const [email, setEmail] = useState<string>(""); // Almacena el correo electrónico actual
@@ -51,16 +51,21 @@ export function EmailInput() {
   // Lógica para avanzar a la siguiente página
   const handleNext = () => {
     alert("Avanzando a la siguiente página...");
-    bonita.changeTask()
+    bonita.changeTask();
     // Aquí puedes agregar la lógica para navegar a otra página
   };
 
   return (
     <Card className="w-full md:w-1/2 p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="font-bold text-lg text-gray-800 mb-4">Ingreso de Correo Electrónico</h2>
+      <h2 className="font-bold text-lg text-gray-800 mb-4">
+        Ingreso de Correo Electrónico
+      </h2>
 
       <div className="mt-4">
-        <label htmlFor="email" className="block font-semibold text-sm text-gray-700 mb-2">
+        <label
+          htmlFor="email"
+          className="block font-semibold text-sm text-gray-700 mb-2"
+        >
           Dirección de Correo Electrónico:
         </label>
         <input
@@ -88,10 +93,15 @@ export function EmailInput() {
       {/* Lista de correos agregados */}
       {emailList.length > 0 && (
         <div className="mt-6">
-          <h3 className="font-semibold text-sm text-gray-700">Correos agregados:</h3>
+          <h3 className="font-semibold text-sm text-gray-700">
+            Correos agregados:
+          </h3>
           <ul className="list-disc pl-6 mt-2">
-            {emailList.map((email, index) => (
-              <li key={index} className="flex justify-between items-center text-gray-800 mb-2">
+            {emailList.map((email) => (
+              <li
+                key={email}
+                className="flex justify-between items-center text-gray-800 mb-2"
+              >
                 <span>{email}</span>
                 <button
                   onClick={() => handleRemoveEmail(email)}

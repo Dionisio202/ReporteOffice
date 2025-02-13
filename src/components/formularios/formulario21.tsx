@@ -69,7 +69,6 @@ export default function ConfirmationScreen() {
             onChange={(checked) => handleChange("certificado", checked)}
           />
 
-          {/* 📧 Email ocupa todo el espacio restante */}
           <div className="flex-1 w-full h-full">
             <EmailInput />
           </div>

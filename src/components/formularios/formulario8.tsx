@@ -12,7 +12,7 @@ export default function MemoCodeForm() {
   };
   const handleNext = () => {
     alert("Avanzando a la siguiente página...");
-    bonita.changeTask()
+    bonita.changeTask();
     // Aquí puedes agregar la lógica para navegar a otra página
   };
   return (
@@ -20,8 +20,11 @@ export default function MemoCodeForm() {
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
         {/* Input para el código del memorando */}
         <div>
-          <label className="block font-semibold">Ingrese el código del memorando generado</label>
+          <label htmlFor="memoCode" className="block font-semibold">
+            Ingrese el código del memorando generado
+          </label>
           <input
+            id="memoCode"
             type="text"
             className="w-full border p-2 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-[#931D21]"
             value={memoCode}
@@ -34,7 +37,6 @@ export default function MemoCodeForm() {
           type="submit"
           className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
           onClick={handleNext}
-
         >
           Siguiente
         </button>
