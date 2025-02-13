@@ -1,7 +1,6 @@
-import React from "react";
 type CheckboxProps = {
-  checked: boolean;
-  onCheckedChange: () => void;
+  readonly checked: boolean;
+  readonly onCheckedChange: () => void;
 };
 
 export function Checkbox({ checked, onCheckedChange }: CheckboxProps) {
