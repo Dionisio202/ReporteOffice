@@ -15,7 +15,7 @@ interface ReportTableProps {
   filters: string[];
 }
 
-const ReportTable: React.FC<ReportTableProps> = ({ filters }) => {
+const ReportTable: React.FC<ReportTableProps> = React.memo(({ filters }) => {
   // Reportes de ejemplo
   const reports: Report[] = [
     { id: 1, name: "Reporte_Trimestre1", period: "T1", file: "/sample.pdf" },
@@ -33,7 +33,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ filters }) => {
 
   // Tipo explícito para el parámetro 'report' que es de tipo 'Report'
   const handleEdit = (report: Report) => {
-    navigate(`/ReporteEditor`); // Redirigir al hacer clic en editar
+    navigate(`/ReporteEditor`, { state: { report } }); // Redirigir al hacer clic en editar y pasar el reporte
   };
 
   const handleDownload = (report: Report) => {
@@ -80,6 +80,6 @@ const ReportTable: React.FC<ReportTableProps> = ({ filters }) => {
       </table>
     </div>
   );
-};
+});
 
 export default ReportTable;

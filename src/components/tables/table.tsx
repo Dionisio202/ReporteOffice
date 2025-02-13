@@ -1,6 +1,3 @@
-// components/tables/table.tsx
-import React from "react";
-
 // Definición para la tabla
 interface TableProps {
   children: React.ReactNode;
