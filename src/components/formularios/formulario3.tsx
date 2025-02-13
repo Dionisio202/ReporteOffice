@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { io, Socket } from "socket.io-client"; // Importa Socket
 import UploadFile from "./components/UploadFile";
-import { BonitaUtilities } from '../bonita/bonita-utilities';
+import { BonitaUtilities } from "../bonita/bonita-utilities";
 import Button from "../UI/button.js";
 
 // Definir la interfaz para el objeto Producto
@@ -13,7 +13,9 @@ interface Producto {
 export default function UploadForm() {
   const [socket, setSocket] = useState<Socket | null>(null); // Estado para la conexión WebSocket
   const [memoCode, setMemoCode] = useState(""); // Estado para el código del memorando
-  const [productos, setProductos] = useState<Producto[]>([{ nombre: "", tipo: "" }]); // Estado para los productos
+  const [productos, setProductos] = useState<Producto[]>([
+    { nombre: "", tipo: "" },
+  ]); // Estado para los productos
   const [facultad, setFacultad] = useState(""); // Estado para la facultad
   const [proyectoNombre, setProyectoNombre] = useState(""); // Estado para el nombre del proyecto
   const [proyectoCodigo, setProyectoCodigo] = useState(""); // Estado para el código del proyecto
@@ -78,15 +80,19 @@ export default function UploadForm() {
 
     // Enviar los datos al backend a través de WebSocket
     if (socket) {
-      socket.emit("agregar_producto_datos", jsonData, (response: { success: boolean; message: string }) => {
-        if (response.success) {
-          console.log("Datos enviados correctamente:", response.message);
-          alert("Datos enviados correctamente");
-        } else {
-          console.error("Error al enviar datos:", response.message);
-          alert("Error al enviar datos");
+      socket.emit(
+        "agregar_producto_datos",
+        jsonData,
+        (response: { success: boolean; message: string }) => {
+          if (response.success) {
+            console.log("Datos enviados correctamente:", response.message);
+            alert("Datos enviados correctamente");
+          } else {
+            console.error("Error al enviar datos:", response.message);
+            alert("Error al enviar datos");
+          }
         }
-      });
+      );
     } else {
       console.error("WebSocket no está conectado");
       alert("Error: WebSocket no está conectado");
@@ -115,7 +121,10 @@ export default function UploadForm() {
         {/* Campos del formulario */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label htmlFor="memoCode" className="block font-semibold text-gray-900">
+            <label
+              htmlFor="memoCode"
+              className="block font-semibold text-gray-900"
+            >
               Ingrese el código del memorando generado
             </label>
             <input
@@ -129,7 +138,10 @@ export default function UploadForm() {
           </div>
 
           <div>
-            <label htmlFor="facultad" className="block font-semibold text-gray-900">
+            <label
+              htmlFor="facultad"
+              className="block font-semibold text-gray-900"
+            >
               Ingrese la Facultad que emite
             </label>
             <input
@@ -146,7 +158,10 @@ export default function UploadForm() {
         {/* Campos del Proyecto */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label htmlFor="proyectoNombre" className="block font-semibold text-gray-900">
+            <label
+              htmlFor="proyectoNombre"
+              className="block font-semibold text-gray-900"
+            >
               Nombre del Proyecto
             </label>
             <input
@@ -160,7 +175,10 @@ export default function UploadForm() {
           </div>
 
           <div>
-            <label htmlFor="proyectoCodigo" className="block font-semibold text-gray-900">
+            <label
+              htmlFor="proyectoCodigo"
+              className="block font-semibold text-gray-900"
+            >
               Código del Proyecto
             </label>
             <input
@@ -177,7 +195,10 @@ export default function UploadForm() {
         {/* Campos de Autoridad */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label htmlFor="autoridadNombre" className="block font-semibold text-gray-900">
+            <label
+              htmlFor="autoridadNombre"
+              className="block font-semibold text-gray-900"
+            >
               Nombre de la Autoridad
             </label>
             <input
@@ -192,16 +213,26 @@ export default function UploadForm() {
         </div>
 
         {/* Lista de Productos */}
+        {/* Lista de Productos */}
         <div className="mb-6">
-          <label className="block font-semibold text-gray-900">Productos</label>
+          <label
+            htmlFor="productos"
+            className="block font-semibold text-gray-900"
+          >
+            Productos
+          </label>
           {productos.map((producto, index) => (
-            <div key={index} className="space-y-4 mb-4">
+            <div key={producto.nombre} className="space-y-4 mb-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block font-semibold text-gray-900">
+                  <label
+                    htmlFor={`producto-nombre-${index}`}
+                    className="block font-semibold text-gray-900"
+                  >
                     Producto {index + 1}
                   </label>
                   <input
+                    id={`producto-nombre-${index}`} // Agregado ID único
                     type="text"
                     className="w-full border-2 border-gray-500 p-3 rounded-lg mt-2"
                     value={producto.nombre}
@@ -212,10 +243,14 @@ export default function UploadForm() {
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-gray-900">
+                  <label
+                    htmlFor={`producto-tipo-${index}`}
+                    className="block font-semibold text-gray-900"
+                  >
                     Tipo de Producto
                   </label>
                   <select
+                    id={`producto-tipo-${index}`} // Agregado ID único
                     className="w-full border-2 border-gray-500 p-3 rounded-lg mt-2"
                     value={producto.tipo}
                     onChange={(e) =>

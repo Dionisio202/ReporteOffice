@@ -59,7 +59,6 @@ export default function Formulario6() {
         </Button>
       </div>
 
-      {/* Contenedor del DocumentViewer - Ocupa todo el espacio restante */}
       <div className="flex-grow">
         {selectedDocument ? (
           <DocumentViewer
