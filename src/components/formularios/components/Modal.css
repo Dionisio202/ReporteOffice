@@ -1,112 +1,149 @@
-/* Estilos para el modal */
+/* Modal Overlay */
 .modal-overlay {
-    position: fixed;
-    top: 0; /* Asegura que el modal ocupe toda la pantalla */
-    left: 0; /* Asegura que el modal ocupe toda la pantalla */
-    width: 100%; /* Ocupa todo el ancho */
-    height: 100%; /* Ocupa toda la altura */
-    background-color: rgba(134, 133, 133, 0.5); /* Fondo semitransparente */
-    display: flex;
-    justify-content: center; /* Centra el contenido horizontalmente */
-    align-items: center; /* Centra el contenido verticalmente */
-    z-index: 1000;
-  }
-  
-  /* Modal */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro */
+  display: flex;
+  justify-content: center; /* Centrado horizontal */
+  align-items: center; /* Centrado vertical */
+  z-index: 1000;
+  padding: 20px; /* Agrega algo de padding para evitar que el modal toque los bordes */
+}
+
+/* Modal */
+.modal {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%; /* Toma todo el ancho disponible */
+  max-width: 800px; /* Máximo de 800px de ancho */
+  height: auto; /* Ajusta la altura automáticamente */
+  max-height: 90vh; /* Limita la altura al 90% de la pantalla */
+  overflow-y: auto; /* Permite desplazamiento vertical */
+  box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
+  position: relative; /* Necesario para posicionar el botón de cierre */
+  margin: auto; /* Centra el modal dentro del overlay */
+}
+
+/* Contenido del Modal */
+.modal-content {
+  overflow-y: auto; /* Permite desplazamiento interno si el contenido es largo */
+  max-height: 100%; /* Usa todo el espacio disponible */
+  padding-right: 10px; /* Espacio para el scrollbar si es necesario */
+}
+
+/* Título del modal */
+.modal-title {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+/* Etiquetas y Inputs */
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+input[type="text"],
+input[type="date"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Acciones del modal */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.btn-cancel {
+  background-color: #ccc;
+}
+
+.btn-cancel:hover {
+  background-color: #999;
+}
+
+.btn-save {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #45a049;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
   .modal {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    width: 90%; /* Ancho dinámico del modal */
-    max-width: 900px; /* Ancho máximo para el modal */
-    height: auto; /* Altura ajustable según el contenido */
-    padding: 20px;
-    position: relative;
-    overflow-y: auto; /* Permite scroll si el contenido es largo */
-    box-sizing: border-box; /* Asegura que el padding no altere el tamaño total */
+    width: 95%; /* 95% del ancho en pantallas pequeñas */
+    padding: 15px;
   }
-  
+
   .modal-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center;
+    font-size: 20px;
   }
-  
-  .modal-content {
-    max-height: calc(100vh - 200px); /* Ajuste dinámico de la altura */
-    overflow-y: auto;
-    padding-right: 10px;
+
+  input[type="text"],
+  input[type="date"] {
+    font-size: 14px;
   }
-  
-  .modal-content p {
-    margin: 10px 0;
+
+  .modal-actions {
+    flex-direction: column;
+    align-items: center;
   }
-  
-  .modal-content h3 {
-    font-size: 18px;
-    font-weight: bold;
-    margin-top: 20px;
+
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
     margin-bottom: 10px;
   }
-  
-  .modal-content ul {
-    list-style-type: disc;
-    padding-left: 20px;
+}
+
+@media (max-width: 480px) {
+  .modal {
+    width: 95%;
+    padding: 10px;
   }
-  
-  .modal-content li {
-    margin: 5px 0;
+
+  .modal-title {
+    font-size: 18px;
   }
-  
-  .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #333;
+
+  input[type="text"],
+  input[type="date"] {
+    font-size: 12px;
   }
-  
-  .close-btn:hover {
-    color: #000;
-  }
-  
-  /* Estilos para los botones del modal */
+
   .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
+    flex-direction: column;
+    align-items: center;
   }
-  
-  .btn-accept,
+
+  .btn-cancel,
   .btn-save {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
   }
-  
-  .btn-accept {
-    background-color: #4caf50; /* Verde */
-    color: white;
-  }
-  
-  .btn-accept:hover {
-    background-color: #45a049;
-  }
-  
-  .btn-save {
-    background-color: #2196f3; /* Azul */
-    color: white;
-  }
-  
-  .btn-save:hover {
-    background-color: #1e88e5;
-  }
-  
+}

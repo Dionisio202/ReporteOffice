@@ -1,17 +1,19 @@
-import { useState } from "react";
+import { useState} from "react";
+import { io } from "socket.io-client"; // Importar socket.io-client
 import UploadFile from "./components/UploadFile";
 import Button from "../UI/button.js";
 import Title from "./components/TitleProps";
-import Modal from "./components/Modal"; // Importa el modal
+import Modal from "./components/Modal"; 
+
+// Configurar la conexión con WebSocket
+const socket = io("http://localhost:3001"); // Asegúrate de que esta URL sea la correcta
 
 export default function UploadForm() {
-  const [intellectualPropertyFile, setIntellectualPropertyFile] =
-    useState<File | null>(null);
+  const [intellectualPropertyFile, setIntellectualPropertyFile] = useState<File | null>(null);
   const [authorDataFile, setAuthorDataFile] = useState<File | null>(null);
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  // Define `modalData` como un objeto constante con los datos de prueba
   const modalData = {
     fecha: "2025-01-29",
     lugar: "Ambato",
@@ -26,25 +28,13 @@ export default function UploadForm() {
       cargo: "Coordinador Subrogante del proyecto.",
     },
     productos: [
-      {
-        id: "1",
-        nombre:
-          "Infografía: Superbacterias En Ríos Y Piscinas Un Problema De Salud En La Provincia De Tungurahua",
-      },
-      {
-        id: "2",
-        nombre:
-          "Tríptico: Superbacterias En Ríos Y Piscinas Un Problema De Salud En La Provincia De Tungurahua",
-      },
+      { id: "1", nombre: "Infografía: Superbacterias En Ríos Y Piscinas" },
+      { id: "2", nombre: "Tríptico: Superbacterias En Ríos Y Piscinas" },
     ],
     proyecto: {
       tipo: "Vinculación",
-      titulo:
-        "Superbacterias Contaminantes De Agua Dulce Estancada Y En Movimiento En La Provincia De Tungurahua",
-      resolucion: {
-        numero: "UTA-CONIN-2023-0060-R",
-        fecha: "2023-04-03",
-      },
+      titulo: "Superbacterias Contaminantes De Agua Dulce",
+      resolucion: { numero: "UTA-CONIN-2023-0060-R", fecha: "2023-04-03" },
     },
   };
 
@@ -62,7 +52,7 @@ export default function UploadForm() {
   };
 
   const handleSave = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault(); // Evita el reenvío del formulario
+    event.preventDefault();
 
     if (!intellectualPropertyFile || !authorDataFile) {
       setShowModal(true); // Abre el modal si faltan archivos
@@ -73,8 +63,14 @@ export default function UploadForm() {
       alert("Guardando documentos...");
       setIsNextDisabled(false);
       setShowModal(true); // Abre el modal después de guardar
+
+      // Enviar los datos por WebSocket
+      socket.emit("saveData", {
+        intellectualPropertyFile,
+        authorDataFile,
+      });
     } catch (error) {
-      setShowModal(true); // Abre el modal si hay un error
+      setShowModal(true);
     }
   };
 
@@ -83,6 +79,18 @@ export default function UploadForm() {
 
   const closeModal = () => {
     setShowModal(false); // Cierra el modal
+  };
+
+  const handleSaveModalData = async (updatedData: any) => {
+    try {
+      console.log("Datos editados:", updatedData);
+      // Enviar datos al backend mediante WebSocket
+      socket.emit("saveModalData", updatedData);
+      alert("Datos guardados correctamente.");
+    } catch (error) {
+      console.error("Error al guardar datos:", error);
+      alert("Hubo un error al guardar los datos.");
+    }
   };
 
   return (
@@ -100,10 +108,7 @@ export default function UploadForm() {
         <UploadFile
           id="intellectual-property-file"
           onFileChange={(file) =>
-            handleFileChange(
-              file,
-              "Solicitud de Registro de Propiedad Intelectual"
-            )
+            handleFileChange(file, "Solicitud de Registro de Propiedad Intelectual")
           }
           label="Cargar Solicitud de registro de propiedad intelectual"
         />
@@ -126,22 +131,22 @@ export default function UploadForm() {
           </Button>
           <Button
             className={buttonStyles}
-            onClick={handleSave} // Usa el manejador corregido
+            onClick={handleSave}
             disabled={!intellectualPropertyFile || !authorDataFile}
           >
             Guardar
           </Button>
         </div>
-      </form>
 
-      {/* Renderiza el modal si `showModal` es true */}
-      {showModal && (
-        <Modal
-          showModal={showModal} // Pasa `showModal` como prop
-          closeModal={closeModal} // Pasa la función para cerrar el modal
-          modalData={modalData} // Pasa los datos de prueba al modal
-        />
-      )}
+        {showModal && (
+          <Modal
+            showModal={showModal}
+            closeModal={closeModal}
+            modalData={modalData}
+            onSave={handleSaveModalData}
+          />
+        )}
+      </form>
     </div>
   );
 }
