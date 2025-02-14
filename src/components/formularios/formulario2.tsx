@@ -105,8 +105,8 @@ export default function WebPage() {
               keyDocument={selectedDocument.key}
               title={selectedDocument.title}
               documentName={selectedDocument.nombre}
-              mode="edit"
-              callbackUrl="http://host.docker.internal:3001/api/save-document"
+              mode="view"
+              callbackUrl="http://formulario.midominio.com:3001/api/save-document"
             />
           ) : (
             <p className="text-center text-gray-500">Selecciona un documento para visualizarlo</p>
