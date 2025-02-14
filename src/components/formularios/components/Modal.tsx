@@ -48,7 +48,7 @@ const Modal: React.FC<ModalProps> = ({ showModal, closeModal, modalData, onSave 
   useEffect(() => {
     setEditableData(modalData);
   }, [modalData]);
-
+// @ts-ignore
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     field: string,
@@ -60,6 +60,7 @@ const Modal: React.FC<ModalProps> = ({ showModal, closeModal, modalData, onSave 
         return {
           ...prevData,
           [parentField]: {
+            // @ts-ignore
             ...prevData[parentField],
             [childField]: event.target.value,
           },
@@ -68,7 +69,7 @@ const Modal: React.FC<ModalProps> = ({ showModal, closeModal, modalData, onSave 
       return { ...prevData, [field]: event.target.value };
     });
   };
-
+// @ts-ignore
   const handleProductChange = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const updatedProducts = [...editableData.productos];
     updatedProducts[index].nombre = event.target.value;

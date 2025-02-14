@@ -31,7 +31,7 @@ const onLoadComponentError = (errorCode: any, errorDescription: any) => {
 };
 
 const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title, documentName, mode, callbackUrl }) => {
-  const documentUrl = `http://formulario.midominio.com:3001/api/document?nombre=${encodeURIComponent(documentName)}`;
+  const documentUrl = `http://host.docker.internal:3001/api/document?nombre=${encodeURIComponent(documentName)}`;
 
   // Configuración de ONLYOFFICE con callbackUrl opcional
   const config: any = {
@@ -56,7 +56,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title, doc
           <div className="w-full h-full">
             <DocumentEditor
               id="docxEditor"
-              documentServerUrl="http://formulario.midominio.com:8081/"
+              documentServerUrl="http://localhost:8081/welcome/"
               config={config} // Pasamos la configuración dinámica
               events_onDocumentReady={onDocumentReady}
               onLoadComponentError={onLoadComponentError}

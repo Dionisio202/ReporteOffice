@@ -13,7 +13,7 @@ type StaticDocument = {
 
 const staticDocuments: Record<string, StaticDocument> = {
   "Validación de Transferencias": {
-    key: "validac-001",
+    key: "fsvt",
     title: "Validación",
     nombre: "Validación_Transferencias.pdf",
   }
