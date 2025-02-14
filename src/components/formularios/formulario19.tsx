@@ -31,7 +31,7 @@ export default function ConfirmationScreen() {
   return (
     <CardContainer title="Validacion de Certificado">
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-        <UploadFile onFileChange={() => {}} /> {/* Placeholder function */}
+        <UploadFile onFileChange={() => { } } id={""} /> {/* Placeholder function */}
         <div className="space-y-3">
           <Checkbox
             label="Certificado Válido?"

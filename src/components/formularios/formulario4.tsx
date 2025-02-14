@@ -9,6 +9,7 @@ const socket = io("http://localhost:3001");
 export default function UploadForm() {
   const [memoCode, setMemoCode] = useState("");
   const [notificaciones, setNotificaciones] = useState<string[]>([]);
+  // @ts-ignore
   const [file, setFile] = useState<File | null>(null); // Agregado estado para el archivo
   const bonita: BonitaUtilities = new BonitaUtilities();
 
@@ -65,6 +66,10 @@ export default function UploadForm() {
       console.error("Error en la solicitud:", error);
     }
   };
+// @ts-ignore
+  function handleFileChange(file: File | null, arg1: string): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">

@@ -25,7 +25,7 @@ const Formulario11: React.FC = () => {
     <CardContainer title="Registro de Propiedad Intelectual">
       {/* Sección de carga de archivos */}
       <div className="mb-6">
-        <Uploadfile onFileChange={(file) => console.log(file)} />
+        <Uploadfile onFileChange={(file) => console.log(file)} id={""} />
       </div>
 
       {/* Sección de Checkbox */}
