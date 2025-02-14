@@ -33,9 +33,9 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileChange, label = "Subir ar
         />
         <label
           htmlFor={id} // El mismo id para la etiqueta y el input
-          className=" bg-neutral-300 flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-3 cursor-pointer hover:border-gray-500 transition"
+          className="bg-neutral-300 flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-3 cursor-pointer hover:border-gray-500 transition"
         >
-          <span className="text-gray-600 border-zinc-900 bg">
+          <span className="text-gray-600">
             {fileName || "Seleccionar archivo..."}
           </span>
         </label>
