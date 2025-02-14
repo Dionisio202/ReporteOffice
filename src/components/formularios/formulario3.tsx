@@ -1,42 +1,27 @@
-import { useState} from "react";
-import { io } from "socket.io-client"; // Importar socket.io-client
-import UploadFile from "./components/UploadFile";
-import Button from "../UI/button.js";
+import { useState } from "react";
+import io from "socket.io-client";
+import Button from "../UI/button";
 import Title from "./components/TitleProps";
-import Modal from "./components/Modal"; 
+import Modal from "./components/Modal";
+import UploadFile from "./components/UploadFile";
 
-// Configurar la conexión con WebSocket
-const socket = io("http://localhost:3001"); // Asegúrate de que esta URL sea la correcta
+const socket = io("http://localhost:3001"); // Conecta con el backend
+
+interface ModalData {
+  success: boolean;
+  message: string;
+  autores: any[];
+  productos: any;
+}
 
 export default function UploadForm() {
   const [intellectualPropertyFile, setIntellectualPropertyFile] = useState<File | null>(null);
   const [authorDataFile, setAuthorDataFile] = useState<File | null>(null);
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
-
-  const modalData = {
-    fecha: "2025-01-29",
-    lugar: "Ambato",
-    destinatario: {
-      nombre: "Rubén Eduardo Nogales Portero",
-      titulo: "Ingeniero",
-      cargo: "Director de Innovación y Emprendimiento",
-      institucion: "Universidad Técnica de Ambato",
-    },
-    solicitante: {
-      nombre: "Dr. Iván Guillermo Toapanta Yugcha",
-      cargo: "Coordinador Subrogante del proyecto.",
-    },
-    productos: [
-      { id: "1", nombre: "Infografía: Superbacterias En Ríos Y Piscinas" },
-      { id: "2", nombre: "Tríptico: Superbacterias En Ríos Y Piscinas" },
-    ],
-    proyecto: {
-      tipo: "Vinculación",
-      titulo: "Superbacterias Contaminantes De Agua Dulce",
-      resolucion: { numero: "UTA-CONIN-2023-0060-R", fecha: "2023-04-03" },
-    },
-  };
+  const [modalData, setModalData] = useState<ModalData | null>(null);
+  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<string | null>(null);
+  const [intellectualPropertyFileBase64, setIntellectualPropertyFileBase64] = useState<string | null>(null);
 
   const handleFileChange = (file: File | null, fileType: string) => {
     if (file) {
@@ -55,42 +40,114 @@ export default function UploadForm() {
     event.preventDefault();
 
     if (!intellectualPropertyFile || !authorDataFile) {
-      setShowModal(true); // Abre el modal si faltan archivos
+      setModalData({
+        success: false,
+        message: "Por favor, sube ambos archivos.",
+        autores: [],
+        productos: {},
+      });
+      setShowModal(true);
       return;
     }
 
     try {
-      alert("Guardando documentos...");
       setIsNextDisabled(false);
-      setShowModal(true); // Abre el modal después de guardar
 
-      // Enviar los datos por WebSocket
-      socket.emit("saveData", {
-        intellectualPropertyFile,
-        authorDataFile,
-      });
+      // Convertir los archivos a base64
+      const intellectualPropertyFileBase64 = await convertFileToBase64(intellectualPropertyFile);
+      const authorDataFileBase64 = await convertFileToBase64(authorDataFile);
+
+      // Guardar los archivos base64 en el estado
+      setIntellectualPropertyFileBase64(intellectualPropertyFileBase64);
+      setAuthorDataFileBase64(authorDataFileBase64);
+
+      // Enviar datos al backend usando socket
+      socket.emit(
+        "procesar_documentos",
+        {
+          documento_autores: authorDataFileBase64,
+          documento_productos: intellectualPropertyFileBase64,
+        },
+        (response: any) => {
+          if (response.success) {
+            console.log("📢 Respuesta del servidor:", response);
+            setModalData({
+              success: response.success,
+              message: response.message,
+              autores: JSON.parse(response.autores),
+              productos: JSON.parse(response.productos),
+            });
+          } else {
+            console.error("❌ Error en la respuesta del servidor:", response.message);
+            setModalData({
+              success: response.success,
+              message: response.message,
+              autores: [],
+              productos: {},
+            });
+          }
+          setShowModal(true);
+        }
+      );
     } catch (error) {
+      console.error("Error al guardar los documentos:", error);
+      setModalData({
+        success: false,
+        message: "Error al procesar los documentos. Inténtalo de nuevo.",
+        autores: [],
+        productos: {},
+      });
       setShowModal(true);
     }
   };
 
-  const buttonStyles =
-    "bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200";
+  const handleSaveEditedData = async (editedData: any) => {
+    try {
+      if (!authorDataFileBase64 || !intellectualPropertyFileBase64) {
+        throw new Error("No se encontraron los archivos base64.");
+      }
 
-  const closeModal = () => {
-    setShowModal(false); // Cierra el modal
+      // Enviar los datos editados al backend usando socket
+      socket.emit(
+        "procesar_documentos", // Mismo endpoint
+        {
+          documento_autores: authorDataFileBase64,
+          documento_productos: intellectualPropertyFileBase64,
+          editedData, // Enviar los datos editados
+        },
+        (response: any) => {
+          if (response.success) {
+            console.log("📢 Datos editados guardados correctamente:", response);
+            alert("Datos editados guardados correctamente.");
+          } else {
+            console.error("❌ Error al guardar los datos editados:", response.message);
+            alert("Error al guardar los datos editados.");
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Error al guardar los datos editados:", error);
+      alert("Error al guardar los datos editados.");
+    }
   };
 
-  const handleSaveModalData = async (updatedData: any) => {
-    try {
-      console.log("Datos editados:", updatedData);
-      // Enviar datos al backend mediante WebSocket
-      socket.emit("saveModalData", updatedData);
-      alert("Datos guardados correctamente.");
-    } catch (error) {
-      console.error("Error al guardar datos:", error);
-      alert("Hubo un error al guardar los datos.");
-    }
+  const convertFileToBase64 = (file: File) => {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          resolve(reader.result.toString().split(",")[1]); // Retorna solo la parte base64 del archivo
+        } else {
+          reject("No se pudo convertir el archivo.");
+        }
+      };
+      reader.onerror = () => reject("Error al leer el archivo.");
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -115,22 +172,20 @@ export default function UploadForm() {
 
         <UploadFile
           id="author-data-file"
-          onFileChange={(file) =>
-            handleFileChange(file, "Datos informativos de autores")
-          }
+          onFileChange={(file) => handleFileChange(file, "Datos informativos de autores")}
           label="Cargar Datos informativos de autores"
         />
 
         <div className="flex justify-center mt-6 space-x-4">
           <Button
-            className={buttonStyles}
+            className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
             onClick={handleNext}
             disabled={isNextDisabled}
           >
             Siguiente
           </Button>
           <Button
-            className={buttonStyles}
+            className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
             onClick={handleSave}
             disabled={!intellectualPropertyFile || !authorDataFile}
           >
@@ -138,12 +193,12 @@ export default function UploadForm() {
           </Button>
         </div>
 
-        {showModal && (
+        {showModal && modalData && (
           <Modal
             showModal={showModal}
             closeModal={closeModal}
             modalData={modalData}
-            onSave={handleSaveModalData}
+            onSave={handleSaveEditedData}
           />
         )}
       </form>
