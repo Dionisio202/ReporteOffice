@@ -1,0 +1,112 @@
+/* Estilos para el modal */
+.modal-overlay {
+    position: fixed;
+    top: 0; /* Asegura que el modal ocupe toda la pantalla */
+    left: 0; /* Asegura que el modal ocupe toda la pantalla */
+    width: 100%; /* Ocupa todo el ancho */
+    height: 100%; /* Ocupa toda la altura */
+    background-color: rgba(134, 133, 133, 0.5); /* Fondo semitransparente */
+    display: flex;
+    justify-content: center; /* Centra el contenido horizontalmente */
+    align-items: center; /* Centra el contenido verticalmente */
+    z-index: 1000;
+  }
+  
+  /* Modal */
+  .modal {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    width: 90%; /* Ancho dinámico del modal */
+    max-width: 900px; /* Ancho máximo para el modal */
+    height: auto; /* Altura ajustable según el contenido */
+    padding: 20px;
+    position: relative;
+    overflow-y: auto; /* Permite scroll si el contenido es largo */
+    box-sizing: border-box; /* Asegura que el padding no altere el tamaño total */
+  }
+  
+  .modal-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .modal-content {
+    max-height: calc(100vh - 200px); /* Ajuste dinámico de la altura */
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+  
+  .modal-content p {
+    margin: 10px 0;
+  }
+  
+  .modal-content h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .modal-content ul {
+    list-style-type: disc;
+    padding-left: 20px;
+  }
+  
+  .modal-content li {
+    margin: 5px 0;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  .close-btn:hover {
+    color: #000;
+  }
+  
+  /* Estilos para los botones del modal */
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .btn-accept,
+  .btn-save {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-accept {
+    background-color: #4caf50; /* Verde */
+    color: white;
+  }
+  
+  .btn-accept:hover {
+    background-color: #45a049;
+  }
+  
+  .btn-save {
+    background-color: #2196f3; /* Azul */
+    color: white;
+  }
+  
+  .btn-save:hover {
+    background-color: #1e88e5;
+  }
+  

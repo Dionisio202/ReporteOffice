@@ -49,32 +49,36 @@ export function EmailInput() {
   };
 
   // Lógica para avanzar a la siguiente página
-  const handleNext = () => {
-    alert("Avanzando a la siguiente página...");
-    bonita.changeTask();
-    // Aquí puedes agregar la lógica para navegar a otra página
+  const handleNext = async () => {
+    try {
+      await bonita.changeTask(); 
+      alert("Avanzando a la siguiente página...");
+    } catch (error) {
+      console.error("Error al cambiar la tarea:", error);
+      alert("Ocurrió un error al intentar avanzar.");
+    }
   };
 
   return (
-    <Card className="w-full md:w-1/2 p-6 bg-white shadow-lg rounded-lg">
+    <Card className="w-full md:w-1/2 p-5 bg-white shadow-lg rounded-lg">
       <h2 className="font-bold text-lg text-gray-800 mb-4">
-        Ingreso de Correo Electrónico
+        Envío de formatos a:
       </h2>
 
       <div className="mt-4">
         <label
           htmlFor="email"
-          className="block font-semibold text-sm text-gray-700 mb-2"
+          className="block font-semibold text-xs text-gray-700 mb-1"
         >
-          Dirección de Correo Electrónico:
+          Dirección de Correo Electrónico
         </label>
         <input
           type="email"
           id="email"
-          className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full text-xs mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
           value={email}
           onChange={handleEmailChange}
-          placeholder="Ingrese su correo electrónico"
+          placeholder="Ingrese correo destinatario"
         />
       </div>
 
@@ -83,7 +87,7 @@ export function EmailInput() {
 
       {/* Botón para agregar correo */}
       <Button
-        className="mt-4 w-full flex items-center justify-center gap-2 bg-[#931D21] text-white rounded-lg p-2 hover:border-y-orange-600 transition-colors duration-300"
+        className="mt-4 text-xs w-full flex items-center justify-center gap-2 bg-[#931D21] text-white rounded-lg p-2 hover:border-y-orange-600 transition-colors duration-300"
         onClick={handleAddEmail}
         disabled={!email}
       >
@@ -93,19 +97,19 @@ export function EmailInput() {
       {/* Lista de correos agregados */}
       {emailList.length > 0 && (
         <div className="mt-6">
-          <h3 className="font-semibold text-sm text-gray-700">
+          <h3 className="font-semibold text-xs text-gray-700">
             Correos agregados:
           </h3>
           <ul className="list-disc pl-6 mt-2">
             {emailList.map((email) => (
               <li
                 key={email}
-                className="flex justify-between items-center text-gray-800 mb-2"
+                className=" text-xs flex justify-between items-center text-gray-800 mb-2"
               >
                 <span>{email}</span>
                 <button
                   onClick={() => handleRemoveEmail(email)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 text-xs"
                 >
                   Eliminar
                 </button>
@@ -117,11 +121,11 @@ export function EmailInput() {
 
       {/* Botón para enviar los correos */}
       <Button
-        className="mt-4 w-full flex items-center justify-center gap-2 bg-green-600 text-white rounded-lg p-2 hover:bg-green-700 transition-colors duration-200"
+        className="text-xs mt-4 w-full flex items-center justify-center gap-2 bg-green-600 text-white rounded-lg p-2 hover:bg-green-700 transition-colors duration-200"
         onClick={handleSubmit}
         disabled={emailList.length === 0}
       >
-        <Send size={16} /> Enviar
+        <Send size={16} /> Enviar Correos
       </Button>
 
       {/* Botón "Siguiente" al final, centrado */}
@@ -130,7 +134,7 @@ export function EmailInput() {
           className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
           onClick={handleNext}
         >
-          Siguiente
+          Siguiente Proceso
         </Button>
       </div>
     </Card>

@@ -2,9 +2,11 @@ import React, { useState } from "react";
 
 interface UploadFileProps {
   onFileChange: (file: File | null) => void;
+  label?: string; // Prop opcional para el título
+  id: string; // id único para cada input
 }
 
-const UploadFile: React.FC<UploadFileProps> = ({ onFileChange }) => {
+const UploadFile: React.FC<UploadFileProps> = ({ onFileChange, label = "Subir archivo", id }) => {
   const [fileName, setFileName] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,24 +18,24 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileChange }) => {
   return (
     <div className="mb-4">
       <label
-        htmlFor="file-upload"
-        className="block font-semibold text-gray-700"
+        htmlFor={id} // Usamos el id único aquí
+        className="block font-semibold text-gray-700 text-sm"
       >
-        Subir archivo
+        {label} {/* Usamos el prop label aquí */}
       </label>
       <div className="relative mt-2">
         <input
-          id="file-upload" // Asegúrate de que el id coincida con el htmlFor
+          id={id} // Asegúrate de que el id coincida con el htmlFor
           type="file"
           className="hidden"
           onChange={handleFileChange}
           accept=".pdf,.doc,.docx,.jpg,.png"
         />
         <label
-          htmlFor="file-upload"
-          className="flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-3 cursor-pointer hover:border-gray-500 transition"
+          htmlFor={id} // El mismo id para la etiqueta y el input
+          className=" bg-neutral-300 flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-3 cursor-pointer hover:border-gray-500 transition"
         >
-          <span className="text-gray-600">
+          <span className="text-gray-600 border-zinc-900 bg">
             {fileName || "Seleccionar archivo..."}
           </span>
         </label>
