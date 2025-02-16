@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { EmailInput } from "./components/EmailInput";
 import DocumentViewer from "../files/DocumentViewer";
 import Title from "./components/TitleProps";
-import io from "socket.io-client"; // Importar la librería para WebSockets
+import io from "socket.io-client";
 
 // Definimos un tipo para los documentos
 type DocumentType = {
@@ -47,7 +47,7 @@ export default function WebPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Conectar con el servidor de WebSockets
-  const socket = io("http://localhost:3001"); // Cambia la URL según tu entorno
+  const socket = io("http://localhost:3001");
 
   // Verificar conexión WebSocket
   useEffect(() => {
@@ -75,9 +75,9 @@ export default function WebPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "X-Bonita-API-Token": "tu_token_aqui", // Asegúrate de incluir el token si es necesario
+            "X-Bonita-API-Token": "tu_token_aqui",
           },
-          credentials: "include", // Para mantener la sesión en Bonita
+          credentials: "include",
         }
       );
 
@@ -95,7 +95,7 @@ export default function WebPage() {
       const idProcesoObtenido = jsonData[0].id;
       console.log("ID del proceso obtenido:", idProcesoObtenido);
 
-      return idProcesoObtenido; // Devuelve el ID del proceso
+      return idProcesoObtenido;
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error al obtener el ID del proceso:", error);
@@ -118,7 +118,7 @@ export default function WebPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "X-Bonita-API-Token": "tu_token_aqui", // Asegúrate de incluir el token si es necesario
+            "X-Bonita-API-Token": "tu_token_aqui",
           },
           credentials: "include",
         }
@@ -144,11 +144,7 @@ export default function WebPage() {
   };
 
   // Función para enviar los datos al backend a través de WebSockets
-  const enviarDatosAlBackend = async (
-    idProceso: string, // idProceso es una cadena (string)
-    caseId: string, // caseId es una cadena (string)
-    assigned_id: string // assigned_id es una cadena (string)
-  ) => {
+  const enviarDatosAlBackend = async (idProceso, caseId, assigned_id) => {
     return new Promise((resolve, reject) => {
       // Convertir idProceso a BigInt
       const id_proceso_bigint = BigInt(idProceso);
@@ -172,9 +168,9 @@ export default function WebPage() {
 
       // Crear el objeto de datos que se enviará al backend
       const datosParaEnviar = {
-        id_funcionario: id_funcionario_int, // Número entero (INT)
-        id_proceso: id_proceso_bigint.toString(), // Convertir BigInt a cadena para enviar
-        id_caso: id_caso_num, // Número entero
+        id_funcionario: id_funcionario_int,
+        id_proceso: id_proceso_bigint.toString(),
+        id_caso: id_caso_num,
       };
 
       // Mostrar el JSON que se enviará al backend
@@ -184,7 +180,7 @@ export default function WebPage() {
       );
 
       // Enviar los datos al backend
-      socket.emit("iniciar_registro", datosParaEnviar, (response: any) => {
+      socket.emit("iniciar_registro", datosParaEnviar, (response) => {
         if (response.success) {
           console.log("Respuesta del backend:", response.message);
           resolve(response);
@@ -197,50 +193,40 @@ export default function WebPage() {
   };
   // Llamar a la función al cargar el componente (solo una vez)
   useEffect(() => {
-    let isMounted = true; // Variable de control
-
-    // Conectar con el servidor de WebSockets
-    const socket = io("http://localhost:3001");
-
-    socket.on("connect", () => {
-      if (isMounted) {
-        console.log("Conectado al servidor WebSocket");
-      }
-    });
-
-    socket.on("connect_error", (err) => {
-      if (isMounted) {
-        console.error("Error de conexión WebSocket:", err);
-      }
-    });
-
-    // Limpiar la conexión al desmontar el componente
-    return () => {
-      isMounted = false;
-      socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true; // Variable de control
+    let isMounted = true;
 
     const fetchData = async () => {
       if (isMounted) {
-        console.log("Iniciando consulta para obtener el ID del proceso...");
-        const processId = await obtenerIdProceso();
-        if (processId && isMounted) {
-          console.log("ID del proceso obtenido:", processId);
+        setLoading(true);
+        setError(null);
 
-          console.log("Iniciando consulta para obtener las tareas...");
-          const tareas = await obtenerTareas(processId);
-          if (tareas && tareas.length > 0 && isMounted) {
-            const primeraTarea = tareas[0];
-            console.log("Enviando datos de la primera tarea:", primeraTarea);
-            await enviarDatosAlBackend(
-              processId,
-              primeraTarea.caseId,
-              primeraTarea.assigned_id
-            );
+        try {
+          // Obtener el ID del proceso
+          const processId = await obtenerIdProceso();
+          if (processId && isMounted) {
+            // Obtener las tareas relacionadas con el proceso
+            const tareas = await obtenerTareas(processId);
+            if (tareas && tareas.length > 0 && isMounted) {
+              const primeraTarea = tareas[0];
+              console.log("Enviando datos de la primera tarea:", primeraTarea);
+              await enviarDatosAlBackend(
+                processId,
+                primeraTarea.caseId,
+                primeraTarea.assigned_id
+              );
+            }
+          }
+        } catch (error) {
+          if (error instanceof Error) {
+            console.error("Error en la carga de datos:", error);
+            setError(`Error en la carga de datos: ${error.message}`);
+          } else {
+            console.error("Error en la carga de datos:", error);
+            setError("Error en la carga de datos: Error desconocido");
+          }
+        } finally {
+          if (isMounted) {
+            setLoading(false);
           }
         }
       }
@@ -248,11 +234,10 @@ export default function WebPage() {
 
     fetchData();
 
-    // Limpiar la variable de control al desmontar el componente
     return () => {
       isMounted = false;
     };
-  }, []); // El array vacío asegura que esto se ejecute solo una vez // El array vacío asegura que esto se ejecute solo una vez // El array vacío asegura que esto se ejecute solo una vez
+  }, []);
 
   // Seleccionar documento a visualizar
   const handleViewDocument = (documentType: keyof typeof staticDocuments) => {
