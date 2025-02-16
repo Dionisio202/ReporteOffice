@@ -1,49 +1,17 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
 
-interface Destinatario {
+const socket = io("http://localhost:3001"); // Conecta con el backend
+
+interface TipoProducto {
+  id: number;
   nombre: string;
-  titulo: string;
-  cargo: string;
-  institucion: string;
-}
-
-interface Solicitante {
-  nombre: string;
-  cargo: string;
-}
-
-interface Producto {
-  nombre: string;
-}
-
-interface Proyecto {
-  tipo: string;
-  titulo: string;
-  resolucion: {
-    numero: string;
-    fecha: string;
-  };
-}
-
-interface ModalData {
-  success: boolean;
-  message: string;
-  productos: {
-    fecha: string;
-    lugar: string;
-    codigoMemorando: string;
-    tipoMemorando: string; // Nuevo campo para el combobox
-    destinatario: Destinatario;
-    solicitante: Solicitante;
-    productos: Producto[];
-    proyecto: Proyecto;
-  };
 }
 
 interface ModalProps {
   showModal: boolean;
   closeModal: () => void;
-  modalData: ModalData;
+  modalData: any; // Ajusta según tu interfaz
   onSave: (editedData: any) => void;
 }
 
@@ -54,8 +22,33 @@ const Modal: React.FC<ModalProps> = ({
   onSave,
 }) => {
   const [editedData, setEditedData] = useState(modalData.productos);
+  const [tiposProductos, setTiposProductos] = useState<TipoProducto[]>([]); // Estado para los tipos de productos
+  const [loading, setLoading] = useState(true); // Estado para el indicador de carga
+  const [error, setError] = useState<string | null>(null); // Estado para manejar errores
 
-  if (!showModal) return null;
+  // Cargar los tipos de productos al abrir el modal
+  useEffect(() => {
+    if (showModal) {
+      setError(null); // Reiniciar el estado de error
+      setLoading(true); // Activar el indicador de carga
+
+      // Emitir el evento para obtener los tipos de productos
+      socket.emit("obtener_tipos_productos", (response: any) => {
+        if (response.success) {
+          setTiposProductos(response.tiposProductos); // Guardar los tipos de productos en el estado
+        } else {
+          console.error(
+            "Error al obtener los tipos de productos:",
+            response.message
+          );
+          setError(
+            "Error al obtener los tipos de productos. Inténtalo de nuevo."
+          ); // Mostrar un mensaje de error
+        }
+        setLoading(false); // Desactivar el indicador de carga
+      });
+    }
+  }, [showModal]);
 
   const handleChange = (path: string, value: string) => {
     const keys = path.split(".");
@@ -75,6 +68,8 @@ const Modal: React.FC<ModalProps> = ({
     closeModal();
   };
 
+  if (!showModal) return null;
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
       <div className="bg-amber-50 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -88,66 +83,52 @@ const Modal: React.FC<ModalProps> = ({
                 Revise que los datos de registro sean correctos y edite en caso
                 de incongruencias.
               </p>
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+                  {error}
+                </div>
+              )}
               <div className="space-y-1">
                 {/* Código de Memorando */}
+                <label
+                  htmlFor="codigoMemorando"
+                  className="block text-xs font-medium text-gray-700"
+                >
+                  Código de Memorando:
+                </label>
+                <input
+                  id="codigoMemorando"
+                  type="text"
+                  value={editedData.codigoMemorando}
+                  onChange={(e) =>
+                    handleChange("codigoMemorando", e.target.value)
+                  }
+                  className="mt-1 text-xs block w-full p-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#931D21] focus:border-[#931D21]"
+                />
                 <div>
-                  <label className="block text-xs font-medium text-gray-700">
-                    Código de Memorando:
-                  </label>
-                  <input
-                    type="text"
-                    value={editedData.codigoMemorando}
-                    onChange={(e) =>
-                      handleChange("codigoMemorando", e.target.value)
-                    }
-                    className="mt-1 text-xs block w-full p-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#931D21] focus:border-[#931D21]"
-                  />
-                </div>
-
-                {/* Tipo de Memorando (Combobox) */}
-                <div>
-                  <label className="block text-xs font-medium text-orange-700">
+                  <label
+                    htmlFor="tipoMemorando"
+                    className="block text-xs font-medium text-orange-700"
+                  >
                     Tipo de Registro
                   </label>
                   <select
+                    id="tipoMemorando"
                     value={editedData.tipoMemorando}
                     onChange={(e) =>
                       handleChange("tipoMemorando", e.target.value)
                     }
                     className="mt-1 text-xs block w-full p-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#931D21] focus:border-[#931D21]"
+                    disabled={loading}
                   >
                     <option value="">Seleccione una opción</option>
-                    <option value="Tipo 1">Registro de Obras Literarias</option>
-                    <option value="Tipo 2">
-                      Registro de Obras Artisticas y Musicales
-                    </option>
-                    <option value="Tipo 3">
-                      Registro de Obras Audiovisuales
-                    </option>
-                    <option value="Tipo 4">
-                      Registro de Programas de Ordenador
-                    </option>
-                    <option value="Tipo 5">
-                      Registro de Publicaciones Periódicas y Programas de Audio
-                    </option>
-                    <option value="Tipo 6">Registro de Fonogramas</option>
+                    {tiposProductos.map((tipo) => (
+                      <option key={tipo.id} value={tipo.nombre}>
+                        {tipo.nombre}
+                      </option>
+                    ))}
                   </select>
                 </div>
-
-                {/* Fecha */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-700">
-                    Fecha:
-                  </label>
-                  <input
-                    type="text"
-                    value={editedData.fecha}
-                    onChange={(e) => handleChange("fecha", e.target.value)}
-                    className="mt-1 text-xs block w-full p-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#931D21] focus:border-[#931D21]"
-                  />
-                </div>
-
-                {/* Lugar */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700">
                     Lugar:

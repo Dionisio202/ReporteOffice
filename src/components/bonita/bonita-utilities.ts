@@ -10,20 +10,16 @@ export class BonitaUtilities {
   constructor() {
     const urlParams = new URLSearchParams(window.location.search);
     this.#TASKINSTANCEID = urlParams.get("id");
-    this.#BONITATOKEN = this.#getBonitaToken();
-    this.#BONITAURL = "http://localhost:10116/bonita";
+    this.#BONITATOKEN = this.getBonitaToken();
+    this.#BONITAURL = "http://localhost:48615/bonita";
     this.#APIURL = `${this.#BONITAURL}/API/bpm`;
   }
 
-  #getBonitaToken(): string | null {
-    const match = document.cookie.match(/X-Bonita-API-Token=([^;]+)/);
-    if (match) {
-      console.log("Bonita Token:", match[1]);
-      return match[1];
-    } else {
-      console.error("No se encontró el token de Bonita en las cookies.");
-      return null;
-    }
+  getBonitaToken(): string | null {
+    return document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("X-Bonita-API-Token="))
+      ?.split("=")[1] || null;
   }
 
   async #getCaseId(): Promise<string> {
