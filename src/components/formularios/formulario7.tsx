@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox"; // Importamos el componente Checkbox
 import { BonitaUtilities } from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
+import io from "socket.io-client";
+const socket = io("http://localhost:3001");
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
     contrato: false,
@@ -16,6 +18,17 @@ export default function ConfirmationScreen() {
       [name]: checked,
     }));
   };
+
+  // Efecto para verificar el estado de los checkboxes cada 5 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      //Envio de datos al servidor
+      socket.emit("documentos", selectedDocuments);
+    }, 10000); // 5000 milisegundos = 5 segundos
+
+    // Limpieza del intervalo cuando el componente se desmonta
+    return () => clearInterval(interval);
+  }, [selectedDocuments]); // Dependencia: el estado de los checkboxes
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

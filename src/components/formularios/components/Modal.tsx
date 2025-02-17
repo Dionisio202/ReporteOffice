@@ -35,7 +35,7 @@ const Modal: React.FC<ModalProps> = ({
       // Emitir el evento para obtener los tipos de productos
       socket.emit("obtener_tipos_productos", (response: any) => {
         if (response.success) {
-          setTiposProductos(response.tiposProductos); // Guardar los tipos de productos en el estado
+          setTiposProductos(response.data); // Guardar los tipos de productos en el estado
         } else {
           console.error(
             "Error al obtener los tipos de productos:",
@@ -245,7 +245,7 @@ const Modal: React.FC<ModalProps> = ({
                   <h4 className="text-xss font-semibold text-orange-700 ">
                     Productos:
                   </h4>
-                  {editedData.productos.map((producto, index) => (
+                  {editedData.productos.map((producto:any, index:any) => (
                     <div key={index} className="mb-4">
                       <label className="block text-xs font-medium text-gray-700">
                         Nombre del Producto:
