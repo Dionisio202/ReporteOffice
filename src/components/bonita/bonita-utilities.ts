@@ -18,7 +18,7 @@ export class BonitaUtilities {
     const urlParams = new URLSearchParams(window.location.search);
     this.#TASKINSTANCEID = urlParams.get("id");
     this.#BONITATOKEN = this.getBonitaToken();
-    this.#BONITAURL = "http://localhost:48615/bonita";
+    this.#BONITAURL = "http://localhost:8080/bonita";
     this.#APIURL = `${this.#BONITAURL}/API/bpm`;
   }
 
@@ -39,7 +39,7 @@ export class BonitaUtilities {
       console.log("Consultando el ID y nombre del proceso...");
 
       const response = await fetch(
-        "http://localhost:48615/bonita/API/bpm/process?p=0",
+        "http://localhost:8080/bonita/API/bpm/process?p=0",
         {
           method: "GET",
           headers: {
@@ -74,7 +74,7 @@ export class BonitaUtilities {
       console.log(`Consultando tareas para el proceso ID: ${processId}...`);
 
       const response = await fetch(
-        `http://localhost:48615/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
+        `http://localhost:8080/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
         {
           method: "GET",
           headers: {

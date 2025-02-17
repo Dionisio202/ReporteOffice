@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import CardContainer from "./components/CardContainer";
-import Checkbox from "./components/Checkbox"; // Importamos el componente Checkbox
+import Checkbox from "./components/Checkbox"; 
 import { BonitaUtilities } from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 import io from "socket.io-client";
@@ -14,8 +14,16 @@ export default function ConfirmationScreen() {
     acta: false,
   });
 
+  const [usuario, setUsuario] = useState<{ user_id: string; user_name: string } | null>(null);
+  const [bonitaData, setBonitaData] = useState<{
+    processId: string;
+    taskId: string;
+    caseId: string;
+    processName: string;
+  } | null>(null);
+
   const bonita: BonitaUtilities = new BonitaUtilities();
-  const { obtenerIdProceso, obtenerTareas, error } = useBonitaService(); // Usa el servicio
+  const { obtenerUsuarioAutenticado, obtenerDatosBonita, error } = useBonitaService();
 
   const handleChange = (name: string, checked: boolean) => {
     setSelectedDocuments((prevState) => ({
@@ -24,55 +32,63 @@ export default function ConfirmationScreen() {
     }));
   };
 
-  // Efecto para obtener el ID del proceso y las tareas (solo una vez)
+  // 🔹 Obtener el usuario autenticado al montar el componente
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const proceso = await obtenerIdProceso();
-        console.log("Proceso obtenido:", proceso);
-
-        if (proceso) {
-          const tareas = await obtenerTareas(proceso.id);
-          console.log("Tareas obtenidas:", tareas);
-
-          if (tareas && tareas.length > 0) {
-            // Enviar los datos al servidor a través del socket
-            socket.emit("guardar_estado_temporal", {
-              id_registro: proceso.id, // Usar el ID del proceso
-              id_tarea: tareas[0].caseId, // Usar el ID de la primera tarea
-              jsonData: JSON.stringify(selectedDocuments), // Enviar el estado de los checkboxes
-              id_funcionario: 1, // Reemplaza con el ID del funcionario real
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error al obtener el proceso o las tareas:", error);
+    const fetchUser = async () => {
+      const userData = await obtenerUsuarioAutenticado();
+      if (userData) {
+        setUsuario(userData);
+        console.log("📌 Usuario autenticado:", userData);
       }
     };
 
-    fetchData(); // Llamar a la función para obtener los datos
-  }, []); // Array de dependencias vacío para ejecutar solo una vez
+    fetchUser();
+  }, []);
 
-  // Efecto para verificar el estado de los checkboxes cada 10 segundos
+  // 🔹 Obtener datos de Bonita una vez que se tenga el usuario
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Enviar datos al servidor
-      socket.emit("documentos", selectedDocuments);
-    }, 10000); // 10000 milisegundos = 10 segundos
+    if (!usuario) return;
 
-    // Limpieza del intervalo cuando el componente se desmonta
-    return () => clearInterval(interval);
-  }, [selectedDocuments]); // Dependencia: el estado de los checkboxes
+    const fetchData = async () => {
+      try {
+        const data = await obtenerDatosBonita(usuario.user_id);
+        if (data) {
+          setBonitaData(data);
+          console.log("📌 Datos de Bonita obtenidos:", data);
+
+          // socket.emit("guardar_estado_temporal", {
+          //   id_registro: data.processId,
+          //   id_tarea: data.taskId,
+          //   jsonData: JSON.stringify(selectedDocuments),
+          //   id_funcionario: usuario.user_id, // Ahora usamos el ID del usuario autenticado
+          // });
+        }
+      } catch (error) {
+        console.error("❌ Error obteniendo datos de Bonita:", error);
+      }
+    };
+
+    fetchData();
+  }, [usuario]);
+
+  useEffect(() => {
+    if (bonitaData) {
+      console.log("Datos de Bonita en este formulario:", bonitaData);
+      const interval = setInterval(() => {
+        socket.emit("documentos", selectedDocuments);
+      }, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedDocuments, bonitaData]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Documentos confirmados:", selectedDocuments);
+    console.log("📌 Documentos confirmados:", selectedDocuments);
   };
 
   const handleNext = () => {
     alert("Avanzando a la siguiente página...");
     bonita.changeTask();
-    // Aquí puedes agregar la lógica para navegar a otra página
   };
 
   return (
@@ -82,7 +98,7 @@ export default function ConfirmationScreen() {
           text="Contrato de Cesión de Derechos y Acta de Participación"
           className="text-center text-gray-800 mb-3 text-xs"
         />
-        {/* Sección de checkboxes */}
+
         <div className="space-y-3">
           <Checkbox
             label="Contrato de Cesión de Derechos Patrimoniales"
@@ -97,7 +113,6 @@ export default function ConfirmationScreen() {
           />
         </div>
 
-        {/* Botón Siguiente */}
         <button
           type="submit"
           className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
@@ -105,6 +120,14 @@ export default function ConfirmationScreen() {
         >
           Siguiente
         </button>
+
+        {usuario && (
+          <p className="text-center text-gray-700 mt-2">
+            Usuario autenticado: <b>{usuario.user_name}</b> (ID: {usuario.user_id})
+          </p>
+        )}
+
+        {error && <p className="text-red-500 text-center">{error}</p>}
       </form>
     </CardContainer>
   );

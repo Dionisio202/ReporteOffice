@@ -28,6 +28,8 @@ export interface Proceso {
 }
 
 export interface Tarea {
+  id: string;
+  processId: string;
   caseId: string;
   displayName: string;
   assigned_id: string;
