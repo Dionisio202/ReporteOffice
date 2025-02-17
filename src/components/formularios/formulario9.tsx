@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
-
+import Title from "./components/TitleProps";
 const Formulario9: React.FC = () => {
   const [checkedState, setCheckedState] = useState({
     checkbox1: false,
@@ -22,8 +22,12 @@ const Formulario9: React.FC = () => {
   };
 
   return (
-    <CardContainer title="Pantalla 9">
+    <CardContainer title="Contratos de Cesión de Derechos Patrimoniales">
       {/* Sección de Checkbox */}
+      <Title
+          text="Firma y Emisión de documento firmado"
+          className="text-center text-gray-800 mb-3 text-lg"
+        />
       <div className="flex flex-col space-y-4">
         <Checkbox
           label="Firma Contrato de Cesión de Derechos Patrimoniales"

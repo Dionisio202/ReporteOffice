@@ -20,7 +20,7 @@ export default function MemoCodeForm() {
     <CardContainer title="Contratos de Cesión de Derechos Patrimoniales">
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
         <Title
-          text="Revisión Firma de Rector"
+          text="Solicitud para Firma de Rector"
           className="text-center text-gray-800 mb-3 text-lg"
         />
         <div>
