@@ -1,7 +1,7 @@
 import { useState, ChangeEvent } from "react";
 import CardContainer from "./components/CardContainer";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
-
+import Title from "./components/TitleProps";
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
     contrato: false,
@@ -26,11 +26,15 @@ export default function ConfirmationScreen() {
 
   const handleNext = () => {
     alert("Avanzando a la siguiente página...");
-    bonita.changeTask()
+    bonita.changeTask();
   };
 
   return (
-    <CardContainer title="Formulario 10">
+    <CardContainer title="Contrato de Cesión de Derechos">
+      <Title
+        text="Firma y Emisión de documento firmado"
+        className="text-center text-gray-800 mb-3 text-lg"
+      />
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
         <div className="mb-4">
           <div className="flex items-center">
