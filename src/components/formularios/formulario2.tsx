@@ -31,8 +31,8 @@ const staticDocuments: Record<string, DocumentType> = {
 export default function WebPage() {
   const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
 
   // Verificar conexión WebSocket
   useEffect(() => {

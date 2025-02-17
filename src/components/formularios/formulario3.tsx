@@ -1,24 +1,55 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import io from "socket.io-client";
 import Button from "../UI/button";
 import Title from "./components/TitleProps";
 import Modal from "./components/Modal";
 import UploadFile from "./components/UploadFile";
-import { ModalData } from "../../interfaces/registro.interface";
+import { ModalData } from "../../interfaces/registros.interface";
+import { Tarea } from "../../interfaces/bonita.interface";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
+import { useBonitaAPI } from "../bonita/hooks/useBonitAPI"; // Importar el hook
+
 const socket = io("http://localhost:3001"); // Conecta con el backend
 
 export default function UploadForm() {
   const [intellectualPropertyFileBase64, setIntellectualPropertyFileBase64] =
     useState<string | null>(null);
-  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<
-    string | null
-  >(null);
-  
+  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<string | null>(null);
+
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState<ModalData | null>(null);
+  const [bonitaResponse, setBonitaResponse] = useState<{
+    proceso?: { id: string; name: string };
+    tareas?: Tarea[];
+  } | null>(null);
+
   const bonita: BonitaUtilities = new BonitaUtilities();
+  const { obtenerIdProceso, obtenerTareas, loading, error } = useBonitaAPI(); // Usar el hook
+
+  // Función para obtener ID de proceso y tarea
+  const fetchProcessData = useCallback(async () => {
+    try {
+      const processData = await obtenerIdProceso();
+      if (processData) {
+        const tasks = await obtenerTareas(processData.id);
+        if (tasks && tasks.length > 0) {
+          // Almacenar la respuesta en el estado
+          setBonitaResponse({
+            proceso: processData,
+            tareas: tasks || [],
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Error al obtener datos del proceso o tarea", err);
+      setBonitaResponse(null); // Limpiar el estado en caso de error
+    }
+  }, [obtenerIdProceso, obtenerTareas]);
+
+  useEffect(() => {
+    fetchProcessData(); // Obtener datos de Bonita al cargar la página
+  }, [fetchProcessData]);
 
   const handleFileChange = useCallback(
     (file: File | null, fileType: string) => {
@@ -157,6 +188,15 @@ export default function UploadForm() {
     setShowModal(false);
   };
 
+  // Mostrar loading o error si es necesario
+  if (loading) {
+    return <p>Cargando...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
   return (
     <div className="flex flex-col items-center p-1 bg-gradient-to-r to-gray-100 min-h-screen">
       <form className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-xl border border-gray-700">
@@ -168,6 +208,18 @@ export default function UploadForm() {
         <h1 className="text-sm font-bold text-center text-gray-900 mb-9">
           Revisión y Análisis de Requerimiento
         </h1>
+
+        {/* Mostrar el JSON de Bonita */}
+        {bonitaResponse && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">
+              Respuesta de Bonita:
+            </h2>
+            <pre className="text-sm text-gray-700 whitespace-pre-wrap">
+              {JSON.stringify(bonitaResponse, null, 2)}
+            </pre>
+          </div>
+        )}
 
         <UploadFile
           id="intellectual-property-file"

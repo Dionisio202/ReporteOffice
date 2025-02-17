@@ -1,19 +1,11 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
+import {
+  ModalProps,
+  TipoProducto,
+} from "../../../interfaces/registros.interface";
 
 const socket = io("http://localhost:3001"); // Conecta con el backend
-
-interface TipoProducto {
-  id: number;
-  nombre: string;
-}
-
-interface ModalProps {
-  showModal: boolean;
-  closeModal: () => void;
-  modalData: any; // Ajusta según tu interfaz
-  onSave: (editedData: any) => void;
-}
 
 const Modal: React.FC<ModalProps> = ({
   showModal,
@@ -35,7 +27,7 @@ const Modal: React.FC<ModalProps> = ({
       // Emitir el evento para obtener los tipos de productos
       socket.emit("obtener_tipos_productos", (response: any) => {
         if (response.success) {
-          setTiposProductos(response.tiposProductos); // Guardar los tipos de productos en el estado
+          setTiposProductos(response.data); // Guardar los tipos de productos en el estado
         } else {
           console.error(
             "Error al obtener los tipos de productos:",
@@ -246,7 +238,7 @@ const Modal: React.FC<ModalProps> = ({
                     Productos:
                   </h4>
                   {editedData.productos.map((producto, index) => (
-                    <div key={index} className="mb-4">
+                    <div key={producto.id || index} className="mb-4"> {/* Clave única */}
                       <label className="block text-xs font-medium text-gray-700">
                         Nombre del Producto:
                       </label>

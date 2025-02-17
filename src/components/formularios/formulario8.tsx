@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CardContainer from "./components/CardContainer";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
+import Title from "./components/TitleProps";
 
 export default function MemoCodeForm() {
   const [memoCode, setMemoCode] = useState("");
@@ -16,12 +17,15 @@ export default function MemoCodeForm() {
     // Aquí puedes agregar la lógica para navegar a otra página
   };
   return (
-    <CardContainer title="Ingreso del Código del Memorando">
+    <CardContainer title="Contratos de Cesión de Derechos Patrimoniales">
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-        {/* Input para el código del memorando */}
+        <Title
+          text="Revisión Firma de Rector"
+          className="text-center text-gray-800 mb-3 text-lg"
+        />
         <div>
           <label htmlFor="memoCode" className="block font-semibold">
-            Ingrese el código del memorando generado
+            Ingrese el código del memorando generado para la firma
           </label>
           <input
             id="memoCode"
