@@ -1,8 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { EmailInput } from "./components/EmailInput";
 import DocumentViewer from "../files/DocumentViewer";
 import Title from "./components/TitleProps";
 import io from "socket.io-client";
+
+// Fuera del componente, crea una única instancia de socket
+const socket = io("http://localhost:3001");
 
 // Definimos un tipo para los documentos
 type DocumentType = {
@@ -39,36 +42,39 @@ interface Tarea {
 }
 
 export default function WebPage() {
-  const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(
-    null
-  );
+  const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Conectar con el servidor de WebSockets
-  const socket = io("http://localhost:3001");
-
   // Verificar conexión WebSocket
   useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Conectado al servidor WebSocket");
-    });
+    const handleConnect = () => {
+      if (process.env.NODE_ENV === "development") {
+        console.log("Conectado al servidor WebSocket");
+      }
+    };
 
-    socket.on("connect_error", (err) => {
+    const handleConnectError = (err: Error) => {
       console.error("Error de conexión WebSocket:", err);
-    });
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("connect_error", handleConnectError);
 
     return () => {
-      socket.off("connect");
-      socket.off("connect_error");
+      socket.off("connect", handleConnect);
+      socket.off("connect_error", handleConnectError);
     };
-  }, [socket]);
+  }, []);
 
-  // Función para obtener el ID del proceso
-  const obtenerIdProceso = async (): Promise<string | null> => {
+  // Función para obtener el ID y el nombre del proceso
+  const obtenerIdProceso = useCallback(async (): Promise<{ id: string; name: string } | null> => {
     try {
-      console.log("Iniciando consulta para obtener el ID del proceso...");
+      if (process.env.NODE_ENV === "development") {
+        console.log("Iniciando consulta para obtener el ID y el nombre del proceso...");
+      }
+
       const response = await fetch(
         "http://localhost:48615/bonita/API/bpm/process?p=0",
         {
@@ -86,32 +92,36 @@ export default function WebPage() {
       }
 
       const jsonData: Proceso[] = await response.json();
-      console.log("Respuesta de la API de Bonita (procesos):", jsonData);
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("Respuesta de la API de Bonita (procesos):", jsonData);
+      }
 
       if (jsonData.length === 0) {
         throw new Error("No se encontraron procesos.");
       }
 
-      const idProcesoObtenido = jsonData[0].id;
-      console.log("ID del proceso obtenido:", idProcesoObtenido);
+      const proceso = jsonData[0];
 
-      return idProcesoObtenido;
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error al obtener el ID del proceso:", error);
-        setError(`Error al obtener el ID del proceso: ${error.message}`);
-      } else {
-        console.error("Error al obtener el ID del proceso:", error);
-        setError("Error al obtener el ID del proceso: Error desconocido");
+      if (process.env.NODE_ENV === "development") {
+        console.log("ID y nombre del proceso obtenido:", proceso.id, proceso.name);
       }
+
+      return { id: proceso.id, name: proceso.name };
+    } catch (error) {
+      console.error("Error al obtener el ID y el nombre del proceso:", error);
+      setError(`Error al obtener el ID y el nombre del proceso: ${error instanceof Error ? error.message : "Error desconocido"}`);
       return null;
     }
-  };
+  }, []);
 
   // Función para obtener las tareas relacionadas con el proceso
-  const obtenerTareas = async (processId: string): Promise<Tarea[] | null> => {
+  const obtenerTareas = useCallback(async (processId: string): Promise<Tarea[] | null> => {
     try {
-      console.log("Iniciando consulta para obtener las tareas...");
+      if (process.env.NODE_ENV === "development") {
+        console.log("Iniciando consulta para obtener las tareas...");
+      }
+
       const response = await fetch(
         `http://localhost:48615/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
         {
@@ -129,68 +139,69 @@ export default function WebPage() {
       }
 
       const jsonData: Tarea[] = await response.json();
-      console.log("Respuesta de la API de Bonita (tareas):", jsonData);
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("Respuesta de la API de Bonita (tareas):", jsonData);
+      }
+
       return jsonData;
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error al obtener las tareas:", error);
-        setError(`Error al obtener las tareas: ${error.message}`);
-      } else {
-        console.error("Error al obtener las tareas:", error);
-        setError("Error al obtener las tareas: Error desconocido");
-      }
+      console.error("Error al obtener las tareas:", error);
+      setError(`Error al obtener las tareas: ${error instanceof Error ? error.message : "Error desconocido"}`);
       return null;
     }
-  };
+  }, []);
 
   // Función para enviar los datos al backend a través de WebSockets
-  const enviarDatosAlBackend = async (idProceso, caseId, assigned_id) => {
-    return new Promise((resolve, reject) => {
-      // Convertir idProceso a BigInt
-      const id_proceso_bigint = BigInt(idProceso);
+  const enviarDatosAlBackend = useCallback(
+    async (
+      idProceso: string,
+      name: string,
+      caseId: string,
+      assigned_id: string
+    ) => {
+      return new Promise((resolve, reject) => {
+        const id_proceso_bigint = BigInt(idProceso);
+        const id_caso_num = Number(caseId);
+        const id_funcionario_int = Number(assigned_id);
 
-      // Convertir caseId a número
-      const id_caso_num = Number(caseId);
-
-      // Convertir assigned_id a número
-      const id_funcionario_int = Number(assigned_id);
-
-      // Validar que los valores convertidos sean números válidos
-      if (
-        typeof id_proceso_bigint !== "bigint" ||
-        isNaN(id_caso_num) ||
-        isNaN(id_funcionario_int)
-      ) {
-        console.error("Error: Los datos no son números válidos");
-        reject("Error: Los datos no son números válidos");
-        return;
-      }
-
-      // Crear el objeto de datos que se enviará al backend
-      const datosParaEnviar = {
-        id_funcionario: id_funcionario_int,
-        id_proceso: id_proceso_bigint.toString(),
-        id_caso: id_caso_num,
-      };
-
-      // Mostrar el JSON que se enviará al backend
-      console.log(
-        "JSON que se enviará al backend:",
-        JSON.stringify(datosParaEnviar, null, 2)
-      );
-
-      // Enviar los datos al backend
-      socket.emit("iniciar_registro", datosParaEnviar, (response) => {
-        if (response.success) {
-          console.log("Respuesta del backend:", response.message);
-          resolve(response);
-        } else {
-          console.error("Error en el backend:", response.message);
-          reject(response.message);
+        if (isNaN(id_caso_num) || isNaN(id_funcionario_int)) {
+          console.error("Error: Los datos no son números válidos");
+          reject("Error: Los datos no son números válidos");
+          return;
         }
+
+        const datosParaEnviar = {
+          id_funcionario: id_funcionario_int,
+          id_proceso: id_proceso_bigint.toString(),
+          id_caso: id_caso_num,
+          nombre_proceso: name,
+        };
+
+        if (process.env.NODE_ENV === "development") {
+          console.log("JSON que se enviará al backend:", JSON.stringify(datosParaEnviar, null, 2));
+        }
+
+        socket.emit(
+          "iniciar_registro",
+          datosParaEnviar,
+          (response: { success: boolean; message: string }) => {
+            if (response.success) {
+              if (process.env.NODE_ENV === "development") {
+                console.log("Respuesta del backend:", response.message);
+              }
+              resolve(response);
+            } else {
+              console.error("Error en el backend:", response.message);
+              reject(response.message);
+            }
+          }
+        );
       });
-    });
-  };
+    },
+    [socket]
+  );
+
   // Llamar a la función al cargar el componente (solo una vez)
   useEffect(() => {
     let isMounted = true;
@@ -201,29 +212,29 @@ export default function WebPage() {
         setError(null);
 
         try {
-          // Obtener el ID del proceso
-          const processId = await obtenerIdProceso();
-          if (processId && isMounted) {
-            // Obtener las tareas relacionadas con el proceso
-            const tareas = await obtenerTareas(processId);
+          const proceso = await obtenerIdProceso();
+          if (proceso && isMounted) {
+            const tareas = await obtenerTareas(proceso.id);
             if (tareas && tareas.length > 0 && isMounted) {
               const primeraTarea = tareas[0];
-              console.log("Enviando datos de la primera tarea:", primeraTarea);
+              if (process.env.NODE_ENV === "development") {
+                console.log("Enviando datos de la primera tarea:", primeraTarea);
+              }
               await enviarDatosAlBackend(
-                processId,
+                proceso.id,
+                proceso.name,
                 primeraTarea.caseId,
                 primeraTarea.assigned_id
               );
             }
           }
         } catch (error) {
-          if (error instanceof Error) {
-            console.error("Error en la carga de datos:", error);
-            setError(`Error en la carga de datos: ${error.message}`);
-          } else {
-            console.error("Error en la carga de datos:", error);
-            setError("Error en la carga de datos: Error desconocido");
-          }
+          console.error("Error en la carga de datos:", error);
+          setError(
+            `Error en la carga de datos: ${
+              error instanceof Error ? error.message : "Error desconocido"
+            }`
+          );
         } finally {
           if (isMounted) {
             setLoading(false);
@@ -237,7 +248,7 @@ export default function WebPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [obtenerIdProceso, obtenerTareas, enviarDatosAlBackend]);
 
   // Seleccionar documento a visualizar
   const handleViewDocument = (documentType: keyof typeof staticDocuments) => {
@@ -291,20 +302,12 @@ export default function WebPage() {
                       <input
                         type="checkbox"
                         checked={selectedDocs.has(doc.type)}
-                        onChange={() =>
-                          handleCheckboxChange(
-                            doc.type as keyof typeof staticDocuments
-                          )
-                        }
+                        onChange={() => handleCheckboxChange(doc.type as keyof typeof staticDocuments)}
                         className="h-4 w-4"
                       />
                       {/* Botón para visualizar */}
                       <button
-                        onClick={() =>
-                          handleViewDocument(
-                            doc.type as keyof typeof staticDocuments
-                          )
-                        }
+                        onClick={() => handleViewDocument(doc.type as keyof typeof staticDocuments)}
                         className="bg-[#931D21] text-white py-1 px-4 rounded hover:bg-blue-500 transition duration-300"
                       >
                         Visualizar
