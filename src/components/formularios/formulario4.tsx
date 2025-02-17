@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import UploadFile from "./components/UploadFile"; // Componente para cargar archivos
 import { io } from "socket.io-client";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
-
+import Title from "./components/TitleProps";
+import Button from "../UI/button";
 // 📌 Conectar WebSocket al puerto 3001
 const socket = io("http://localhost:3001");
 
@@ -13,6 +14,15 @@ export default function UploadForm() {
   const [file, setFile] = useState<File | null>(null); // Agregado estado para el archivo
   const bonita: BonitaUtilities = new BonitaUtilities();
 
+  const handleNext = async () => {
+    try {
+      await bonita.changeTask();
+      alert("Avanzando a la siguiente página...");
+    } catch (error) {
+      console.error("Error al cambiar la tarea:", error);
+      alert("Ocurrió un error al intentar avanzar.");
+    }
+  };
   useEffect(() => {
     // 📢 Escuchar notificaciones en tiempo real
     socket.on("nuevoMemorando", (data) => {
@@ -26,16 +36,6 @@ export default function UploadForm() {
       socket.off("nuevoMemorando");
     };
   }, []);
-
-  const handleNext = async () => {
-    alert("Avanzando a la siguiente página...");
-    try {
-      await bonita.changeTask(); // Esperar a que la tarea cambie (si es una operación asíncrona)
-    } catch (error) {
-      console.error("Error al cambiar de tarea:", error); // Captura errores
-    }
-    // Aquí puedes agregar la lógica para navegar a otra página
-  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -66,7 +66,7 @@ export default function UploadForm() {
       console.error("Error en la solicitud:", error);
     }
   };
-// @ts-ignore
+  // @ts-ignore
   function handleFileChange(file: File | null, arg1: string): void {
     throw new Error("Function not implemented.");
   }
@@ -77,13 +77,18 @@ export default function UploadForm() {
         onSubmit={handleSubmit}
         className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg"
       >
-        <h1 className="text-xl font-bold text-center mb-4">
-          Formulario de Registro
+        <Title
+          text="Solicitud de Certificación Presupuestaria"
+          size="2xl"
+          className="text-center text-gray-800 mb-1 text-lg"
+        />
+        <h1 className="text- font-extralight text-center mb-8">
+          Subir código y documento emitido para certificación.
         </h1>
 
         <div className="mb-4">
           <label htmlFor="memoCode" className="block font-semibold">
-            Ingrese el código del memorando generado
+            Ingrese el código del memorando generado para certificación
           </label>
           <input
             id="memoCode" // Agregar id para el label
@@ -95,7 +100,7 @@ export default function UploadForm() {
         </div>
 
         {/* Componente para cargar archivo, pero no lo enviamos */}
-        
+
         <UploadFile
           id="intellectual-property-file"
           onFileChange={(file) =>
@@ -104,22 +109,21 @@ export default function UploadForm() {
               "Solicitud de Registro de Propiedad Intelectual"
             )
           }
-          label="Cargar Solicitud de registro de propiedad intelectual"
+          label="Subir Certificación Presupuestaria"
         />
-        <button
-          type="button" // Cambiado a "button" para evitar enviar el formulario
-          className="w-full bg-[#931D21] text-white p-2 rounded hover:bg-red-600"
+        <Button
+          className="mt-5 w-full bg-blue-600 text-white px-6 rounded hover:bg-blue-700"
           onClick={handleNext}
         >
-          Siguiente
-        </button>
+          Enviar Datos
+        </Button>
 
-        <button
-          type="submit"
-          className="mt-4 w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        <Button
+          className="mt-5 bg-[#931D21] text-white rounded-lg px-6 min-w-full hover:bg-blue-700 transition-colors duration-200"
+          onClick={handleNext}
         >
-          Enviar
-        </button>
+          Siguiente Proceso
+        </Button>
       </form>
 
       {/* 📢 Mostrar notificaciones en tiempo real */}

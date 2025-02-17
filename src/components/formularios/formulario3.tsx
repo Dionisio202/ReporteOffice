@@ -1,50 +1,60 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import io from "socket.io-client";
 import Button from "../UI/button";
 import Title from "./components/TitleProps";
 import Modal from "./components/Modal";
 import UploadFile from "./components/UploadFile";
-
+import { ModalData } from "../../interfaces/registro.interface";
+import { BonitaUtilities } from "../bonita/bonita-utilities";
 const socket = io("http://localhost:3001"); // Conecta con el backend
 
-interface ModalData {
-  success: boolean;
-  message: string;
-  autores: any[];
-  productos: any;
-}
-
 export default function UploadForm() {
-  const [intellectualPropertyFile, setIntellectualPropertyFile] = useState<File | null>(null);
-  const [authorDataFile, setAuthorDataFile] = useState<File | null>(null);
+  const [intellectualPropertyFileBase64, setIntellectualPropertyFileBase64] =
+    useState<string | null>(null);
+  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<
+    string | null
+  >(null);
+  
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState<ModalData | null>(null);
-  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<string | null>(null);
-  const [intellectualPropertyFileBase64, setIntellectualPropertyFileBase64] = useState<string | null>(null);
+  const bonita: BonitaUtilities = new BonitaUtilities();
 
-  const handleFileChange = (file: File | null, fileType: string) => {
-    if (file) {
-      console.log(`Archivo subido para ${fileType}:`, file);
-      fileType === "Solicitud de Registro de Propiedad Intelectual"
-        ? setIntellectualPropertyFile(file)
-        : setAuthorDataFile(file);
+  const handleFileChange = useCallback(
+    (file: File | null, fileType: string) => {
+      if (file) {
+        console.log(`Archivo subido para ${fileType}:`, file);
+        convertFileToBase64(file).then((base64) => {
+          if (fileType === "Solicitud de Registro de Propiedad Intelectual") {
+            setIntellectualPropertyFileBase64(base64);
+          } else {
+            setAuthorDataFileBase64(base64);
+          }
+        });
+      }
+    },
+    []
+  );
+
+  const handleNext = async () => {
+    try {
+      await bonita.changeTask();
+      alert("Avanzando a la siguiente página...");
+    } catch (error) {
+      console.error("Error al cambiar la tarea:", error);
+      alert("Ocurrió un error al intentar avanzar.");
     }
-  };
-
-  const handleNext = () => {
-    alert("Avanzando a la siguiente página...");
   };
 
   const handleSave = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
-    if (!intellectualPropertyFile || !authorDataFile) {
+    if (!intellectualPropertyFileBase64 || !authorDataFileBase64) {
       setModalData({
         success: false,
         message: "Por favor, sube ambos archivos.",
         autores: [],
-        productos: {},
+        productos: [],
       });
       setShowModal(true);
       return;
@@ -53,15 +63,6 @@ export default function UploadForm() {
     try {
       setIsNextDisabled(false);
 
-      // Convertir los archivos a base64
-      const intellectualPropertyFileBase64 = await convertFileToBase64(intellectualPropertyFile);
-      const authorDataFileBase64 = await convertFileToBase64(authorDataFile);
-
-      // Guardar los archivos base64 en el estado
-      setIntellectualPropertyFileBase64(intellectualPropertyFileBase64);
-      setAuthorDataFileBase64(authorDataFileBase64);
-
-      // Enviar datos al backend usando socket
       socket.emit(
         "procesar_documentos",
         {
@@ -78,12 +79,15 @@ export default function UploadForm() {
               productos: JSON.parse(response.productos),
             });
           } else {
-            console.error("❌ Error en la respuesta del servidor:", response.message);
+            console.error(
+              "❌ Error en la respuesta del servidor:",
+              response.message
+            );
             setModalData({
               success: response.success,
               message: response.message,
               autores: [],
-              productos: {},
+              productos: [],
             });
           }
           setShowModal(true);
@@ -95,7 +99,7 @@ export default function UploadForm() {
         success: false,
         message: "Error al procesar los documentos. Inténtalo de nuevo.",
         autores: [],
-        productos: {},
+        productos: [],
       });
       setShowModal(true);
     }
@@ -106,21 +110,22 @@ export default function UploadForm() {
       if (!authorDataFileBase64 || !intellectualPropertyFileBase64) {
         throw new Error("No se encontraron los archivos base64.");
       }
-
-      // Enviar los datos editados al backend usando socket
       socket.emit(
-        "procesar_documentos", // Mismo endpoint
+        "procesar_documentos",
         {
           documento_autores: authorDataFileBase64,
           documento_productos: intellectualPropertyFileBase64,
-          editedData, // Enviar los datos editados
+          editedData,
         },
         (response: any) => {
           if (response.success) {
             console.log("📢 Datos editados guardados correctamente:", response);
             alert("Datos editados guardados correctamente.");
           } else {
-            console.error("❌ Error al guardar los datos editados:", response.message);
+            console.error(
+              "❌ Error al guardar los datos editados:",
+              response.message
+            );
             alert("Error al guardar los datos editados.");
           }
         }
@@ -135,10 +140,12 @@ export default function UploadForm() {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (reader.result) {
-          resolve(reader.result.toString().split(",")[1]); // Retorna solo la parte base64 del archivo
+        if (reader.result && typeof reader.result === "string") {
+          const base64 = reader.result.split(",")[1];
+          if (base64) resolve(base64);
+          else reject("No se pudo extraer la parte base64 del archivo.");
         } else {
-          reject("No se pudo convertir el archivo.");
+          reject("Error al procesar el archivo.");
         }
       };
       reader.onerror = () => reject("Error al leer el archivo.");
@@ -165,14 +172,19 @@ export default function UploadForm() {
         <UploadFile
           id="intellectual-property-file"
           onFileChange={(file) =>
-            handleFileChange(file, "Solicitud de Registro de Propiedad Intelectual")
+            handleFileChange(
+              file,
+              "Solicitud de Registro de Propiedad Intelectual"
+            )
           }
           label="Cargar Solicitud de registro de propiedad intelectual"
         />
 
         <UploadFile
           id="author-data-file"
-          onFileChange={(file) => handleFileChange(file, "Datos informativos de autores")}
+          onFileChange={(file) =>
+            handleFileChange(file, "Datos informativos de autores")
+          }
           label="Cargar Datos informativos de autores"
         />
 
@@ -187,7 +199,7 @@ export default function UploadForm() {
           <Button
             className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
             onClick={handleSave}
-            disabled={!intellectualPropertyFile || !authorDataFile}
+            disabled={!intellectualPropertyFileBase64 || !authorDataFileBase64}
           >
             Guardar
           </Button>

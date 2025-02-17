@@ -3,10 +3,16 @@ import { EmailInput } from "./components/EmailInput";
 import DocumentViewer from "../files/DocumentViewer";
 import Title from "./components/TitleProps";
 import io from "socket.io-client";
+import { BonitaUtilities} from "../bonita/bonita-utilities";
 
 // Fuera del componente, crea una única instancia de socket
 const socket = io("http://localhost:3001");
 
+(async () => {
+  const bonitaUtils = new BonitaUtilities(); // Crear una instancia de la clase
+  const proceso = await bonitaUtils.obtenerIdProceso(); // Llamar a la función desde la instancia
+  console.log(proceso);
+})();
 // Definimos un tipo para los documentos
 type DocumentType = {
   key: string;
@@ -27,19 +33,6 @@ const staticDocuments: Record<string, DocumentType> = {
     nombre: "jfsr-001.docx",
   },
 };
-
-// Definir interfaces para los datos de Bonita
-interface Proceso {
-  id: string;
-  name: string;
-  displayName: string;
-}
-
-interface Tarea {
-  caseId: string;
-  displayName: string;
-  assigned_id: string;
-}
 
 export default function WebPage() {
   const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
@@ -67,91 +60,6 @@ export default function WebPage() {
       socket.off("connect_error", handleConnectError);
     };
   }, []);
-
-  // Función para obtener el ID y el nombre del proceso
-  const obtenerIdProceso = useCallback(async (): Promise<{ id: string; name: string } | null> => {
-    try {
-      if (process.env.NODE_ENV === "development") {
-        console.log("Iniciando consulta para obtener el ID y el nombre del proceso...");
-      }
-
-      const response = await fetch(
-        "http://localhost:48615/bonita/API/bpm/process?p=0",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Bonita-API-Token": "tu_token_aqui",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-
-      const jsonData: Proceso[] = await response.json();
-
-      if (process.env.NODE_ENV === "development") {
-        console.log("Respuesta de la API de Bonita (procesos):", jsonData);
-      }
-
-      if (jsonData.length === 0) {
-        throw new Error("No se encontraron procesos.");
-      }
-
-      const proceso = jsonData[0];
-
-      if (process.env.NODE_ENV === "development") {
-        console.log("ID y nombre del proceso obtenido:", proceso.id, proceso.name);
-      }
-
-      return { id: proceso.id, name: proceso.name };
-    } catch (error) {
-      console.error("Error al obtener el ID y el nombre del proceso:", error);
-      setError(`Error al obtener el ID y el nombre del proceso: ${error instanceof Error ? error.message : "Error desconocido"}`);
-      return null;
-    }
-  }, []);
-
-  // Función para obtener las tareas relacionadas con el proceso
-  const obtenerTareas = useCallback(async (processId: string): Promise<Tarea[] | null> => {
-    try {
-      if (process.env.NODE_ENV === "development") {
-        console.log("Iniciando consulta para obtener las tareas...");
-      }
-
-      const response = await fetch(
-        `http://localhost:48615/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Bonita-API-Token": "tu_token_aqui",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-
-      const jsonData: Tarea[] = await response.json();
-
-      if (process.env.NODE_ENV === "development") {
-        console.log("Respuesta de la API de Bonita (tareas):", jsonData);
-      }
-
-      return jsonData;
-    } catch (error) {
-      console.error("Error al obtener las tareas:", error);
-      setError(`Error al obtener las tareas: ${error instanceof Error ? error.message : "Error desconocido"}`);
-      return null;
-    }
-  }, []);
-
   // Función para enviar los datos al backend a través de WebSockets
   const enviarDatosAlBackend = useCallback(
     async (

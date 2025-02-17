@@ -1,5 +1,12 @@
 // src/bonita/bonita-utilities.ts
-import { TaskDetails, BonitaContext, FormDataContract, VariableValue } from '../../interfaces/bonita.interface';
+import {
+  TaskDetails,
+  BonitaContext,
+  FormDataContract,
+  VariableValue,
+  Proceso,
+  Tarea,
+} from "../../interfaces/bonita.interface";
 
 export class BonitaUtilities {
   #TASKINSTANCEID: string | null;
@@ -16,11 +23,81 @@ export class BonitaUtilities {
   }
 
   getBonitaToken(): string | null {
-    return document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("X-Bonita-API-Token="))
-      ?.split("=")[1] || null;
+    return (
+      document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("X-Bonita-API-Token="))
+        ?.split("=")[1] || null
+    );
   }
+
+  /**
+   * Obtiene el ID y nombre del primer proceso disponible en Bonita.
+   */
+  obtenerIdProceso = async (): Promise<Proceso | null> => {
+    try {
+      console.log("Consultando el ID y nombre del proceso...");
+
+      const response = await fetch(
+        "http://localhost:48615/bonita/API/bpm/process?p=0",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Bonita-API-Token": "tu_token_aqui",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok)
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+      const jsonData: Proceso[] = await response.json();
+
+      if (jsonData.length === 0) throw new Error("No se encontraron procesos.");
+
+      console.log("Proceso obtenido:", jsonData[0]);
+
+      return jsonData[0];
+    } catch (error) {
+      console.error("Error en obtenerIdProceso:", error);
+      return null;
+    }
+  };
+
+  /**
+   * Obtiene las tareas activas de un proceso específico en Bonita.
+   */
+  obtenerTareas = async (processId: string): Promise<Tarea[] | null> => {
+    try {
+      console.log(`Consultando tareas para el proceso ID: ${processId}...`);
+
+      const response = await fetch(
+        `http://localhost:48615/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Bonita-API-Token": "tu_token_aqui",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok)
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+      const jsonData: Tarea[] = await response.json();
+
+      console.log("Tareas obtenidas:", jsonData);
+
+      return jsonData;
+    } catch (error) {
+      console.error("Error en obtenerTareas:", error);
+      return null;
+    }
+  };
 
   async #getCaseId(): Promise<string> {
     try {
@@ -28,11 +105,11 @@ export class BonitaUtilities {
       const response = await fetch(url, {
         method: "GET",
         headers: {
-          "X-Bonita-API-Token": this.#BONITATOKEN || '',
+          "X-Bonita-API-Token": this.#BONITATOKEN || "",
         },
       });
 
-      const taskDetails = await this.#manageResponse(response) as TaskDetails;
+      const taskDetails = (await this.#manageResponse(response)) as TaskDetails;
       return taskDetails.caseId;
     } catch (error) {
       alert("Error en la solicitud.");
@@ -60,7 +137,9 @@ export class BonitaUtilities {
     return context;
   }
 
-  async changeTask({ formData = null }: { formData?: FormDataContract | null } = {}): Promise<void> {
+  async changeTask({
+    formData = null,
+  }: { formData?: FormDataContract | null } = {}): Promise<void> {
     const body = formData ? JSON.stringify(formData) : "{}";
 
     try {
@@ -69,7 +148,7 @@ export class BonitaUtilities {
         {
           method: "POST",
           headers: {
-            "X-Bonita-API-Token": this.#BONITATOKEN || '',
+            "X-Bonita-API-Token": this.#BONITATOKEN || "",
             "Content-Type": "application/json",
           },
           body: body,
@@ -78,14 +157,18 @@ export class BonitaUtilities {
       );
 
       await this.#manageResponse(response);
-      alert("Tarea completada exitosamente. Avanzando a la siguiente tarea. por favor recargue la pagina");
+      alert(
+        "Tarea completada exitosamente. Avanzando a la siguiente tarea. por favor recargue la pagina"
+      );
     } catch (err) {
       alert("Error en la solicitud.");
       console.error("Error en la solicitud:", err);
     }
   }
 
-  async getDataFromContract(...businessVariableNames: string[]): Promise<any[]> {
+  async getDataFromContract(
+    ...businessVariableNames: string[]
+  ): Promise<any[]> {
     const context = await this.#fetchTaskContext();
     const result: any[] = [];
     for (const businessVariableName of businessVariableNames) {
@@ -95,7 +178,10 @@ export class BonitaUtilities {
     return result;
   }
 
-  async #loadData(context: BonitaContext, businessVariableName: string): Promise<any> {
+  async #loadData(
+    context: BonitaContext,
+    businessVariableName: string
+  ): Promise<any> {
     try {
       const ref = context[`${businessVariableName}_ref`];
 
@@ -107,7 +193,7 @@ export class BonitaUtilities {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "X-Bonita-API-Token": this.#BONITATOKEN || '',
+          "X-Bonita-API-Token": this.#BONITATOKEN || "",
         },
       });
 
@@ -128,7 +214,7 @@ export class BonitaUtilities {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "X-Bonita-API-Token": this.#BONITATOKEN || '',
+            "X-Bonita-API-Token": this.#BONITATOKEN || "",
           },
         }
       );
@@ -150,24 +236,29 @@ export class BonitaUtilities {
       boolean: "java.lang.Boolean",
       object: "java.lang.Object",
     };
-  
+
     // Obtener el tipo de Java correspondiente
     const type = typeof value;
     const javaType = javaTypeMap[type] || "java.lang.Object";
-  
+
     try {
       const response = await fetch(
-        `${this.#APIURL}/caseVariable/${await this.#getCaseId()}/${variableName}`,
+        `${
+          this.#APIURL
+        }/caseVariable/${await this.#getCaseId()}/${variableName}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "X-Bonita-API-Token": this.#BONITATOKEN || '',
+            "X-Bonita-API-Token": this.#BONITATOKEN || "",
           },
-          body: JSON.stringify({ value: value, type: javaType } as VariableValue),
+          body: JSON.stringify({
+            value: value,
+            type: javaType,
+          } as VariableValue),
         }
       );
-  
+
       const context = await this.#manageResponse(response);
       return context;
     } catch (err) {

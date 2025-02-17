@@ -2,7 +2,7 @@ import { useState } from "react";
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox"; // Importamos el componente Checkbox
 import { BonitaUtilities } from "../bonita/bonita-utilities";
-
+import Title from "./components/TitleProps";
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
     contrato: false,
@@ -23,14 +23,16 @@ export default function ConfirmationScreen() {
   };
   const handleNext = () => {
     alert("Avanzando a la siguiente página...");
-    bonita.changeTask()
+    bonita.changeTask();
     // Aquí puedes agregar la lógica para navegar a otra página
   };
   return (
     <CardContainer title="Confirmación de Firma">
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-        <p className="text-lg">Confirmación de firma en los documentos de:</p>
-
+        <Title
+          text="Contrato de Cesión de Derechos y Acta de Participación"
+          className="text-center text-gray-800 mb-3 text-xs"
+        />
         {/* Sección de checkboxes */}
         <div className="space-y-3">
           <Checkbox
@@ -51,7 +53,6 @@ export default function ConfirmationScreen() {
           type="submit"
           className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
           onClick={handleNext}
-
         >
           Siguiente
         </button>
