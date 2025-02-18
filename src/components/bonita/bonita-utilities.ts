@@ -18,7 +18,7 @@ export class BonitaUtilities {
     const urlParams = new URLSearchParams(window.location.search);
     this.#TASKINSTANCEID = urlParams.get("id");
     this.#BONITATOKEN = this.getBonitaToken();
-    this.#BONITAURL = "http://localhost:48615/bonita";
+    this.#BONITAURL = "http://localhost:8080/bonita";
     this.#APIURL = `${this.#BONITAURL}/API/bpm`;
   }
 
@@ -30,6 +30,75 @@ export class BonitaUtilities {
         ?.split("=")[1] || null
     );
   }
+
+  /**
+   * Obtiene el ID y nombre del primer proceso disponible en Bonita.
+   */
+  obtenerIdProceso = async (): Promise<Proceso | null> => {
+    try {
+      console.log("Consultando el ID y nombre del proceso...");
+
+      const response = await fetch(
+        "http://localhost:8080/bonita/API/bpm/process?p=0",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Bonita-API-Token": "tu_token_aqui",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok)
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+      const jsonData: Proceso[] = await response.json();
+
+      if (jsonData.length === 0) throw new Error("No se encontraron procesos.");
+
+      console.log("Proceso obtenido:", jsonData[0]);
+
+      return jsonData[0];
+    } catch (error) {
+      console.error("Error en obtenerIdProceso:", error);
+      return null;
+    }
+  };
+
+  /**
+   * Obtiene las tareas activas de un proceso específico en Bonita.
+   */
+  obtenerTareas = async (processId: string): Promise<Tarea[] | null> => {
+    try {
+      console.log(`Consultando tareas para el proceso ID: ${processId}...`);
+
+      const response = await fetch(
+        `http://localhost:8080/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Bonita-API-Token": "tu_token_aqui",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok)
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+      const jsonData: Tarea[] = await response.json();
+
+      console.log("Tareas obtenidas:", jsonData);
+
+      return jsonData;
+    } catch (error) {
+      console.error("Error en obtenerTareas:", error);
+      return null;
+    }
+  };
+
   async #getCaseId(): Promise<string> {
     try {
       const url = `${this.#APIURL}/userTask/${this.#TASKINSTANCEID}`;
