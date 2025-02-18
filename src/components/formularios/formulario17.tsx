@@ -26,6 +26,7 @@ export default function ConfirmationScreen() {
   } | null>(null);
 
   const bonita: BonitaUtilities = new BonitaUtilities();
+  // @ts-ignore
   const { obtenerUsuarioAutenticado, obtenerDatosBonita, error } =
     useBonitaService();
 

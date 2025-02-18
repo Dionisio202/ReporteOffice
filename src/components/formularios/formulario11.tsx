@@ -1,50 +1,85 @@
 import React, { useState } from "react";
 import CardContainer from "./components/CardContainer";
-import Checkbox from "./components/Checkbox";
-import Uploadfile from "./components/UploadFile";
+import UploadFile from "./components/UploadFile";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
+import Button from "../UI/button";
+import Title from "./components/TitleProps";
 
 const Formulario11: React.FC = () => {
-  const [checkedState, setCheckedState] = useState({
-    checkbox1: false,
-  });
+  const [file, setFile] = useState<File | null>(null);
   const bonita: BonitaUtilities = new BonitaUtilities();
-  const handleNext = () => {
-    alert("Avanzando a la siguiente página...");
-    bonita.changeTask()
-    // Aquí puedes agregar la lógica para navegar a otra página
+
+  const handleNext = async () => {
+    try {
+      await bonita.changeTask();
+      alert("Avanzando a la siguiente página...");
+    } catch (error) {
+      console.error("Error al cambiar la tarea:", error);
+      alert("Ocurrió un error al intentar avanzar.");
+    }
   };
-  const handleCheckboxChange = (checkboxName: string, newValue: boolean) => {
-    setCheckedState({
-      ...checkedState,
-      [checkboxName]: newValue,
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!file) {
+      alert("Por favor, cargue un archivo.");
+      return;
+    }
+
+    const fileName = file.name;
+    const dotIndex = fileName.lastIndexOf(".");
+    const baseName = dotIndex !== -1 ? fileName.substring(0, dotIndex) : fileName;
+
+    const fileBase64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64String = result.split(",")[1];
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
     });
+
+    const payload = {
+      nombre: baseName + "_3-Test001",
+      id_registro_per: "3",
+      id_tipo_documento: "3",
+      document: fileBase64,
+    };
+
+    try {
+      const response = await fetch("http://formulario.midominio.com:3001/api/get-document", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      console.log("Respuesta del servidor:", data);
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+    }
   };
 
   return (
     <CardContainer title="Registro de Propiedad Intelectual">
-      {/* Sección de carga de archivos */}
-      <div className="mb-6">
-        <Uploadfile onFileChange={(file) => console.log(file)} id={""} />
-      </div>
+      <form onSubmit={handleSubmit} className="w-full max-w-lg p-6 rounded-lg shadow-lg">
+        <Title text="Comprobante de Pago Senadi" size="2xl" className="text-center mb-1" />
+       
+        <UploadFile id="document-file" onFileChange={setFile} label="Subir comprobante de pago  de la solucitud del registro de la propiedad intelectual" />
 
-      {/* Sección de Checkbox */}
-      <div className="flex flex-col space-y-4">
-        <Checkbox
-          label="¿Solicitud de Registro de Propiedad Intelectual ingresado?"
-          value={checkedState.checkbox1}
-          onChange={(newValue) => handleCheckboxChange("checkbox1", newValue)}
-        />
-      </div>
+        <Button type="submit" className="mt-5 w-full bg-blue-600 text-white px-6 rounded hover:bg-blue-700">
+          Enviar Datos
+        </Button>
 
-      {/* Botón Enviar */}
-      <div className="mt-6 text-center">
-        <button className="bg-[#931D21] hover:bg-[#7A171A] text-white py-3 px-8 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
-         onClick={handleNext}
-        >
-          Enviar
-        </button>
-      </div>
+        <Button className="mt-5 bg-[#931D21] text-white rounded-lg px-6 min-w-full hover:bg-blue-700" onClick={handleNext}>
+          Siguiente Proceso
+        </Button>
+      </form>
     </CardContainer>
   );
 };
