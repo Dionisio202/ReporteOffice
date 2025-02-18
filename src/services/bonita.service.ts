@@ -17,7 +17,7 @@ export const useBonitaService = () => {
       }
 
       const response = await fetch(
-        "http://localhost:8080/bonita/API/bpm/process?p=0",
+        "http://localhost:48615//bonita/API/bpm/process?p=0",
         {
           method: "GET",
           headers: {
@@ -51,7 +51,7 @@ export const useBonitaService = () => {
         }
 
         const response = await fetch(
-          `http://localhost:8080/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
+          `http://localhost:48615/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
           {
             method: "GET",
             headers: {
@@ -84,7 +84,7 @@ export const useBonitaService = () => {
         }
 
         const response = await fetch(
-          `http://localhost:8080/bonita/API/bpm/task?p=0&c=1&f=assigned_id=${userId}`,
+          `http://localhost:48615/bonita/API/bpm/task?p=0&c=1&f=assigned_id=${userId}`,
           {
             method: "GET",
             headers: {
@@ -117,7 +117,7 @@ export const useBonitaService = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8080/bonita/API/bpm/userTask/${taskId}`,
+        `http://localhost:48615/bonita/API/bpm/userTask/${taskId}`,
         {
           method: "GET",
           headers: {
@@ -144,7 +144,7 @@ export const useBonitaService = () => {
     async (processId: string): Promise<Proceso | null> => {
       try {
         const response = await fetch(
-          `http://localhost:8080/bonita/API/bpm/process/${processId}`,
+          `http://localhost:48615/bonita/API/bpm/process/${processId}`,
           {
             method: "GET",
             headers: {
@@ -221,7 +221,7 @@ export const useBonitaService = () => {
   } | null> => {
     try {
       const response = await fetch(
-        "http://localhost:8080/bonita/API/system/session/unusedId",
+        "http://localhost:48615/bonita/API/system/session/unusedId",
         {
           method: "GET",
           headers: {
