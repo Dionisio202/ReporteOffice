@@ -45,7 +45,7 @@ const Formulario11: React.FC = () => {
     const payload = {
       nombre: baseName + "_3-Test001",
       id_registro_per: "3",
-      id_tipo_documento: "3",
+      id_tipo_documento: "6",
       document: fileBase64,
     };
 
