@@ -31,11 +31,14 @@ export default function ConfirmationScreen() {
     }));
   };
 
-  const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault(); // Opcional: Evita el comportamiento por defecto del botón
-    console.log("Documentos confirmados:", selectedDocuments);
-    alert("Avanzando a la siguiente página...");
-    bonita.changeTask();
+  const handleNext = async () => {
+    try {
+      await bonita.changeTask();
+      alert("Avanzando a la siguiente página...");
+    } catch (error) {
+      console.error("Error al cambiar la tarea:", error);
+      alert("Ocurrió un error al intentar avanzar.");
+    }
   };
 
   return (
@@ -77,7 +80,7 @@ export default function ConfirmationScreen() {
           <button
             type="button" // Cambia el tipo a "button"
             className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-3 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
-            onClick={handleSubmit}
+            onClick={handleNext}
           >
             Siguiente
           </button>

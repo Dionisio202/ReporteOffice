@@ -26,10 +26,14 @@ export default function Formulario6() {
   const [selectedDocument, setSelectedDocument] = useState<StaticDocument | null>(null);
   const bonita: BonitaUtilities = new BonitaUtilities();
 
-  const handleNext = () => {
-    alert("Avanzando a la siguiente página...");
-    bonita.changeTask();
-    // Aquí puedes agregar la lógica para navegar a otra página
+  const handleNext = async () => {
+    try {
+      await bonita.changeTask();
+      alert("Avanzando a la siguiente página...");
+    } catch (error) {
+      console.error("Error al cambiar la tarea:", error);
+      alert("Ocurrió un error al intentar avanzar.");
+    }
   };
 
   // Función para seleccionar el documento a visualizar y llamar a la API de verificación

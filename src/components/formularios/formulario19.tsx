@@ -8,7 +8,16 @@ export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
     certificado: false,
   });
-
+  const bonita: BonitaUtilities = new BonitaUtilities();
+  const handleNext = async () => {
+    try {
+      await bonita.changeTask();
+      alert("Avanzando a la siguiente página...");
+    } catch (error) {
+      console.error("Error al cambiar la tarea:", error);
+      alert("Ocurrió un error al intentar avanzar.");
+    }
+  };
   const handleChange = (name: string, checked: boolean) => {
     setSelectedDocuments((prevState) => ({
       ...prevState,
@@ -31,7 +40,8 @@ export default function ConfirmationScreen() {
   return (
     <CardContainer title="Validacion de Certificado">
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-        <UploadFile onFileChange={() => { } } id={""} /> {/* Placeholder function */}
+        <UploadFile onFileChange={() => {}} id={""} />{" "}
+        {/* Placeholder function */}
         <div className="space-y-3">
           <Checkbox
             label="Certificado Válido?"
@@ -43,6 +53,7 @@ export default function ConfirmationScreen() {
         <button
           type="submit"
           className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
+          onClick={handleNext}
         >
           Siguiente
         </button>
