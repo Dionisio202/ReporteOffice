@@ -1,6 +1,6 @@
 import React from 'react';
 import { DocumentEditor } from '@onlyoffice/document-editor-react';
-
+import { SERVER_BACK_URL, SERVER_ONLYOFFICE_URL } from "../../config.ts";
 interface DocumentViewerProps {
   keyDocument: string;
   title: string;
@@ -41,8 +41,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   fileType,
   documentType
 })  => {
-  const documentUrl = `http://formulario.midominio.com:3001/api/document?nombre=${encodeURIComponent(documentName)}`;
-
+  const documentUrl = `${SERVER_BACK_URL}api/document?nombre=${encodeURIComponent(documentName)}`;
+  const serverUrl = SERVER_ONLYOFFICE_URL;
   // Configuración de ONLYOFFICE con callbackUrl opcional
   const config: any = {
     document: {
@@ -66,7 +66,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
           <div className="w-full h-full">
             <DocumentEditor
               id="docxEditor"
-              documentServerUrl="http://formulario.midominio.com:8081"
+              documentServerUrl = {serverUrl}
               config={config} // Pasamos la configuración dinámica
               events_onDocumentReady={onDocumentReady}
               onLoadComponentError={onLoadComponentError}

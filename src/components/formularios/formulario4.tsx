@@ -4,6 +4,7 @@ import UploadFile from "./components/UploadFile"; // Componente para cargar arch
 import BonitaUtilities  from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 import Button from "../UI/button";
+import { SERVER_BACK_URL } from "../../config.ts";
 
 export default function UploadForm() {
   const [memoCode, setMemoCode] = useState("");
@@ -64,7 +65,7 @@ export default function UploadForm() {
     };
 
     try {
-      const response = await fetch("http://formulario.midominio.com:3001/api/get-document", {
+      const response = await fetch(`${SERVER_BACK_URL}/api/get-document`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

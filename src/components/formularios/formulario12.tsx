@@ -4,7 +4,8 @@ import DocumentViewer from "../files/DocumentViewer"; // Importa tu componente d
 import BonitaUtilities  from "../bonita/bonita-utilities";
 
 import io from "socket.io-client";
-const socket = io("http://formulario.midominio.com:3001");
+import { SERVER_BACK_URL } from "../../config.ts";
+const socket = io(SERVER_BACK_URL);
 
 type DocumentType = {
   key: string;
@@ -22,6 +23,7 @@ const staticDocuments: Record<string, DocumentType> = {
 };
 
 export default function WebPage() {
+  const urlSave = `${SERVER_BACK_URL}/api/save-document`;
   const [codigo, setCodigo] = useState(""); // Código del comprobante
   const [codigoGuardado, setCodigoGuardado] = useState<string | null>(null); // Código guardado después de hacer clic en Siguiente
   const [alertMessage, setAlertMessage] = useState<string | null>(null); // Estado para el mensaje de alerta
@@ -61,7 +63,7 @@ export default function WebPage() {
       setCodigoGuardado(codigo); // Guarda el código ingresado
       try {
 ; // Ejemplo, reemplazar con valor real codigo_documento, codigo_almacenamiento
-        const response = await fetch(`http://formulario.midominio.com:3001/api/update-document?codigo_almacenamiento=${codigoalmacenamiento}&codigo_documento=${codigo}`);
+        const response = await fetch(`${SERVER_BACK_URL}/api/update-document?codigo_almacenamiento=${codigoalmacenamiento}&codigo_documento=${codigo}`);
         
         if (!response.ok) {
           throw new Error("Error al guardar el memorando");
@@ -92,7 +94,7 @@ export default function WebPage() {
           mode="view"
           fileType="pdf"
           documentType="pdf"
-          callbackUrl="http://formulario.midominio.com:3001/api/save-document"
+          callbackUrl={urlSave}
         />
       </div>
 

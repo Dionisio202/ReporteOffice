@@ -4,6 +4,7 @@ import DocumentViewer from "../files/DocumentViewer"; // Componente para visuali
 import Button from "../UI/button"; // Componente botón
 // @ts-ignore
 import BonitaUtilities  from "../bonita/bonita-utilities";
+import { SERVER_BACK_URL } from "../../config.ts";
 
 // Definimos un tipo para nuestros documentos
 type StaticDocument = {
@@ -23,6 +24,7 @@ const staticDocuments: Record<string, StaticDocument> = {
 };
 
 export default function Formulario6() {
+  const urlSave = `${SERVER_BACK_URL}/api/save-document`;
   // Estado para almacenar el documento seleccionado
   const [selectedDocument, setSelectedDocument] = useState<StaticDocument | null>(null);
   const bonita: BonitaUtilities = new BonitaUtilities();
@@ -44,7 +46,7 @@ export default function Formulario6() {
     if (documentType === "Validación de Transferencias") {
       try {
         // Llamada a la API usando los valores del documento estático
-        const apiUrl = `http://formulario.midominio.com:3001/api/verificar-documento?key=${document.key}&nombre=${nombrePlantilla}.docx&id_registro_per=3&id_tipo_documento=3`;
+        const apiUrl = `${SERVER_BACK_URL}/api/verificar-documento?key=${document.key}&nombre=${nombrePlantilla}.docx&id_registro_per=3&id_tipo_documento=3`;
         const response = await fetch(apiUrl);
         const data = await response.json();
         console.log("Respuesta de la API:", data);
@@ -80,7 +82,7 @@ export default function Formulario6() {
             title={selectedDocument.title}
             documentName={selectedDocument.nombre}
             mode="edit"
-            callbackUrl="http://formulario.midominio.com:3001/api/save-document"
+            callbackUrl= {urlSave}
           />
         ) : (
           <p className="text-center text-gray-500">

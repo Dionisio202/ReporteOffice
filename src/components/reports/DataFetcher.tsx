@@ -6,6 +6,7 @@ import {
   ServerResponse, 
   RawActivityData 
 } from '../../interfaces/actividad.interface';
+import { SERVER_BACK_URL } from "../../config.ts";
 
 const DataFetcher: React.FC<DataFetcherProps> = ({ 
   setActividad, 
@@ -15,7 +16,7 @@ const DataFetcher: React.FC<DataFetcherProps> = ({
   useEffect(() => {
     const fetchPoaData = async () => {
       try {
-        const socket = io('http://localhost:3001');
+        const socket = io(SERVER_BACK_URL);
         setLoading(true);
 
         socket.emit('get_poa', (response: ServerResponse) => {

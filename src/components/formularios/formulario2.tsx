@@ -4,8 +4,9 @@ import DocumentViewer from "../files/DocumentViewer";
 import Title from "./components/TitleProps";
 import io from "socket.io-client";
 import {Proceso, Tarea} from "../../interfaces/bonita.interface"
+import { SERVER_BACK_URL, SERVER_BONITA_URL } from "../../config.ts";
 // Fuera del componente, crea una única instancia de socket
-const socket = io("http://formulario.midominio.com:3001");
+const socket = io(SERVER_BACK_URL);
 
 // Definimos un tipo para los documentos
 type DocumentType = {
@@ -29,6 +30,7 @@ const staticDocuments: Record<string, DocumentType> = {
 };
 
 export default function WebPage() {
+  const urlSaveDocument = SERVER_BACK_URL+"/api/save-document";
   const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
   // @ts-ignore
@@ -63,7 +65,7 @@ export default function WebPage() {
     
 
       const response = await fetch(
-        "http://formulario.midominio.com:8080/bonita/API/bpm/process?p=0",
+        `${SERVER_BONITA_URL}/bonita/API/bpm/process?p=0`,
         {
           method: "GET",
           headers: {
@@ -108,7 +110,7 @@ export default function WebPage() {
     
 
       const response = await fetch(
-        `http://formulario.midominio.com:8080/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
+        `${SERVER_BONITA_URL}/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
         {
           method: "GET",
           headers: {
@@ -309,7 +311,7 @@ export default function WebPage() {
           title={selectedDocument.title}
           documentName={selectedDocument.nombre}
           mode="edit"
-          callbackUrl="http://formulario.midominio.com:3001/api/save-document"
+          callbackUrl= {urlSaveDocument}
         />
           ) : (
             <p className="text-center text-gray-500">

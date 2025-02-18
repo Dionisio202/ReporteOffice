@@ -9,8 +9,9 @@ import Title from "./components/TitleProps";
 import io from "socket.io-client";
 import { useBonitaService } from "../../services/bonita.service";
 import { useSaveTempState } from "../bonita/hooks/datos_temprales";
+import { SERVER_BACK_URL } from "../../config.ts";
 
-const socket = io("http://localhost:3001");
+const socket = io(SERVER_BACK_URL);
 
 export default function ConfirmationScreen() {
   // Usamos las funciones extendidas del hook
