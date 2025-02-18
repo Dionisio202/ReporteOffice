@@ -3,7 +3,7 @@ import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox"; // Importamos el componente Checkbox
 import UploadFile from "./components/UploadFile";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
-
+import Title from "./components/TitleProps";
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
     certificado: false,
@@ -38,7 +38,11 @@ export default function ConfirmationScreen() {
   };
 
   return (
-    <CardContainer title="Validacion de Certificado">
+    <CardContainer title="Certificado/Título de Registro.">
+      <Title
+        text="Validación de Certificado"
+        className="text-center mb-6"
+      />
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
         <UploadFile onFileChange={() => {}} id={""} />{" "}
         {/* Placeholder function */}

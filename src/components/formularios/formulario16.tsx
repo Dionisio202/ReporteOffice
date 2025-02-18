@@ -5,7 +5,7 @@ import { BonitaUtilities } from "../bonita/bonita-utilities";
 import { useBonitaService } from "../../services/bonita.service";
 import { useSaveTempState } from "../hooks/datos_temprales";
 import io from "socket.io-client";
-
+import Title from "./components/TitleProps";
 const socket = io("http://localhost:3001");
 
 export default function DocumentForm() {
@@ -106,21 +106,22 @@ export default function DocumentForm() {
   };
 
   return (
-    <CardContainer title="Formulario de Documentos">
+    <CardContainer title="Expediente de Entrega">
+       <Title text="Oficio de entrega y Expediente" className="text-center mb-1" />
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
         <div className="flex flex-col">
           <label htmlFor="memoCode" className="block font-semibold">
-            Código del Memorando:
+            Código de Oficio realizado para entrega de ejemplares
           </label>
           <input
             id="memoCode"
             type="text"
-            className="border p-2 rounded mt-1"
+            className="border p-1 rounded mt-1"
             value={memoCode}
             onChange={handleMemoCodeChange}
           />
         </div>
-        <div className="space-y-3">
+        <div className="space-y-2 text-xn">
           <Checkbox
             label="Solicitud"
             value={selectedDocuments.solicitud}

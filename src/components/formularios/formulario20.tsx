@@ -5,7 +5,7 @@ import { BonitaUtilities } from "../bonita/bonita-utilities";
 import { useSaveTempState } from "../hooks/datos_temprales";
 import { useBonitaService } from "../../services/bonita.service";
 import io from "socket.io-client";
-
+import Title from "./components/TitleProps";
 const socket = io("http://localhost:3001");
 
 export default function ConfirmationScreen() {
@@ -98,7 +98,11 @@ export default function ConfirmationScreen() {
   };
 
   return (
-    <CardContainer title="Certificado">
+    <CardContainer title="Certificado/Título de Registro">
+       <Title
+        text="Autorización de Entrega"
+        className="text-center mb-6"
+      />
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
         <p className="text-lg">Confirmación de entrega de certificado:</p>
 

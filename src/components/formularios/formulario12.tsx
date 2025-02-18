@@ -46,7 +46,6 @@ export default function WebPage() {
         bonita.changeTask();
         
         setAlertMessage("Avanzando a la siguiente página...");
-        // Si todo está bien, avanzar
       } catch (err) {
         console.error("Error:", err);
       }
@@ -56,7 +55,7 @@ export default function WebPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <h1 className="text-2xl font-bold mb-6">Comprobante de Pago</h1>
+      <h1 className="text-2xl justify-center font-bold mb-6">Comprobante de Pago Registro de Propiedad Intelectual</h1>
 
       {/* DocumentViewer para mostrar el documento siempre */}
       <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-4 mb-8">
@@ -74,7 +73,7 @@ export default function WebPage() {
       {/* Input para ingresar el código del comprobante */}
       <div className="w-full max-w-md">
         <label htmlFor="codigo" className="block text-gray-700 font-medium mb-2">
-          Ingrese el código del Memorando
+          Ingrese el código del Memorando emitido a Vicerrectorado
         </label>
         <input
           id="codigo"

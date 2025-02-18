@@ -4,6 +4,7 @@ import Checkbox from "./components/Checkbox";
 import { EmailInput } from "./components/EmailInput";
 import FileViewer from "./components/FileViewer";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
+import Title from "./components/TitleProps";
 
 export default function ConfirmationScreen() {
   const [selectedDocuments, setSelectedDocuments] = useState({
@@ -43,11 +44,12 @@ export default function ConfirmationScreen() {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <CardContainer title="Certificado">
+      <CardContainer title="Certificado/Título de Registro.">
+        <Title text="Entrega de Certificado a Partes Interesadas" className="text-center mb-6" />
         {/* Contenedor principal en una sola columna */}
         <div className="flex flex-col space-y-6 h-full">
           {/* 📄 Sección de visualización del documento */}
-          <div className="w-full p-4 border rounded-lg shadow-sm bg-gray-100 text-center">
+          <div className="w-full p-2 border rounded-lg shadow-sm bg-gray-100 text-center">
             {selectedDocument ? (
               <FileViewer file={selectedDocument} />
             ) : (
@@ -72,14 +74,14 @@ export default function ConfirmationScreen() {
             onChange={(checked) => handleChange("certificado", checked)}
           />
 
-          <div className="flex-1 w-full h-full">
+          <div className="flex-1 w-230 h-ful">
             <EmailInput />
           </div>
 
           {/* ▶️ Botón Siguiente */}
           <button
             type="button" // Cambia el tipo a "button"
-            className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-3 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
+            className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
             onClick={handleNext}
           >
             Siguiente
