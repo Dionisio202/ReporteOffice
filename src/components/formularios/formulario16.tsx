@@ -3,13 +3,13 @@ import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
 import { useBonitaService } from "../../services/bonita.service";
-import { useSaveTempState } from "../hooks/datos_temprales";
+import { useSaveTempState } from "../bonita/hooks/datos_temprales";
 import io from "socket.io-client";
 import Title from "./components/TitleProps";
 const socket = io("http://localhost:3001");
 
 export default function DocumentForm() {
-  const { saveTempState } = useSaveTempState(socket);
+  const { startAutoSave, saveFinalState } = useSaveTempState(socket);
   const [memoCode, setMemoCode] = useState("");
   const [selectedDocuments, setSelectedDocuments] = useState({
     solicitud: false,
@@ -60,23 +60,21 @@ export default function DocumentForm() {
     fetchData();
   }, [usuario]);
 
+  // 🔹 Iniciar el guardado automático ("En Proceso")
   useEffect(() => {
     if (bonitaData && usuario) {
-      const interval = setInterval(async () => {
-        try {
-          await saveTempState({
-            id_registro: `${bonitaData.processId}-${bonitaData.caseId}`,
-            id_tarea: parseInt(bonitaData.taskId),
-            jsonData: JSON.stringify(selectedDocuments),
-            id_funcionario: parseInt(usuario.user_id),
-          });
-        } catch (error) {
-          console.error("Error al guardar estado temporal:", error);
-        }
-      }, 10000);
-      return () => clearInterval(interval);
+      startAutoSave(
+        {
+          id_registro: `${bonitaData.processId}-${bonitaData.caseId}`,
+          id_tarea: parseInt(bonitaData.taskId),
+          jsonData: JSON.stringify(selectedDocuments),
+          id_funcionario: parseInt(usuario.user_id),
+        },
+        10000, // intervalo de 10 segundos
+        "En Proceso"
+      );
     }
-  }, [selectedDocuments, bonitaData, usuario]);
+  }, [selectedDocuments, bonitaData, usuario, startAutoSave]);
 
   const handleMemoCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMemoCode(event.target.value);
@@ -95,13 +93,21 @@ export default function DocumentForm() {
     console.log("Documentos seleccionados:", selectedDocuments);
   };
 
+  // 🔹 Guardado final al hacer clic en "Siguiente"
   const handleNext = async () => {
-    try {
-      await bonita.changeTask();
-      alert("Avanzando a la siguiente página...");
-    } catch (error) {
-      console.error("Error al cambiar la tarea:", error);
-      alert("Ocurrió un error al intentar avanzar.");
+    if (bonitaData && usuario) {
+      try {
+        await saveFinalState({
+          id_registro: `${bonitaData.processId}-${bonitaData.caseId}`,
+          id_tarea: parseInt(bonitaData.taskId),
+          jsonData: JSON.stringify(selectedDocuments),
+          id_funcionario: parseInt(usuario.user_id),
+        });
+        alert("Avanzando a la siguiente página...");
+        bonita.changeTask();
+      } catch (error) {
+        console.error("Error guardando estado final:", error);
+      }
     }
   };
 
