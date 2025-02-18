@@ -1,15 +1,10 @@
-import { useState, useEffect, useEffect } from "react";
+import { useState, useEffect} from "react";
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox"; 
 import { BonitaUtilities } from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
-import io from "socket.io-client";
 import { useBonitaService } from "../../services/bonita.service";
-
-const socket = io("http://localhost:3001");
-
 import io from "socket.io-client";
-import { useBonitaService } from "../../services/bonita.service";
 import { useSaveTempState } from "../hooks/datos_temprales";
 
 const socket = io("http://localhost:3001");
@@ -30,8 +25,7 @@ export default function ConfirmationScreen() {
   } | null>(null);
 
   const bonita: BonitaUtilities = new BonitaUtilities();
-  const { obtenerIdProceso, obtenerTareas, error } = useBonitaService(); // Usa el servicio
-  const { obtenerUsuarioAutenticado, obtenerDatosBonita, error } = useBonitaService();
+  const { obtenerTareas, obtenerIdProceso, obtenerUsuarioAutenticado, obtenerDatosBonita, error } = useBonitaService();
 
   const handleChange = (name: string, checked: boolean) => {
     setSelectedDocuments((prevState) => ({
