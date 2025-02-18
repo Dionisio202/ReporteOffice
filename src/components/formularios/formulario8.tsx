@@ -1,7 +1,7 @@
 import { useState } from "react";
 import CardContainer from "./components/CardContainer";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
-
+import Title from "./components/TitleProps";
 export default function MemoCodeForm() {
   const [memoCode, setMemoCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,6 @@ export default function MemoCodeForm() {
       const data = await response.json();
       console.log("Memorando guardado:", data);
       
-      // Si todo está bien, avanzar
       handleNext();
     } catch (err) {
       setError("Error al guardar el memorando. Verifica el código e intenta nuevamente.");
@@ -43,11 +42,15 @@ export default function MemoCodeForm() {
   };
 
   return (
-    <CardContainer title="Ingreso del Código del Memorando">
+    <CardContainer title="Contrato Cesión de Derechos Patrimoniales">
+      <Title
+        text="Solicitud para firma de Rector"
+        className="text-center text-gray-800 mb-3 text-lg"
+      />
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
         <div>
           <label htmlFor="memoCode" className="block font-semibold">
-            Ingrese el código del memorando generado
+            Ingrese el código del memorando generado para solicitud
           </label>
           <input
             id="memoCode"

@@ -90,9 +90,14 @@ export default function ConfirmationScreen() {
     console.log("📌 Documentos confirmados:", selectedDocuments);
   };
 
-  const handleNext = () => {
-    alert("Avanzando a la siguiente página...");
-    bonita.changeTask();
+  const handleNext = async () => {
+    try {
+      await bonita.changeTask();
+      alert("Avanzando a la siguiente página...");
+    } catch (error) {
+      console.error("Error al cambiar la tarea:", error);
+      alert("Ocurrió un error al intentar avanzar.");
+    }
   };
 
   return (

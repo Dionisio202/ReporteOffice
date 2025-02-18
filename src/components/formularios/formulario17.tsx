@@ -5,6 +5,7 @@ import { BonitaUtilities } from "../bonita/bonita-utilities";
 import { useSaveTempState } from "../hooks/datos_temprales";
 import { useBonitaService } from "../../services/bonita.service";
 import io from "socket.io-client";
+import Title from "./components/TitleProps";
 
 const socket = io("http://localhost:3001");
 
@@ -92,14 +93,22 @@ export default function ConfirmationScreen() {
     console.log("Documentos confirmados:", selectedDocuments);
   };
 
-  const handleNext = () => {
-    alert("Avanzando a la siguiente página...");
-    bonita.changeTask(); // Llamada para cambiar la tarea
-    // Aquí puedes agregar la lógica para navegar a otra página si es necesario
+  const handleNext = async () => {
+    try {
+      await bonita.changeTask();
+      alert("Avanzando a la siguiente página...");
+    } catch (error) {
+      console.error("Error al cambiar la tarea:", error);
+      alert("Ocurrió un error al intentar avanzar.");
+    }
   };
 
   return (
-    <CardContainer title="Oficio Proceso 17">
+    <CardContainer title="Oficio para Entrega de Ejemplares">
+      <Title
+        text="Firma de oficio para entrega de documentación"
+        className="text-center mb-6"
+      />
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
         <p className="text-lg">Confirmación de firma de oficio:</p>
 
