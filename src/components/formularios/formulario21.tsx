@@ -13,9 +13,9 @@ type DocumentType = {
 
 const staticDocuments: Record<string, DocumentType> = {
   datos: {
-    key: "",
+    key: "Formato_datos_informativos_autores_3-Test001",
     title: "Comprobante de Pago",
-    nombre: "",
+    nombre: "Formato_datos_informativos_autores_3-Test001.pdf",
   },
 };
 
