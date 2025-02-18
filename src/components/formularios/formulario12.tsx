@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import DocumentViewer from "../files/DocumentViewer"; // Importa tu componente de visor de documentos
-import { BonitaUtilities } from "../bonita/bonita-utilities";
+// @ts-ignore
+import BonitaUtilities  from "../bonita/bonita-utilities";
+
 import io from "socket.io-client";
 const socket = io("http://formulario.midominio.com:3001");
 

@@ -3,7 +3,8 @@ import io from "socket.io-client";
 import CardContainer from "./components/CardContainer";
 import { EmailInput } from "./components/EmailInput";
 import DocumentViewer from "../files/DocumentViewer";
-import { BonitaUtilities } from "../bonita/bonita-utilities";
+// @ts-ignore
+import BonitaUtilities  from "../bonita/bonita-utilities";
 
 type DocumentType = {
   key: string;

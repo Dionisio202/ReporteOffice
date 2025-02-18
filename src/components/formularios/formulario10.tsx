@@ -1,6 +1,7 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import CardContainer from "./components/CardContainer";
-import { BonitaUtilities } from "../bonita/bonita-utilities";
+// @ts-ignore
+import BonitaUtilities  from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 import io from "socket.io-client";
 import { useBonitaService } from "../../services/bonita.service";

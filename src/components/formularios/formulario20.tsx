@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox"; // Importamos el componente Checkbox
-import { BonitaUtilities } from "../bonita/bonita-utilities";
+// @ts-ignore
+import BonitaUtilities  from "../bonita/bonita-utilities";
 import { useSaveTempState } from "../hooks/datos_temprales";
 import { useBonitaService } from "../../services/bonita.service";
 import io from "socket.io-client";

@@ -5,7 +5,8 @@ import Title from "./components/TitleProps";
 import Modal from "./components/Modal";
 import UploadFile from "./components/UploadFile";
 import { ModalData } from "../../interfaces/registros.interface"; // Asegúrate de que la ruta sea correcta
-import { BonitaUtilities } from "../bonita/bonita-utilities";
+// @ts-ignore
+import BonitaUtilities  from "../bonita/bonita-utilities";
 import { useBonitaService } from "../../services/bonita.service";
 
 const socket = io("http://localhost:3001"); // Conecta con el backend

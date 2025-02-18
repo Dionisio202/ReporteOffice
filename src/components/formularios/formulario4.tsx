@@ -1,6 +1,7 @@
 import { useState } from "react";
 import UploadFile from "./components/UploadFile"; // Componente para cargar archivos
-import { BonitaUtilities } from "../bonita/bonita-utilities";
+// @ts-ignore
+import BonitaUtilities  from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 import Button from "../UI/button";
 

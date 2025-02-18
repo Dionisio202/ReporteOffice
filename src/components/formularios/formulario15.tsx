@@ -2,7 +2,8 @@ import { useState } from "react";
 import DropdownCard from "./components/DropdownCard"; // Componente para el dropdown
 import DocumentViewer from "../files/DocumentViewer"; // Componente para visualizar el documento
 import Button from "../UI/button"; // Componente botón
-import { BonitaUtilities } from "../bonita/bonita-utilities";
+// @ts-ignore
+import BonitaUtilities  from "../bonita/bonita-utilities";
 
 // Definimos un tipo para nuestros documentos
 type StaticDocument = {

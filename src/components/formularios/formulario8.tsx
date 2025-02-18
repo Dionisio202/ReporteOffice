@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CardContainer from "./components/CardContainer";
-import { BonitaUtilities } from "../bonita/bonita-utilities";
+// @ts-ignore
+import BonitaUtilities  from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 export default function MemoCodeForm() {
   const [memoCode, setMemoCode] = useState("");

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DropdownCard from "./components/DropdownCard";
 import DocumentViewer from "../files/DocumentViewer";
-import { BonitaUtilities } from "../bonita/bonita-utilities";
+// @ts-ignore
+import BonitaUtilities  from "../bonita/bonita-utilities";
 import io from "socket.io-client";
 
 const socket = io("http://formulario.midominio.com:3001");

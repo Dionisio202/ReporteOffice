@@ -5,7 +5,7 @@ import Title from "./components/TitleProps";
 import io from "socket.io-client";
 import {Proceso, Tarea} from "../../interfaces/bonita.interface"
 // Fuera del componente, crea una única instancia de socket
-const socket = io("http://localhost:3001");
+const socket = io("http://formulario.midominio.com:3001");
 
 // Definimos un tipo para los documentos
 type DocumentType = {
@@ -60,12 +60,10 @@ export default function WebPage() {
   // Función para obtener el ID y el nombre del proceso
   const obtenerIdProceso = useCallback(async (): Promise<{ id: string; name: string } | null> => {
     try {
-      if (process.env.NODE_ENV === "development") {
-        console.log("Iniciando consulta para obtener el ID y el nombre del proceso...");
-      }
+    
 
       const response = await fetch(
-        "http://localhost:48615/bonita/API/bpm/process?p=0",
+        "http://formulario.midominio.com:8080/bonita/API/bpm/process?p=0",
         {
           method: "GET",
           headers: {
@@ -107,12 +105,10 @@ export default function WebPage() {
   // Función para obtener las tareas relacionadas con el proceso
   const obtenerTareas = useCallback(async (processId: string): Promise<Tarea[] | null> => {
     try {
-      if (process.env.NODE_ENV === "development") {
-        console.log("Iniciando consulta para obtener las tareas...");
-      }
+    
 
       const response = await fetch(
-        `http://localhost:48615/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
+        `http://formulario.midominio.com:8080/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
         {
           method: "GET",
           headers: {
@@ -129,9 +125,7 @@ export default function WebPage() {
 
       const jsonData: Tarea[] = await response.json();
 
-      if (process.env.NODE_ENV === "development") {
-        console.log("Respuesta de la API de Bonita (tareas):", jsonData);
-      }
+      
 
       return jsonData;
     } catch (error) {
@@ -167,25 +161,18 @@ export default function WebPage() {
           nombre_proceso: name,
         };
 
-        if (process.env.NODE_ENV === "development") {
-          console.log("JSON que se enviará al backend:", JSON.stringify(datosParaEnviar, null, 2));
-        }
+       
 
-        socket.emit(
-          "iniciar_registro",
-          datosParaEnviar,
-          (response: { success: boolean; message: string }) => {
-            if (response.success) {
-              if (process.env.NODE_ENV === "development") {
-                console.log("Respuesta del backend:", response.message);
-              }
-              resolve(response);
-            } else {
-              console.error("Error en el backend:", response.message);
-              reject(response.message);
-            }
+        socket.emit("iniciar_registro", datosParaEnviar, (response:any) => {
+          console.log("Respuesta completa del backend:", response);
+          if (response.success) {
+            resolve(response);
+          } else {
+            console.error("Error en el backend:", response.message);
+            reject(response.message);
           }
-        );
+        });
+        
       });
     },
     [socket]

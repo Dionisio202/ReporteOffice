@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import CardContainer from "./components/CardContainer";
 import UploadFile from "./components/UploadFile";
-import { BonitaUtilities } from "../bonita/bonita-utilities";
+// @ts-ignore
+import BonitaUtilities  from "../bonita/bonita-utilities";
 import Button from "../UI/button";
 import Title from "./components/TitleProps";
 
