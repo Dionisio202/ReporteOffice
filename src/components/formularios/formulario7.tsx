@@ -5,10 +5,11 @@ import { BonitaUtilities } from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 import io from "socket.io-client";
 import { useBonitaService } from "../../services/bonita.service";
+import { useSaveTempState } from "../hooks/datos_temprales";
 
 const socket = io("http://localhost:3001");
-
 export default function ConfirmationScreen() {
+  const { saveTempState } = useSaveTempState(socket);
   const [selectedDocuments, setSelectedDocuments] = useState({
     contrato: false,
     acta: false,
@@ -38,7 +39,6 @@ export default function ConfirmationScreen() {
       const userData = await obtenerUsuarioAutenticado();
       if (userData) {
         setUsuario(userData);
-        console.log("📌 Usuario autenticado:", userData);
       }
     };
 
@@ -54,14 +54,6 @@ export default function ConfirmationScreen() {
         const data = await obtenerDatosBonita(usuario.user_id);
         if (data) {
           setBonitaData(data);
-          console.log("📌 Datos de Bonita obtenidos:", data);
-
-          // socket.emit("guardar_estado_temporal", {
-          //   id_registro: data.processId,
-          //   id_tarea: data.taskId,
-          //   jsonData: JSON.stringify(selectedDocuments),
-          //   id_funcionario: usuario.user_id, // Ahora usamos el ID del usuario autenticado
-          // });
         }
       } catch (error) {
         console.error("❌ Error obteniendo datos de Bonita:", error);
@@ -71,15 +63,25 @@ export default function ConfirmationScreen() {
     fetchData();
   }, [usuario]);
 
+  // 🔹 Obtener el usuario autenticado al montar el componente
   useEffect(() => {
-    if (bonitaData) {
-      console.log("Datos de Bonita en este formulario:", bonitaData);
-      const interval = setInterval(() => {
-        socket.emit("documentos", selectedDocuments);
+    if (bonitaData && usuario) {
+      const interval = setInterval(async () => {
+        try {
+          await saveTempState({
+            id_registro: (bonitaData.processId+"-"+bonitaData.caseId),
+            id_tarea: parseInt(bonitaData.taskId),
+            jsonData: JSON.stringify(selectedDocuments),
+            id_funcionario: parseInt(usuario.user_id)
+          });
+        } catch (error) {
+          console.error("Error al guardar estado temporal:", error);
+        }
       }, 10000);
+
       return () => clearInterval(interval);
     }
-  }, [selectedDocuments, bonitaData]);
+  }, [selectedDocuments, bonitaData, usuario]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
