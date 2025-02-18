@@ -4,9 +4,11 @@ import { DocumentEditor } from '@onlyoffice/document-editor-react';
 interface DocumentViewerProps {
   keyDocument: string;
   title: string;
-  documentName: string; // Nueva prop para el nombre del documento
-  mode?: 'edit' | 'view'; // Modo de visualización del documento
-  callbackUrl?: string; // Hacer que callbackUrl sea opcional
+  documentName: string; // Nombre del documento
+  mode?: 'edit' | 'view'; // Modo de visualización
+  callbackUrl?: string;   // Callback opcional
+  fileType?: string;      // Tipo de archivo, ej. 'pdf', 'docx', etc.
+  documentType?: string;  // Tipo de documento, ej. 'pdf', 'word', etc.
 }
 
 const onDocumentReady = (event: any) => {
@@ -30,21 +32,29 @@ const onLoadComponentError = (errorCode: any, errorDescription: any) => {
   }
 };
 
-const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title, documentName, mode, callbackUrl }) => {
-  const documentUrl = `http://host.docker.internal:3001/api/document?nombre=${encodeURIComponent(documentName)}`;
+const DocumentViewer: React.FC<DocumentViewerProps> = ({
+  keyDocument,
+  title,
+  documentName,
+  mode,
+  callbackUrl,
+  fileType,
+  documentType
+})  => {
+  const documentUrl = `http://formulario.midominio.com:3001/api/document?nombre=${encodeURIComponent(documentName)}`;
 
   // Configuración de ONLYOFFICE con callbackUrl opcional
   const config: any = {
     document: {
-      fileType: 'docx',
+      fileType: fileType || 'docx', // Valor por defecto 'pdf'
       key: keyDocument,
       title: title,
       url: documentUrl,
     },
-    documentType: 'word',
+    documentType: documentType || 'word', // Valor por defecto 'pdf'
     editorConfig: {
-      mode: mode || 'view',
-      ...(callbackUrl && { callbackUrl }) // Solo incluir si callbackUrl está definida
+      mode: mode || 'view', // Modo de visualización, por defecto 'view'
+      ...(callbackUrl && { callbackUrl })
     },
   };
 
@@ -56,7 +66,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ keyDocument, title, doc
           <div className="w-full h-full">
             <DocumentEditor
               id="docxEditor"
-              documentServerUrl="http://localhost:8080/"
+              documentServerUrl="http://formulario.midominio.com:8081"
               config={config} // Pasamos la configuración dinámica
               events_onDocumentReady={onDocumentReady}
               onLoadComponentError={onLoadComponentError}

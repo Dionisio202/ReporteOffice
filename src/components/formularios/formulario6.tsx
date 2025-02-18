@@ -2,23 +2,27 @@ import { useState } from "react";
 import DropdownCard from "./components/DropdownCard";
 import DocumentViewer from "../files/DocumentViewer";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
+import io from "socket.io-client";
 
+const socket = io("http://formulario.midominio.com:3001");
 type StaticDocument = {
   key: string;
   title: string;
   nombre: string;
 };
-
+const nombrePlantilla1="Contrato_Cesion_Derechos";
+const nombrePlantilla2="Acta_Porcentaje_Participacion";
+const codigoProceso="3-TT001";
 const staticDocuments: Record<string, StaticDocument> = {
   "Contrato Cesion de Derechos": {
-    key: "jfda-001",
+    key: `${nombrePlantilla1}_${codigoProceso}`,       
     title: "Contrato Cesión de Derechos",
-    nombre: "Contrato_Cesion_Derechos.pdf",
+    nombre: `${nombrePlantilla1}_${codigoProceso}.docx`,
   },
   "Acta de Participación": {
-    key: "act-001",
+    key: `${nombrePlantilla2}_${codigoProceso}`,       
     title: "Acta de Participación",
-    nombre: "Acta_Participacion.pdf",
+    nombre: `${nombrePlantilla2}_${codigoProceso}.docx`,
   },
 };
 
@@ -27,9 +31,19 @@ export default function Formulario6() {
   const bonita: BonitaUtilities = new BonitaUtilities();
 
   // Modificamos la función para aceptar un string
-  const handleViewDocument = (documentType: string) => {
+  const handleViewDocument = async (documentType: string) => {
     const document = staticDocuments[documentType];
     if (document) {
+      // Emitir evento al servidor para verificar o generar el documento id_registro, id_tarea 
+      socket.emit('generar_documentos', { id_registro:"3", id_tarea: "TT001"}, (response:any) => {
+        if (response.success) {
+          console.log('Respuesta del servidor:', response.message);
+          // Puedes manejar la respuesta según tus necesidades
+        } else {
+          console.error('Error del servidor:', response.message);
+        }
+      });
+
       setSelectedDocument(document);
     }
   };
@@ -61,6 +75,8 @@ export default function Formulario6() {
             keyDocument={selectedDocument.key}
             title={selectedDocument.title}
             documentName={selectedDocument.nombre}
+             mode="edit"
+            callbackUrl="http://formulario.midominio.com:3001/api/save-document"
           />
         ) : (
           <p className="text-center text-gray-500">

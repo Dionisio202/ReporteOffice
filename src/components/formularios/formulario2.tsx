@@ -31,7 +31,9 @@ const staticDocuments: Record<string, DocumentType> = {
 export default function WebPage() {
   const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+  // @ts-ignore
   const [loading, setLoading] = useState<boolean>(false);
+  // @ts-ignore
   const [error, setError] = useState<string | null>(null);
 
   // Verificar conexión WebSocket
@@ -315,13 +317,13 @@ export default function WebPage() {
         {/* Panel Derecho - Visor de documentos */}
         <div className="w-full h-full md:w-3/4 pl-6 mt-0.5">
           {selectedDocument ? (
-            <DocumentViewer
-              keyDocument={selectedDocument.key}
-              title={selectedDocument.title}
-              documentName={selectedDocument.nombre}
-              mode="edit"
-              callbackUrl="http://host.docker.internal:3001/api/save-document"
-            />
+          <DocumentViewer
+          keyDocument={selectedDocument.key}
+          title={selectedDocument.title}
+          documentName={selectedDocument.nombre}
+          mode="edit"
+          callbackUrl="http://formulario.midominio.com:3001/api/save-document"
+        />
           ) : (
             <p className="text-center text-gray-500">
               Selecciona un documento para visualizarlo

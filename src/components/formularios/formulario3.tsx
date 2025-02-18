@@ -49,7 +49,7 @@ export default function UploadForm() {
             console.log("Datos de Bonita:", bonitaData);
 
             // Enviar los datos al servidor a través del socket
-            socket.emit("guardar_datos_bonita", bonitaData, (response) => {
+            socket.emit("guardar_datos_bonita", bonitaData, (response:any) => {
               if (response && response.success) {
                 console.log("Respuesta del servidor:", response);
               } else {

@@ -18,7 +18,7 @@ export class BonitaUtilities {
     const urlParams = new URLSearchParams(window.location.search);
     this.#TASKINSTANCEID = urlParams.get("id");
     this.#BONITATOKEN = this.getBonitaToken();
-    this.#BONITAURL = "http://localhost:8080/bonita";
+    this.#BONITAURL = "http://localhost:48615/bonita";
     this.#APIURL = `${this.#BONITAURL}/API/bpm`;
   }
 

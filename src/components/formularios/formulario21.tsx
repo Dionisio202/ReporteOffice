@@ -1,39 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import io from "socket.io-client";
 import CardContainer from "./components/CardContainer";
-import Checkbox from "./components/Checkbox";
 import { EmailInput } from "./components/EmailInput";
-import FileViewer from "./components/FileViewer";
+import DocumentViewer from "../files/DocumentViewer";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
 
+type DocumentType = {
+  key: string;
+  title: string;
+  nombre: string;
+};
+
+const staticDocuments: Record<string, DocumentType> = {
+  datos: {
+    key: "Formato_datos_informativos_autores_3-Test001",
+    title: "Comprobante de Pago",
+    nombre: "Formato_datos_informativos_autores_3-Test001.pdf",
+  },
+};
+
+const socket = io("http://formulario.midominio.com:3001");
+
 export default function ConfirmationScreen() {
-  const [selectedDocuments, setSelectedDocuments] = useState({
-    certificado: false,
-  });
+  const [selectedDocument, setSelectedDocument] = useState<DocumentType>(staticDocuments.datos);
+  const bonita = new BonitaUtilities();
 
-  const [selectedDocument, setSelectedDocument] = useState<File | null>(null);
-  const bonita: BonitaUtilities = new BonitaUtilities();
-
-  // Simula la selección de un documento cualquiera
-  const handleViewDocument = () => {
-    const sampleFile = new Blob(["Ejemplo de documento"], {
-      type: "application/pdf",
+  useEffect(() => {
+    // Emitir el evento para obtener el código de almacenamiento y actualizar la key del documento
+    socket.emit("obtener_codigo_almacenamiento", { id_registro: "3", id_tipo_documento: 6 }, (response: any) => {
+      if (response.success) {
+        console.log("Dato recibido:", response.jsonData);
+        setSelectedDocument({
+          key: response.jsonData, // Asigna la key recibida
+          title: staticDocuments.datos.title, // Mantiene el título original
+          nombre: `${response.jsonData}.pdf`, // Forma el nombre concatenando la key con la extensión
+        });
+      } else {
+        console.error("Error:", response.message);
+      }
     });
-    const file = new File([sampleFile], "documento_ejemplo.pdf", {
-      type: "application/pdf",
-    });
-    setSelectedDocument(file);
-  };
 
-  const handleChange = (name: string, checked: boolean) => {
-    setSelectedDocuments((prevState) => ({
-      ...prevState,
-      [name]: checked,
-    }));
-  };
+    return () => {
+      socket.off("obtener_codigo_almacenamiento");
+    };
+  }, []);
 
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault(); // Opcional: Evita el comportamiento por defecto del botón
-    console.log("Documentos confirmados:", selectedDocuments);
+    event.preventDefault();
     alert("Avanzando a la siguiente página...");
     bonita.changeTask();
   };
@@ -41,41 +54,28 @@ export default function ConfirmationScreen() {
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <CardContainer title="Certificado">
-        {/* Contenedor principal en una sola columna */}
         <div className="flex flex-col space-y-6 h-full">
-          {/* 📄 Sección de visualización del documento */}
+          {/* Sección para visualizar el documento usando DocumentViewer */}
           <div className="w-full p-4 border rounded-lg shadow-sm bg-gray-100 text-center">
-            {selectedDocument ? (
-              <FileViewer file={selectedDocument} />
-            ) : (
-              <div>
-                <p className="text-gray-500">
-                  Selecciona un documento para visualizarlo
-                </p>
-                <button
-                  onClick={handleViewDocument}
-                  className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  Ver Documento
-                </button>
-              </div>
-            )}
+            <DocumentViewer
+              keyDocument={selectedDocument.key}
+              title={selectedDocument.title}
+              documentName={selectedDocument.nombre}
+              mode="view"
+              fileType="pdf"
+              documentType="pdf"
+              callbackUrl="http://formulario.midominio.com:3001/api/save-document"
+            />
           </div>
 
-          {/* ✅ Checkbox */}
-          <Checkbox
-            label="Entrega de Certificado de Título de Registro"
-            value={selectedDocuments.certificado}
-            onChange={(checked) => handleChange("certificado", checked)}
-          />
-
+          {/* Sección para el EmailInput */}
           <div className="flex-1 w-full h-full">
             <EmailInput />
           </div>
 
-          {/* ▶️ Botón Siguiente */}
+          {/* Botón Siguiente */}
           <button
-            type="button" // Cambia el tipo a "button"
+            type="button"
             className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-3 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
             onClick={handleSubmit}
           >

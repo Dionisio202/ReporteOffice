@@ -1,17 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import UploadFile from "./components/UploadFile"; // Componente para cargar archivos
-import { io } from "socket.io-client";
 import { BonitaUtilities } from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 import Button from "../UI/button";
-// 📌 Conectar WebSocket al puerto 3001
-const socket = io("http://localhost:3001");
 
 export default function UploadForm() {
   const [memoCode, setMemoCode] = useState("");
-  const [notificaciones, setNotificaciones] = useState<string[]>([]);
-  // @ts-ignore
-  const [file, setFile] = useState<File | null>(null); // Agregado estado para el archivo
+  const [notificaciones] = useState<string[]>([]);
+  const [file, setFile] = useState<File | null>(null);
   const bonita: BonitaUtilities = new BonitaUtilities();
 
   const handleNext = async () => {
@@ -23,19 +19,6 @@ export default function UploadForm() {
       alert("Ocurrió un error al intentar avanzar.");
     }
   };
-  useEffect(() => {
-    // 📢 Escuchar notificaciones en tiempo real
-    socket.on("nuevoMemorando", (data) => {
-      setNotificaciones((prev) => [
-        `Nuevo memorando: ${data.codigo_documento}`,
-        ...prev,
-      ]);
-    });
-
-    return () => {
-      socket.off("nuevoMemorando");
-    };
-  }, []);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -50,14 +33,42 @@ export default function UploadForm() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("memoCode", memoCode);
-    formData.append("file", file);
+    // Extraer el nombre del archivo sin la extensión (por ejemplo, "edison202" de "edison202.pdf")
+    const fileName = file.name;
+    const dotIndex = fileName.lastIndexOf(".");
+    const baseName = dotIndex !== -1 ? fileName.substring(0, dotIndex) : fileName;
+
+    // Convertir el archivo a base64 usando FileReader
+    const fileBase64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        // El resultado viene en el formato: "data:<mime type>;base64,<base64String>"
+        // Separamos y tomamos solo la parte base64
+        const result = reader.result as string;
+        const base64String = result.split(",")[1];
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+
+    // Construir el payload para enviar al back-end
+    const payload = {
+      // "nombre" se usará para formar el nombre final del documento en el back-end (se agregará la extensión)
+      nombre: baseName+"_3-Test001",
+      id_registro_per: "3",       // Ajusta según tu lógica
+      id_tipo_documento: "3",      // Ajusta según tu lógica
+      document: fileBase64,        // Archivo en base64
+      memorando: memoCode,         // Valor del código del memorando
+    };
 
     try {
-      const response = await fetch("http://localhost:3001/api/memorando", {
+      const response = await fetch("http://formulario.midominio.com:3001/api/get-document", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -66,10 +77,6 @@ export default function UploadForm() {
       console.error("Error en la solicitud:", error);
     }
   };
-  // @ts-ignore
-  function handleFileChange(file: File | null, arg1: string): void {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
@@ -82,7 +89,7 @@ export default function UploadForm() {
           size="2xl"
           className="text-center text-gray-800 mb-1 text-lg"
         />
-        <h1 className="text- font-extralight text-center mb-8">
+        <h1 className="font-extralight text-center mb-8">
           Subir código y documento emitido para certificación.
         </h1>
 
@@ -91,7 +98,7 @@ export default function UploadForm() {
             Ingrese el código del memorando generado para certificación
           </label>
           <input
-            id="memoCode" // Agregar id para el label
+            id="memoCode"
             type="text"
             className="w-full border p-2 rounded mt-1"
             value={memoCode}
@@ -99,21 +106,15 @@ export default function UploadForm() {
           />
         </div>
 
-        {/* Componente para cargar archivo, pero no lo enviamos */}
-
         <UploadFile
-          id="intellectual-property-file"
-          onFileChange={(file) =>
-            handleFileChange(
-              file,
-              "Solicitud de Registro de Propiedad Intelectual"
-            )
-          }
+          id="document-file"
+          onFileChange={(file) => setFile(file)}
           label="Subir Certificación Presupuestaria"
         />
+
         <Button
+          type="submit"
           className="mt-5 w-full bg-blue-600 text-white px-6 rounded hover:bg-blue-700"
-          onClick={handleNext}
         >
           Enviar Datos
         </Button>
@@ -126,7 +127,6 @@ export default function UploadForm() {
         </Button>
       </form>
 
-      {/* 📢 Mostrar notificaciones en tiempo real */}
       <div className="mt-6 w-full max-w-lg">
         <h2 className="text-lg font-semibold">Notificaciones</h2>
         <ul className="bg-white p-4 rounded-lg shadow">
