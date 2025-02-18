@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DropdownCard from "./components/DropdownCard"; // Componente para el dropdown
 import DocumentViewer from "../files/DocumentViewer"; // Componente para visualizar el documento
 import Button from "../UI/button"; // Componente botón
 // @ts-ignore
 import BonitaUtilities  from "../bonita/bonita-utilities";
 import { SERVER_BACK_URL } from "../../config.ts";
+import { useBonitaService } from "../../services/bonita.service";
 
 // Definimos un tipo para nuestros documentos
 type StaticDocument = {
@@ -12,18 +13,10 @@ type StaticDocument = {
   title: string;
   nombre: string;
 };
-const nombrePlantilla="fsvt-001";
-const codigoProceso="test-002";
-const staticDocuments: Record<string, StaticDocument> = {
-  //valores a enviar 
-  "Validación de Transferencias": {
-    key: `${nombrePlantilla}-${codigoProceso}`,           
-    title: "Validación",
-    nombre: `${nombrePlantilla}-${codigoProceso}.docx`,   
-  },
-};
+
 
 export default function Formulario6() {
+  const { obtenerUsuarioAutenticado, obtenerDatosBonita } = useBonitaService();
   const urlSave = `${SERVER_BACK_URL}/api/save-document`;
   // Estado para almacenar el documento seleccionado
   const [selectedDocument, setSelectedDocument] = useState<StaticDocument | null>(null);
@@ -38,6 +31,48 @@ export default function Formulario6() {
       alert("Ocurrió un error al intentar avanzar.");
     }
   };
+      // Obtener datos del formulario
+      const [usuario, setUsuario] = useState<{
+        user_id: string;
+        user_name: string;
+      } | null>(null);
+      const [bonitaData, setBonitaData] = useState<{
+        processId: string;
+        taskId: string;
+        caseId: string;
+        processName: string;
+      } | null>(null);
+      useEffect(() => {
+        const fetchUser = async () => {
+          const userData = await obtenerUsuarioAutenticado();
+          if (userData) setUsuario(userData);
+        };
+        fetchUser();
+      }, []);
+      useEffect(() => {
+        if (!usuario) return;
+        const fetchData = async () => {
+          try {
+            const data = await obtenerDatosBonita(usuario.user_id);
+            if (data) {
+              setBonitaData(data);
+            }
+          } catch (error) {
+            console.error("❌ Error obteniendo datos de Bonita:", error);
+          }
+        };
+        fetchData();
+      }, [usuario, obtenerDatosBonita]);
+      const nombrePlantilla="fsvt-001";
+      const codigoProceso=`${bonitaData?.processId}-${bonitaData?.caseId}-${bonitaData?.taskId}`;
+      const staticDocuments: Record<string, StaticDocument> = {
+        //valores a enviar 
+        "Validación de Transferencias": {
+          key: `${nombrePlantilla}-${codigoProceso}`,           
+          title: "Validación",
+          nombre: `${nombrePlantilla}-${codigoProceso}.docx`,   
+        },
+      };
 
   // Función para seleccionar el documento a visualizar y llamar a la API de verificación
   const handleViewDocument = async (documentType: keyof typeof staticDocuments) => {
@@ -45,8 +80,9 @@ export default function Formulario6() {
     
     if (documentType === "Validación de Transferencias") {
       try {
+        
         // Llamada a la API usando los valores del documento estático
-        const apiUrl = `${SERVER_BACK_URL}/api/verificar-documento?key=${document.key}&nombre=${nombrePlantilla}.docx&id_registro_per=3&id_tipo_documento=3`;
+        const apiUrl = `${SERVER_BACK_URL}/api/verificar-documento?key=${document.key}&nombre=${nombrePlantilla}.docx&id_registro_per=${bonitaData?.processId}-${bonitaData?.caseId}&id_tipo_documento=3`;
         const response = await fetch(apiUrl);
         const data = await response.json();
         console.log("Respuesta de la API:", data);

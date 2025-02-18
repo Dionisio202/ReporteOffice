@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UploadFile from "./components/UploadFile"; // Componente para cargar archivos
 // @ts-ignore
 import BonitaUtilities  from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 import Button from "../UI/button";
 import { SERVER_BACK_URL } from "../../config.ts";
+import { useBonitaService } from "../../services/bonita.service";
 
 export default function UploadForm() {
+  const { obtenerUsuarioAutenticado, obtenerDatosBonita } = useBonitaService();
   const [memoCode, setMemoCode] = useState("");
   const [notificaciones] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
@@ -54,11 +56,44 @@ export default function UploadForm() {
       reader.onerror = (error) => reject(error);
     });
 
+      // Obtener datos del formulario
+      const [usuario, setUsuario] = useState<{
+        user_id: string;
+        user_name: string;
+      } | null>(null);
+      const [bonitaData, setBonitaData] = useState<{
+        processId: string;
+        taskId: string;
+        caseId: string;
+        processName: string;
+      } | null>(null);
+      useEffect(() => {
+        const fetchUser = async () => {
+          const userData = await obtenerUsuarioAutenticado();
+          if (userData) setUsuario(userData);
+        };
+        fetchUser();
+      }, []);
+      useEffect(() => {
+        if (!usuario) return;
+        const fetchData = async () => {
+          try {
+            const data = await obtenerDatosBonita(usuario.user_id);
+            if (data) {
+              setBonitaData(data);
+            }
+          } catch (error) {
+            console.error("❌ Error obteniendo datos de Bonita:", error);
+          }
+        };
+        fetchData();
+      }, [usuario, obtenerDatosBonita]);
+
     // Construir el payload para enviar al back-end
     const payload = {
       // "nombre" se usará para formar el nombre final del documento en el back-end (se agregará la extensión)
-      nombre: baseName+"_3-Test001",
-      id_registro_per: "3",       // Ajusta según tu lógica
+      nombre: baseName+`_${bonitaData?.processId}-${bonitaData?.caseId}-${bonitaData?.taskId}`,
+      id_registro_per: `${bonitaData?.processId}-${bonitaData?.caseId}`,       // Ajusta según tu lógica
       id_tipo_documento: "3",      // Ajusta según tu lógica
       document: fileBase64,        // Archivo en base64
       memorando: memoCode,         // Valor del código del memorando
