@@ -5,12 +5,12 @@ import BonitaUtilities  from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 import io from "socket.io-client";
 import { useBonitaService } from "../../services/bonita.service";
-import { useSaveTempState } from "../hooks/datos_temprales";
+import { useSaveTempState } from "../bonita/hooks/datos_temprales";
 
 const socket = io("http://localhost:3001");
 
 export default function ConfirmationScreen() {
-  const { saveTempState } = useSaveTempState(socket);
+  const { startAutoSave, saveFinalState } = useSaveTempState(socket);
   const [selectedDocuments, setSelectedDocuments] = useState({
     contrato: false,
     acta: false,
@@ -67,37 +67,42 @@ export default function ConfirmationScreen() {
   }, [usuario]);
 
   // 🔹 Guardar estado temporal cada 10 segundos si hay datos
+  // 🔹 Iniciar el guardado automático ("En Proceso")
   useEffect(() => {
     if (bonitaData && usuario) {
-      const interval = setInterval(async () => {
-        try {
-          await saveTempState({
-            id_registro: `${bonitaData.processId}-${bonitaData.caseId}`,
-            id_tarea: parseInt(bonitaData.taskId),
-            jsonData: JSON.stringify(selectedDocuments),
-            id_funcionario: parseInt(usuario.user_id),
-          });
-        } catch (error) {
-          console.error("Error al guardar estado temporal:", error);
-        }
-      }, 10000);
-
-      return () => clearInterval(interval);
+      startAutoSave(
+        {
+          id_registro: `${bonitaData.processId}-${bonitaData.caseId}`,
+          id_tarea: parseInt(bonitaData.taskId),
+          jsonData: JSON.stringify(selectedDocuments),
+          id_funcionario: parseInt(usuario.user_id),
+        },
+        10000, // intervalo de 10 segundos
+        "En Proceso"
+      );
     }
-  }, [selectedDocuments, bonitaData, usuario]);
+  }, [selectedDocuments, bonitaData, usuario, startAutoSave]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     console.log("📌 Documentos confirmados:", selectedDocuments);
   };
 
+  // 🔹 Guardado final al hacer clic en "Siguiente"
   const handleNext = async () => {
-    try {
-      await bonita.changeTask();
-      alert("Avanzando a la siguiente página...");
-    } catch (error) {
-      console.error("Error al cambiar la tarea:", error);
-      alert("Ocurrió un error al intentar avanzar.");
+    if (bonitaData && usuario) {
+      try {
+        await saveFinalState({
+          id_registro: `${bonitaData.processId}-${bonitaData.caseId}`,
+          id_tarea: parseInt(bonitaData.taskId),
+          jsonData: JSON.stringify(selectedDocuments),
+          id_funcionario: parseInt(usuario.user_id),
+        });
+        alert("Avanzando a la siguiente página...");
+        bonita.changeTask();
+      } catch (error) {
+        console.error("Error guardando estado final:", error);
+      }
     }
   };
 
