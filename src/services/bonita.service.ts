@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Proceso, Tarea } from "../interfaces/bonita.interface";
-import { SERVER_BACK_URL, SERVER_BONITA_URL } from "../config";
+import { SERVER_BONITA_URL } from "../config";
 export const useBonitaService = () => {
   const [error, setError] = useState<string | null>(null);
 
