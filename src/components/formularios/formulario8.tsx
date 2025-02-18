@@ -10,7 +10,7 @@ export default function MemoCodeForm() {
   const bonita: BonitaUtilities = new BonitaUtilities();
 
   // Valores que deberías obtener de tu aplicación (pueden venir por props o contexto)
-  const id_registro = "3"; // Ejemplo, reemplazar con valor real
+  const id_registro = "7540851946479253287-2001"; // Ejemplo, reemplazar con valor real
   const id_tipo_documento = 3; // Ejemplo, reemplazar con valor real
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
