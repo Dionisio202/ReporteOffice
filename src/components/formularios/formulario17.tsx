@@ -7,8 +7,9 @@ import { useSaveTempState } from "../bonita/hooks/datos_temprales";
 import { useBonitaService } from "../../services/bonita.service";
 import io from "socket.io-client";
 import Title from "./components/TitleProps";
+import { SERVER_BACK_URL } from "../../config.ts";
 
-const socket = io("http://localhost:3001");
+const socket = io(SERVER_BACK_URL);
 
 export default function ConfirmationScreen() {
   const { startAutoSave, saveFinalState } = useSaveTempState(socket);
@@ -50,6 +51,30 @@ export default function ConfirmationScreen() {
 
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (bonitaData) {
+      const id_registro = `${bonitaData.processId}-${bonitaData.caseId}`;
+      const id_tarea = bonitaData.taskId; // o parsearlo si es necesario
+
+      socket.emit(
+        "obtener_estado_temporal",
+        { id_registro, id_tarea },
+        (response: { success: boolean; message: string; jsonData?: string }) => {
+          if (response.success && response.jsonData) {
+            try {
+              const loadedState = JSON.parse(response.jsonData);
+              setSelectedDocuments(loadedState);
+            } catch (err) {
+              console.error("Error al parsear el JSON:", err);
+            }
+          } else {
+            console.error("Error al obtener el estado temporal:", response.message);
+          }
+        }
+      );
+    }
+  }, [bonitaData]);
 
   // 🔹 Obtener datos de Bonita una vez que se tenga el usuario
   useEffect(() => {

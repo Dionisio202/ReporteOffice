@@ -3,6 +3,7 @@ import CardContainer from "./components/CardContainer";
 // @ts-ignore
 import BonitaUtilities  from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
+import { SERVER_BACK_URL } from "../../config.ts";
 export default function MemoCodeForm() {
   const [memoCode, setMemoCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ export default function MemoCodeForm() {
     setError("");
 
     try {
-      const response = await fetch(`http://formulario.midominio.com:3001/api/save-memorando?key=${memoCode}&id_tipo_documento=${id_tipo_documento}&id_registro=${id_registro}`);
+      const response = await fetch(`${SERVER_BACK_URL}/api/save-memorando?key=${memoCode}&id_tipo_documento=${id_tipo_documento}&id_registro=${id_registro}`);
       
       if (!response.ok) {
         throw new Error('Error al guardar el memorando');

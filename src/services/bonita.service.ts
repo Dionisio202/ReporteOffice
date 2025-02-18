@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Proceso, Tarea } from "../interfaces/bonita.interface";
-
+import { SERVER_BACK_URL, SERVER_BONITA_URL } from "../config";
 export const useBonitaService = () => {
   const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +17,7 @@ export const useBonitaService = () => {
       }
 
       const response = await fetch(
-        "http://localhost:48615//bonita/API/bpm/process?p=0",
+        `${SERVER_BONITA_URL}/bonita/API/bpm/process?p=0`,
         {
           method: "GET",
           headers: {
@@ -51,7 +51,7 @@ export const useBonitaService = () => {
         }
 
         const response = await fetch(
-          `http://localhost:48615/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
+          `${SERVER_BONITA_URL}/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
           {
             method: "GET",
             headers: {
@@ -84,7 +84,7 @@ export const useBonitaService = () => {
         }
 
         const response = await fetch(
-          `http://localhost:48615/bonita/API/bpm/task?p=0&c=1&f=assigned_id=${userId}`,
+          `${SERVER_BONITA_URL}/bonita/API/bpm/task?p=0&c=1&f=assigned_id=${userId}`,
           {
             method: "GET",
             headers: {
@@ -117,7 +117,7 @@ export const useBonitaService = () => {
       }
 
       const response = await fetch(
-        `http://localhost:48615/bonita/API/bpm/userTask/${taskId}`,
+        `${SERVER_BONITA_URL}/bonita/API/bpm/userTask/${taskId}`,
         {
           method: "GET",
           headers: {
@@ -144,7 +144,7 @@ export const useBonitaService = () => {
     async (processId: string): Promise<Proceso | null> => {
       try {
         const response = await fetch(
-          `http://localhost:48615/bonita/API/bpm/process/${processId}`,
+          `${SERVER_BONITA_URL}/bonita/API/bpm/process/${processId}`,
           {
             method: "GET",
             headers: {
@@ -221,7 +221,7 @@ export const useBonitaService = () => {
   } | null> => {
     try {
       const response = await fetch(
-        "http://localhost:48615/bonita/API/system/session/unusedId",
+        `${SERVER_BONITA_URL}/bonita/API/system/session/unusedId`,
         {
           method: "GET",
           headers: {

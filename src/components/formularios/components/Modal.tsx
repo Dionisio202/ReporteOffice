@@ -4,8 +4,8 @@ import {
   ModalProps,
   TipoProducto,
 } from "../../../interfaces/registros.interface";
-
-const socket = io("http://localhost:3001"); // Conecta con el backend
+import { SERVER_BACK_URL } from "../../../config.ts";
+const socket = io(SERVER_BACK_URL); // Conecta con el backend
 
 const Modal: React.FC<ModalProps> = ({
   showModal,

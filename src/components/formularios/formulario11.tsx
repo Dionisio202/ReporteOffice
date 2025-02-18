@@ -5,6 +5,7 @@ import UploadFile from "./components/UploadFile";
 import BonitaUtilities  from "../bonita/bonita-utilities";
 import Button from "../UI/button";
 import Title from "./components/TitleProps";
+import { SERVER_BACK_URL } from "../../config.ts";
 
 const Formulario11: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -51,7 +52,7 @@ const Formulario11: React.FC = () => {
     };
 
     try {
-      const response = await fetch("http://formulario.midominio.com:3001/api/get-document", {
+      const response = await fetch(`${SERVER_BACK_URL}/api/get-document`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

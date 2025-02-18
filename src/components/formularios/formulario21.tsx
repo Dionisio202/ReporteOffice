@@ -5,6 +5,7 @@ import { EmailInput } from "./components/EmailInput";
 import DocumentViewer from "../files/DocumentViewer";
 // @ts-ignore
 import BonitaUtilities  from "../bonita/bonita-utilities";
+import { SERVER_BACK_URL } from "../../config.ts";
 
 type DocumentType = {
   key: string;
@@ -20,9 +21,10 @@ const staticDocuments: Record<string, DocumentType> = {
   },
 };
 
-const socket = io("http://formulario.midominio.com:3001");
+const socket = io(SERVER_BACK_URL);
 
 export default function ConfirmationScreen() {
+  const urlSave = `${SERVER_BACK_URL}/api/save-document`;
   const [selectedDocument, setSelectedDocument] = useState<DocumentType>(staticDocuments.datos);
   const bonita = new BonitaUtilities();
 
@@ -65,7 +67,7 @@ export default function ConfirmationScreen() {
               mode="view"
               fileType="pdf"
               documentType="pdf"
-              callbackUrl="http://formulario.midominio.com:3001/api/save-document"
+              callbackUrl={urlSave}
             />
           </div>
 

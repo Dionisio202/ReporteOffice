@@ -8,8 +8,8 @@ import { ModalData } from "../../interfaces/registros.interface"; // Asegúrate 
 // @ts-ignore
 import BonitaUtilities  from "../bonita/bonita-utilities";
 import { useBonitaService } from "../../services/bonita.service";
-
-const socket = io("http://localhost:3001"); // Conecta con el backend
+import { SERVER_BACK_URL } from "../../config.ts";
+const socket = io(SERVER_BACK_URL); // Conecta con el backend
 
 export default function UploadForm() {
   const [intellectualPropertyFileBase64, setIntellectualPropertyFileBase64] =

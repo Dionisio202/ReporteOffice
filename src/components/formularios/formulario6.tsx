@@ -4,8 +4,9 @@ import DocumentViewer from "../files/DocumentViewer";
 // @ts-ignore
 import BonitaUtilities  from "../bonita/bonita-utilities";
 import io from "socket.io-client";
+import { SERVER_BACK_URL } from "../../config.ts";
 
-const socket = io("http://formulario.midominio.com:3001");
+const socket = io(SERVER_BACK_URL);
 type StaticDocument = {
   key: string;
   title: string;
@@ -28,6 +29,7 @@ const staticDocuments: Record<string, StaticDocument> = {
 };
 
 export default function Formulario6() {
+  const urlSave = `${SERVER_BACK_URL}api/save-document`;
   const [selectedDocument, setSelectedDocument] = useState<StaticDocument | null>(null);
   const bonita: BonitaUtilities = new BonitaUtilities();
 
@@ -77,7 +79,7 @@ export default function Formulario6() {
             title={selectedDocument.title}
             documentName={selectedDocument.nombre}
              mode="edit"
-            callbackUrl="http://formulario.midominio.com:3001/api/save-document"
+            callbackUrl= {urlSave}
           />
         ) : (
           <p className="text-center text-gray-500">

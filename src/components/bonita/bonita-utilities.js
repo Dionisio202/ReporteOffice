@@ -1,4 +1,4 @@
-
+import {SERVER_BONITA_URL} from "../../config.ts";
 
 
 export default class BonitaUtilities {
@@ -13,13 +13,13 @@ export default class BonitaUtilities {
     this.#TASKINSTANCEID = urlParams.get("id");
 
     this.#BONITATOKEN = this.#getBonitaToken();
-    this.#BONITAURL = "http://formulario.midominio.com:8080/bonita";
+    this.#BONITAURL = `${SERVER_BONITA_URL}/bonita`;
     this.#APIURL = `${this.#BONITAURL}/API/bpm`;
   }
 
   async #getBonitaToken() {
     try {
-        const response = await fetch("http://formulario.midominio.com:8080/bonita/API/system/session/unusedId", {
+        const response = await fetch(`${SERVER_BONITA_URL}/bonita/API/system/session/unusedId`, {
             method: "GET",
             credentials: "include", // Asegura que las cookies se envíen con la solicitud
             headers: {
