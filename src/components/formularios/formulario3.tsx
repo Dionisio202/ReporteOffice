@@ -1,56 +1,75 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import io from "socket.io-client";
 import Button from "../UI/button";
 import Title from "./components/TitleProps";
 import Modal from "./components/Modal";
 import UploadFile from "./components/UploadFile";
-import { ModalData } from "../../interfaces/registros.interface";
-import { Tarea } from "../../interfaces/bonita.interface";
+import { ModalData } from "../../interfaces/registros.interface"; // Asegúrate de que la ruta sea correcta
 import { BonitaUtilities } from "../bonita/bonita-utilities";
-import { useBonitaAPI } from "../bonita/hooks/useBonitAPI"; // Importar el hook
+import { useBonitaService } from "../../services/bonita.service";
 
 const socket = io("http://localhost:3001"); // Conecta con el backend
 
 export default function UploadForm() {
   const [intellectualPropertyFileBase64, setIntellectualPropertyFileBase64] =
     useState<string | null>(null);
-  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<string | null>(null);
-
+  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<
+    string | null
+  >(null);
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState<ModalData | null>(null);
-  const [bonitaResponse, setBonitaResponse] = useState<{
-    proceso?: { id: string; name: string };
-    tareas?: Tarea[];
-  } | null>(null);
-
+  const [loading, setLoading] = useState(false); // Estado para el indicador de carga
   const bonita: BonitaUtilities = new BonitaUtilities();
-  const { obtenerIdProceso, obtenerTareas, loading, error } = useBonitaAPI(); // Usar el hook
+  const { obtenerIdProceso, obtenerTareas } = useBonitaService(); // Usa el servicio
 
-  // Función para obtener ID de proceso y tarea
-  const fetchProcessData = useCallback(async () => {
-    try {
-      const processData = await obtenerIdProceso();
-      if (processData) {
-        const tasks = await obtenerTareas(processData.id);
-        if (tasks && tasks.length > 0) {
-          // Almacenar la respuesta en el estado
-          setBonitaResponse({
-            proceso: processData,
-            tareas: tasks || [],
-          });
-        }
-      }
-    } catch (err) {
-      console.error("Error al obtener datos del proceso o tarea", err);
-      setBonitaResponse(null); // Limpiar el estado en caso de error
-    }
-  }, [obtenerIdProceso, obtenerTareas]);
-
+  // Efecto para obtener el ID del proceso y las tareas (solo una vez)
   useEffect(() => {
-    fetchProcessData(); // Obtener datos de Bonita al cargar la página
-  }, [fetchProcessData]);
+    const fetchData = async () => {
+      try {
+        // Obtener el ID del proceso
+        const proceso = await obtenerIdProceso();
+        console.log("Proceso obtenido:", proceso);
 
+        if (proceso) {
+          // Obtener las tareas relacionadas con el proceso
+          const tareas = await obtenerTareas(proceso.id);
+          console.log("Tareas obtenidas:", tareas);
+
+          if (tareas && tareas.length > 0) {
+            // Crear un objeto JSON con la información obtenida
+            const bonitaData = {
+              id_proceso: proceso.id,
+              nombre_proceso: proceso.name,
+              id_tarea: tareas[0].id,
+              assigned_id: tareas[0].assigned_id,
+              caseId: tareas[0].caseId,
+            };
+
+            console.log("Datos de Bonita:", bonitaData);
+
+            // Enviar los datos al servidor a través del socket
+            socket.emit("guardar_datos_bonita", bonitaData, (response) => {
+              if (response && response.success) {
+                console.log("Respuesta del servidor:", response);
+              } else {
+                console.error(
+                  "Error en la respuesta del servidor:",
+                  response?.message
+                );
+              }
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error al obtener el proceso o las tareas:", error);
+      }
+    };
+
+    fetchData(); // Llamar a la función para obtener los datos
+  }, [obtenerIdProceso, obtenerTareas]); // Dependencias para evitar warnings de React
+
+  // Función para manejar cambios en los archivos
   const handleFileChange = useCallback(
     (file: File | null, fileType: string) => {
       if (file) {
@@ -67,6 +86,7 @@ export default function UploadForm() {
     []
   );
 
+  // Función para avanzar a la siguiente tarea
   const handleNext = async () => {
     try {
       await bonita.changeTask();
@@ -77,6 +97,7 @@ export default function UploadForm() {
     }
   };
 
+  // Función para guardar los documentos y mostrar el modal
   const handleSave = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
@@ -92,8 +113,23 @@ export default function UploadForm() {
     }
 
     try {
+      setLoading(true); // Activar el indicador de carga
       setIsNextDisabled(false);
 
+      // Timeout para evitar que el botón se quede en "Procesando..."
+      const timeout = setTimeout(() => {
+        setLoading(false);
+        console.error("❌ El servidor no respondió a tiempo.");
+        setModalData({
+          success: false,
+          message: "El servidor no respondió a tiempo. Inténtalo de nuevo.",
+          autores: [],
+          productos: [],
+        });
+        setShowModal(true);
+      }, 10000); // 10 segundos
+
+      // Enviar los documentos al backend
       socket.emit(
         "procesar_documentos",
         {
@@ -101,7 +137,10 @@ export default function UploadForm() {
           documento_productos: intellectualPropertyFileBase64,
         },
         (response: any) => {
-          if (response.success) {
+          clearTimeout(timeout); // Cancelar el timeout si el servidor responde
+          setLoading(false); // Desactivar el indicador de carga
+
+          if (response && response.success) {
             console.log("📢 Respuesta del servidor:", response);
             setModalData({
               success: response.success,
@@ -112,19 +151,20 @@ export default function UploadForm() {
           } else {
             console.error(
               "❌ Error en la respuesta del servidor:",
-              response.message
+              response?.message
             );
             setModalData({
-              success: response.success,
-              message: response.message,
+              success: false,
+              message: response?.message || "Error desconocido",
               autores: [],
               productos: [],
             });
           }
-          setShowModal(true);
+          setShowModal(true); // Mostrar el modal con la respuesta
         }
       );
     } catch (error) {
+      setLoading(false); // Desactivar el indicador de carga en caso de error
       console.error("Error al guardar los documentos:", error);
       setModalData({
         success: false,
@@ -136,11 +176,14 @@ export default function UploadForm() {
     }
   };
 
+  // Función para guardar los datos editados
   const handleSaveEditedData = async (editedData: any) => {
     try {
       if (!authorDataFileBase64 || !intellectualPropertyFileBase64) {
         throw new Error("No se encontraron los archivos base64.");
       }
+
+      // Enviar los datos editados al backend
       socket.emit(
         "procesar_documentos",
         {
@@ -167,6 +210,7 @@ export default function UploadForm() {
     }
   };
 
+  // Función para convertir un archivo a base64
   const convertFileToBase64 = (file: File) => {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -184,18 +228,10 @@ export default function UploadForm() {
     });
   };
 
+  // Función para cerrar el modal
   const closeModal = () => {
     setShowModal(false);
   };
-
-  // Mostrar loading o error si es necesario
-  if (loading) {
-    return <p>Cargando...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
 
   return (
     <div className="flex flex-col items-center p-1 bg-gradient-to-r to-gray-100 min-h-screen">
@@ -208,18 +244,6 @@ export default function UploadForm() {
         <h1 className="text-sm font-bold text-center text-gray-900 mb-9">
           Revisión y Análisis de Requerimiento
         </h1>
-
-        {/* Mostrar el JSON de Bonita */}
-        {bonitaResponse && (
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">
-              Respuesta de Bonita:
-            </h2>
-            <pre className="text-sm text-gray-700 whitespace-pre-wrap">
-              {JSON.stringify(bonitaResponse, null, 2)}
-            </pre>
-          </div>
-        )}
 
         <UploadFile
           id="intellectual-property-file"
@@ -251,9 +275,13 @@ export default function UploadForm() {
           <Button
             className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
             onClick={handleSave}
-            disabled={!intellectualPropertyFileBase64 || !authorDataFileBase64}
+            disabled={
+              !intellectualPropertyFileBase64 ||
+              !authorDataFileBase64 ||
+              loading
+            }
           >
-            Guardar
+            {loading ? "Procesando..." : "Guardar"}
           </Button>
         </div>
 

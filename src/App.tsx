@@ -14,10 +14,8 @@ import Principal from "./pages/principal/principal";
 import Format from "./components/reports/Format";
 import Formulario2 from "./components/formularios/formulario2";
 import Formulario6 from "./components/formularios/formulario6";
-import Formulario9 from "./components/formularios/formulario9";
 import Formulario11 from "./components/formularios/formulario11";
 import Formulario12 from "./components/formularios/formulario12";
-import Formulario14 from "./components/formularios/formulario14";
 import Formulario15 from "./components/formularios/formulario15";
 import Formulario17 from "./components/formularios/formulario17";
 import Formulario19 from "./components/formularios/formulario19";
@@ -44,10 +42,8 @@ const App = () => {
             <Route path="/Formulario16" element={<Formulario16 />} />
             <Route path="/Formulario2" element={<Formulario2 />} />
             <Route path = "/Formulario6" element={<Formulario6/>}/>
-            <Route path = "/Formulario9" element={<Formulario9/>}/>
             <Route path = "/Formulario11" element={<Formulario11/>}/>
             <Route path = "/Formulario12" element={<Formulario12/>}/>
-            <Route path = "/Formulario14" element={<Formulario14/>}/>
             <Route path = "/Formulario15" element={<Formulario15/>}/>
             <Route path = "/Formulario17" element={<Formulario17/>}/>
             <Route path = "/Formulario19" element={<Formulario19/>}/>
