@@ -1,10 +1,10 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import CardContainer from "./components/CardContainer";
 import Checkbox from "./components/Checkbox"; 
 import { BonitaUtilities } from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
-import { useBonitaService } from "../../services/bonita.service";
 import io from "socket.io-client";
+import { useBonitaService } from "../../services/bonita.service";
 import { useSaveTempState } from "../hooks/datos_temprales";
 
 const socket = io("http://localhost:3001");
@@ -15,7 +15,6 @@ export default function ConfirmationScreen() {
     acta: false,
   });
 
-
   const [usuario, setUsuario] = useState<{ user_id: string; user_name: string } | null>(null);
   const [bonitaData, setBonitaData] = useState<{
     processId: string;
@@ -25,7 +24,7 @@ export default function ConfirmationScreen() {
   } | null>(null);
 
   const bonita: BonitaUtilities = new BonitaUtilities();
-  const { obtenerTareas, obtenerIdProceso, obtenerUsuarioAutenticado, obtenerDatosBonita, error } = useBonitaService();
+  const { obtenerUsuarioAutenticado, obtenerDatosBonita, error } = useBonitaService();
 
   const handleChange = (name: string, checked: boolean) => {
     setSelectedDocuments((prevState) => ({
@@ -33,46 +32,6 @@ export default function ConfirmationScreen() {
       [name]: checked,
     }));
   };
-
-  // Efecto para obtener el ID del proceso y las tareas (solo una vez)
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const proceso = await obtenerIdProceso();
-        console.log("Proceso obtenido:", proceso);
-
-        if (proceso) {
-          const tareas = await obtenerTareas(proceso.id);
-          console.log("Tareas obtenidas:", tareas);
-
-          if (tareas && tareas.length > 0) {
-            // Enviar los datos al servidor a través del socket
-            socket.emit("guardar_estado_temporal", {
-              id_registro: proceso.id, // Usar el ID del proceso
-              id_tarea: tareas[0].caseId, // Usar el ID de la primera tarea
-              jsonData: JSON.stringify(selectedDocuments), // Enviar el estado de los checkboxes
-              id_funcionario: 1, // Reemplaza con el ID del funcionario real
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error al obtener el proceso o las tareas:", error);
-      }
-    };
-
-    fetchData(); // Llamar a la función para obtener los datos
-  }, []); // Array de dependencias vacío para ejecutar solo una vez
-
-  // Efecto para verificar el estado de los checkboxes cada 10 segundos
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Enviar datos al servidor
-      socket.emit("documentos", selectedDocuments);
-    }, 10000); // 10000 milisegundos = 10 segundos
-
-    // Limpieza del intervalo cuando el componente se desmonta
-    return () => clearInterval(interval);
-  }, [selectedDocuments]); // Dependencia: el estado de los checkboxes
 
   // 🔹 Obtener el usuario autenticado al montar el componente
   useEffect(() => {
