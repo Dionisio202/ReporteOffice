@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import DocumentViewer from "../files/DocumentViewer"; // Importa tu componente de visor de documentos
 // @ts-ignore
-import BonitaUtilities  from "../bonita/bonita-utilities";
+import BonitaUtilities from "../bonita/bonita-utilities";
 import { useBonitaService } from "../../services/bonita.service";
 import io from "socket.io-client";
 import { SERVER_BACK_URL } from "../../config.ts";
+
 const socket = io(SERVER_BACK_URL);
 
 type DocumentType = {
@@ -19,7 +20,6 @@ const staticDocuments: Record<string, DocumentType> = {
     title: "Comprobante de Pago",
     nombre: "Formato_datos_informativos_autores_3-Test001.pdf",
   },
- 
 };
 
 export default function WebPage() {
@@ -27,27 +27,25 @@ export default function WebPage() {
   const { obtenerUsuarioAutenticado, obtenerDatosBonita, error } = useBonitaService();
   const urlSave = `${SERVER_BACK_URL}/api/save-document`;
   const [codigo, setCodigo] = useState(""); // Código del comprobante
-  const [codigoGuardado, setCodigoGuardado] = useState<string | null>(null); // Código guardado después de hacer clic en Siguiente
-  const [alertMessage, setAlertMessage] = useState<string | null>(null); // Estado para el mensaje de alerta
+  const [codigoGuardado, setCodigoGuardado] = useState<string | null>(null);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const bonita: BonitaUtilities = new BonitaUtilities();
-  const[codigoalmacenamiento, setCodigoAlmacenamiento] = useState<string>("");
-  // Inicializamos selectedDocument con el documento predeterminado
+  const [codigoalmacenamiento, setCodigoAlmacenamiento] = useState<string>("");
   const [selectedDocument, setSelectedDocument] = useState<DocumentType>(staticDocuments.datos);
-  const [usuario, setUsuario] = useState<{
-    user_id: string;
-    user_name: string;
-  } | null>(null);
+  const [usuario, setUsuario] = useState<{ user_id: string; user_name: string } | null>(null);
   const [bonitaData, setBonitaData] = useState<{
     processId: string;
     taskId: string;
     caseId: string;
     processName: string;
   } | null>(null);
+
   const handleCodigoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCodigo(e.target.value);
   };
-   // 🔹 Obtener el usuario autenticado al montar el componente
-   useEffect(() => {
+
+  // 🔹 Obtener el usuario autenticado
+  useEffect(() => {
     const fetchUser = async () => {
       const userData = await obtenerUsuarioAutenticado();
       if (userData) {
@@ -57,7 +55,7 @@ export default function WebPage() {
     fetchUser();
   }, [obtenerUsuarioAutenticado]);
 
-  // 🔹 Obtener datos de Bonita una vez que se tenga el usuario
+  // 🔹 Obtener datos de Bonita cuando ya se tenga el usuario
   useEffect(() => {
     if (!usuario) return;
     const fetchData = async () => {
@@ -73,45 +71,48 @@ export default function WebPage() {
     fetchData();
   }, [usuario, obtenerDatosBonita]);
 
+  // 🔹 Emitir el evento socket para obtener el código de almacenamiento cuando la data de Bonita esté disponible
   useEffect(() => {
-    // Emitir el evento para obtener el código de almacenamiento
-    socket.emit("obtener_codigo_almacenamiento", { id_registro:`${bonitaData?.processId}-${bonitaData?.caseId}`, id_tipo_documento: 6 }, (response: any) => {
-      if (response.success) {
-        console.log("Dato recibido:", response.jsonData);
-        setCodigoAlmacenamiento(response.jsonData);
-        // Actualiza el estado con el dato recibido
-        setSelectedDocument({
-          key: response.jsonData, // Se asigna el dato recibido a key
-          title: staticDocuments.datos.title, // Mantenemos el título original o puedes modificarlo
-          nombre: `${response.jsonData}.pdf`, // Concatena el dato para formar el nombre
-        });
-      } else {
-        console.error("Error:", response.message);
-      }
-    });
-
+    if (bonitaData) {
+      socket.emit(
+        "obtener_codigo_almacenamiento",
+        { id_registro: `${bonitaData.processId}-${bonitaData.caseId}`, id_tipo_documento: 6 },
+        (response: any) => {
+          if (response.success) {
+            console.log("Dato recibido:", response.jsonData);
+            setCodigoAlmacenamiento(response.jsonData);
+            setSelectedDocument({
+              key: response.jsonData,
+              title: staticDocuments.datos.title,
+              nombre: `${response.jsonData}.pdf`,
+            });
+          } else {
+            console.error("Error:", response.message);
+          }
+        }
+      );
+    }
     return () => {
       socket.off("obtener_codigo_almacenamiento");
     };
-  }, []);
+  }, [bonitaData]);
 
   const handleSiguiente = async () => {
     if (codigo.trim() !== "") {
-      setCodigoGuardado(codigo); // Guarda el código ingresado
+      setCodigoGuardado(codigo);
       try {
-; // Ejemplo, reemplazar con valor real codigo_documento, codigo_almacenamiento
-        const response = await fetch(`${SERVER_BACK_URL}/api/update-document?codigo_almacenamiento=${codigoalmacenamiento}&codigo_documento=${codigo}`);
-        
+        setCodigo("");
+        bonita.changeTask();
+        setAlertMessage("Avanzando a la siguiente página...");
+        const response = await fetch(
+          `${SERVER_BACK_URL}/api/update-document?codigo_almacenamiento=${codigoalmacenamiento}&codigo_documento=${codigo}`
+        );
         if (!response.ok) {
           throw new Error("Error al guardar el memorando");
         }
-        
         const data = await response.json();
         console.log("Memorando guardado:", data);
-        setCodigo(""); // Limpia el input después de guardar el código
-        bonita.changeTask();
         
-        setAlertMessage("Avanzando a la siguiente página...");
       } catch (err) {
         console.error("Error:", err);
       }
@@ -120,14 +121,16 @@ export default function WebPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <h1 className="text-2xl justify-center font-bold mb-6">Comprobante de Pago Registro de Propiedad Intelectual</h1>
+      <h1 className="text-2xl justify-center font-bold mb-6">
+        Comprobante de Pago Registro de Propiedad Intelectual
+      </h1>
 
       {/* DocumentViewer para mostrar el documento siempre */}
       <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-4 mb-8">
         <DocumentViewer
-           keyDocument={selectedDocument.key}
-           title={selectedDocument.title}
-           documentName={selectedDocument.nombre}
+          keyDocument={selectedDocument.key}
+          title={selectedDocument.title}
+          documentName={selectedDocument.nombre}
           mode="view"
           fileType="pdf"
           documentType="pdf"
@@ -158,16 +161,12 @@ export default function WebPage() {
 
       {/* Mostrar el código guardado solo si existe */}
       {codigoGuardado && (
-        <p className="mt-4 text-black-600 font-medium">
-          Código guardado: {codigoGuardado}
-        </p>
+        <p className="mt-4 text-black-600 font-medium">Código guardado: {codigoGuardado}</p>
       )}
 
       {/* Mostrar mensaje de alerta */}
       {alertMessage && (
-        <div className="mt-4 p-2 bg-yellow-200 text-black rounded">
-          {alertMessage}
-        </div>
+        <div className="mt-4 p-2 bg-yellow-200 text-black rounded">{alertMessage}</div>
       )}
     </div>
   );
