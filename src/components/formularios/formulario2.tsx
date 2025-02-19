@@ -34,8 +34,12 @@ export default function WebPage() {
   const urlSaveDocument = SERVER_BACK_URL + "/api/save-document";
   const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+  // @ts-ignore
   const [loading, setLoading] = useState<boolean>(false);
+  // @ts-ignore
+
   const [error, setError] = useState<string | null>(null);
+// @ts-ignore
 
   // Usamos el servicio actualizado de Bonita (solo con las APIs públicas)
   const { obtenerDatosBonita, obtenerUsuarioAutenticado, error: bonitaError } = useBonitaService();
