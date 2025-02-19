@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import UploadFile from "./components/UploadFile"; // Componente para cargar archivos
 // @ts-ignore
 import BonitaUtilities from "../bonita/bonita-utilities";
@@ -10,7 +10,7 @@ import { useBonitaService } from "../../services/bonita.service";
 export default function UploadForm() {
   const { obtenerUsuarioAutenticado, obtenerDatosBonita } = useBonitaService();
   const [memoCode, setMemoCode] = useState("");
-  const [notificaciones] = useState<string[]>([]);
+  const [notificaciones, setNotificaciones] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [usuario, setUsuario] = useState<{ user_id: string; user_name: string } | null>(null);
   const [bonitaData, setBonitaData] = useState<{
@@ -19,15 +19,21 @@ export default function UploadForm() {
     caseId: string;
     processName: string;
   } | null>(null);
+  // @ts-ignore
+  const [isSubmitted, setIsSubmitted] = useState(false); // Nuevo estado para controlar el envío
 
   // Instancia de BonitaUtilities
-  const bonita: BonitaUtilities = new BonitaUtilities();
+  const bonita = new BonitaUtilities();
 
   // Obtener usuario autenticado
   useEffect(() => {
     const fetchUser = async () => {
-      const userData = await obtenerUsuarioAutenticado();
-      if (userData) setUsuario(userData);
+      try {
+        const userData = await obtenerUsuarioAutenticado();
+        if (userData) setUsuario(userData);
+      } catch (error) {
+        console.error("❌ Error obteniendo usuario autenticado:", error);
+      }
     };
     fetchUser();
   }, [obtenerUsuarioAutenticado]);
@@ -35,6 +41,7 @@ export default function UploadForm() {
   // Obtener datos de Bonita cuando el usuario ya esté disponible
   useEffect(() => {
     if (!usuario) return;
+
     const fetchData = async () => {
       try {
         const data = await obtenerDatosBonita(usuario.user_id);
@@ -48,7 +55,7 @@ export default function UploadForm() {
     fetchData();
   }, [usuario, obtenerDatosBonita]);
 
-  const handleNext = async () => {
+  const handleNext = useCallback(async () => {
     try {
       await bonita.changeTask();
       alert("Avanzando a la siguiente página...");
@@ -56,9 +63,9 @@ export default function UploadForm() {
       console.error("Error al cambiar la tarea:", error);
       alert("Ocurrió un error al intentar avanzar.");
     }
-  };
+  }, [bonita]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!memoCode) {
@@ -85,17 +92,17 @@ export default function UploadForm() {
         const base64String = result.split(",")[1];
         resolve(base64String);
       };
+// @ts-ignore
       reader.onerror = (error) => reject(error);
     });
 
     // Construir el payload para enviar al back-end
     const payload = {
-      // "nombre" se usará para formar el nombre final del documento (se agregará la extensión en el back-end)
       nombre: baseName + `_${bonitaData?.processId}-${bonitaData?.caseId}-${bonitaData?.taskId}`,
-      id_registro_per: `${bonitaData?.processId}-${bonitaData?.caseId}`, // Ajusta según tu lógica
-      id_tipo_documento: "3", // Ajusta según tu lógica
-      document: fileBase64,   // Archivo en base64
-      memorando: memoCode,    // Valor del código del memorando
+      id_registro_per: `${bonitaData?.processId}-${bonitaData?.caseId}`,
+      id_tipo_documento: "3",
+      document: fileBase64,
+      memorando: memoCode,
     };
 
     try {
@@ -107,12 +114,22 @@ export default function UploadForm() {
         body: JSON.stringify(payload),
       });
 
+      if (!response.ok) {
+        throw new Error(`Error en la solicitud: ${response.statusText}`);
+      }
+
       const data = await response.json();
       console.log("Respuesta del servidor:", data);
+
+      // Mostrar mensaje de confirmación
+      setIsSubmitted(true);
+      setNotificaciones([...notificaciones, "Datos enviados correctamente."]);
+      alert("Datos enviados correctamente."); // Mensaje de confirmación
     } catch (error) {
       console.error("Error en la solicitud:", error);
+      alert("Ocurrió un error al enviar los datos.");
     }
-  };
+  }, [memoCode, file, bonitaData, notificaciones]);
 
   return (
     <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
@@ -166,8 +183,8 @@ export default function UploadForm() {
           {notificaciones.length === 0 ? (
             <li className="text-gray-500">No hay notificaciones aún.</li>
           ) : (
-            notificaciones.map((noti) => (
-              <li key={noti} className="text-green-600">
+            notificaciones.map((noti, index) => (
+              <li key={index} className="text-green-600">
                 {noti}
               </li>
             ))
