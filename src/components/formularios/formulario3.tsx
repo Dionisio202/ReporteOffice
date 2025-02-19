@@ -19,17 +19,20 @@ export default function UploadForm() {
     string | null
   >(null);
   const [isNextDisabled, setIsNextDisabled] = useState(true);
+  const [tipoMemorando, setTipoMemorando] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState<ModalData | null>(null);
   const [loading, setLoading] = useState(false); // Estado para el indicador de carga
   const bonita: BonitaUtilities = new BonitaUtilities();
+  const handleTipoMemorandoChange = (e: any) => {
+    setTipoMemorando(e.target.value);
+  };
 
   // Usamos el servicio modificado: únicamente obtenerDatosBonita y obtenerUsuarioAutenticado
   const { obtenerDatosBonita, obtenerUsuarioAutenticado } = useBonitaService();
 
   const [bonitaData, setBonitaData] = useState<any>(null);
   const [jsonAutroes, setJsonAutores] = useState<any>(null);
-  const [jsonProductos, setJsonProductos] = useState<any>(null);
 
   // Efecto para obtener los datos de Bonita usando las APIs sin privilegios de admin
   useEffect(() => {
@@ -126,7 +129,7 @@ export default function UploadForm() {
 
           if (response && response.success) {
             setJsonAutores(JSON.parse(response.autores));
-            setJsonProductos(JSON.parse(response.productos));
+            console.log("📢 Documentos procesados correctamente:", response);
             setModalData({
               success: response.success,
               message: response.message,
@@ -167,41 +170,48 @@ export default function UploadForm() {
       if (!authorDataFileBase64 || !intellectualPropertyFileBase64) {
         throw new Error("No se encontraron los archivos base64.");
       }
-      editedData.tipo = 1;
-      editedData.productos = jsonProductos.productos
+      // Se establece el tipo y se asignan los productos extraídos del JSON de productos
+      editedData.tipo = parseInt(tipoMemorando);
+
       console.log("Json de productos editados:", editedData);
       console.log("Json de autores editados:", jsonAutroes);
-      // Enviar los datos editados al backend
+
+      // Enviar los datos editados al backend como JSON string
       socket.emit(
         "agregar_producto_datos",
         {
-          id_registro: bonitaData.processId + "-" + bonitaData.caseId,
-          jsonProductos: editedData,
+          id_registro: `${bonitaData.processId}-${bonitaData.caseId}`,
+          jsonProductos: JSON.stringify(editedData), // Se envía como cadena
           memorando: editedData.codigoMemorando,
         },
         (response: any) => {
           if (response.success) {
+            const codigoCombinado =
+              bonitaData.processId + "-" + bonitaData.caseId;
+            console.log("📢 ID", codigoCombinado);
             console.log("📢 Datos editados guardados correctamente:", response);
             alert("Datos editados guardados correctamente.");
-          } else {
-            console.error(
-              "❌ Error al guardar los datos editados:",
-              response.message
+            alert("Insertando autores...");
+            // Enviar los autores, también convertidos a cadena JSON
+            socket.emit(
+              "set_autores",
+              {
+                codigo: codigoCombinado,
+                autores: JSON.stringify(jsonAutroes),
+              },
+              (response: any) => {
+                if (response.success) {
+                  console.log("📢 Autores guardados correctamente:", response);
+                  alert("Datos editados guardados correctamente.");
+                } else {
+                  console.error(
+                    "❌ Error al guardar los autores:",
+                    response.message
+                  );
+                  alert("Error al guardar los datos editados.");
+                }
+              }
             );
-            alert("Error al guardar los datos editados.");
-          }
-        }
-      );
-      socket.emit(
-        "set_autores",
-        {
-          codigo: editedData.codigoMemorando,
-          autores: jsonAutroes
-        },
-        (response: any) => {
-          if (response.success) {
-            console.log("📢 Datos editados guardados correctamente:", response);
-            alert("Datos editados guardados correctamente.");
           } else {
             console.error(
               "❌ Error al guardar los datos editados:",
@@ -298,6 +308,8 @@ export default function UploadForm() {
             closeModal={closeModal}
             modalData={modalData}
             onSave={handleSaveEditedData}
+            tipoMemorando={tipoMemorando}
+            handleTipoMemorandoChange={handleTipoMemorandoChange}
           />
         )}
       </form>
