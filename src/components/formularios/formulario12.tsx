@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import DocumentViewer from "../files/DocumentViewer"; // Importa tu componente de visor de documentos
 // @ts-ignore
 import BonitaUtilities  from "../bonita/bonita-utilities";
-
+import { useBonitaService } from "../../services/bonita.service";
 import io from "socket.io-client";
 import { SERVER_BACK_URL } from "../../config.ts";
 const socket = io(SERVER_BACK_URL);
@@ -23,6 +23,8 @@ const staticDocuments: Record<string, DocumentType> = {
 };
 
 export default function WebPage() {
+  // @ts-ignore
+  const { obtenerUsuarioAutenticado, obtenerDatosBonita, error } = useBonitaService();
   const urlSave = `${SERVER_BACK_URL}/api/save-document`;
   const [codigo, setCodigo] = useState(""); // Código del comprobante
   const [codigoGuardado, setCodigoGuardado] = useState<string | null>(null); // Código guardado después de hacer clic en Siguiente
@@ -31,14 +33,49 @@ export default function WebPage() {
   const[codigoalmacenamiento, setCodigoAlmacenamiento] = useState<string>("");
   // Inicializamos selectedDocument con el documento predeterminado
   const [selectedDocument, setSelectedDocument] = useState<DocumentType>(staticDocuments.datos);
-
+  const [usuario, setUsuario] = useState<{
+    user_id: string;
+    user_name: string;
+  } | null>(null);
+  const [bonitaData, setBonitaData] = useState<{
+    processId: string;
+    taskId: string;
+    caseId: string;
+    processName: string;
+  } | null>(null);
   const handleCodigoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCodigo(e.target.value);
   };
+   // 🔹 Obtener el usuario autenticado al montar el componente
+   useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await obtenerUsuarioAutenticado();
+      if (userData) {
+        setUsuario(userData);
+      }
+    };
+    fetchUser();
+  }, [obtenerUsuarioAutenticado]);
+
+  // 🔹 Obtener datos de Bonita una vez que se tenga el usuario
+  useEffect(() => {
+    if (!usuario) return;
+    const fetchData = async () => {
+      try {
+        const data = await obtenerDatosBonita(usuario.user_id);
+        if (data) {
+          setBonitaData(data);
+        }
+      } catch (error) {
+        console.error("❌ Error obteniendo datos de Bonita:", error);
+      }
+    };
+    fetchData();
+  }, [usuario, obtenerDatosBonita]);
 
   useEffect(() => {
     // Emitir el evento para obtener el código de almacenamiento
-    socket.emit("obtener_codigo_almacenamiento", { id_registro: "3", id_tipo_documento: 6 }, (response: any) => {
+    socket.emit("obtener_codigo_almacenamiento", { id_registro:`${bonitaData?.processId}-${bonitaData?.caseId}`, id_tipo_documento: 6 }, (response: any) => {
       if (response.success) {
         console.log("Dato recibido:", response.jsonData);
         setCodigoAlmacenamiento(response.jsonData);
