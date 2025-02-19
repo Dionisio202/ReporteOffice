@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CardContainer from "./components/CardContainer";
 import UploadFile from "./components/UploadFile";
 // @ts-ignore
@@ -6,8 +6,10 @@ import BonitaUtilities  from "../bonita/bonita-utilities";
 import Button from "../UI/button";
 import Title from "./components/TitleProps";
 import { SERVER_BACK_URL } from "../../config.ts";
+import { useBonitaService } from "../../services/bonita.service";
 
 export default function ConfirmationScreen() {
+  const { obtenerUsuarioAutenticado, obtenerDatosBonita } = useBonitaService();
   const [file, setFile] = useState<File | null>(null);
   const bonita = new BonitaUtilities();
 
@@ -20,6 +22,39 @@ export default function ConfirmationScreen() {
       alert("Ocurrió un error al intentar avanzar.");
     }
   };
+
+        // Obtener datos del formulario
+        const [usuario, setUsuario] = useState<{
+          user_id: string;
+          user_name: string;
+        } | null>(null);
+        const [bonitaData, setBonitaData] = useState<{
+          processId: string;
+          taskId: string;
+          caseId: string;
+          processName: string;
+        } | null>(null);
+        useEffect(() => {
+          const fetchUser = async () => {
+            const userData = await obtenerUsuarioAutenticado();
+            if (userData) setUsuario(userData);
+          };
+          fetchUser();
+        }, []);
+        useEffect(() => {
+          if (!usuario) return;
+          const fetchData = async () => {
+            try {
+              const data = await obtenerDatosBonita(usuario.user_id);
+              if (data) {
+                setBonitaData(data);
+              }
+            } catch (error) {
+              console.error("❌ Error obteniendo datos de Bonita:", error);
+            }
+          };
+          fetchData();
+        }, [usuario, obtenerDatosBonita]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -48,8 +83,8 @@ export default function ConfirmationScreen() {
 
     // Construir el payload para enviar al servidor
     const payload = {
-      nombre: baseName + "_3-Test009",
-      id_registro_per: "3",
+      nombre: baseName+`_${bonitaData?.processId}-${bonitaData?.caseId}-${bonitaData?.taskId}`,
+      id_registro_per: `${bonitaData?.processId}-${bonitaData?.caseId}`,
       id_tipo_documento: "6",
       document: fileBase64,
     };

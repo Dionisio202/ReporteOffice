@@ -145,6 +145,8 @@ export default function WebPage() {
       caseId: string,
       assigned_id: string
     ) => {
+      console.log("Enviando datos al backend...");
+      console.log(idProceso, name, caseId, assigned_id);
       return new Promise((resolve, reject) => {
         const id_proceso_bigint = BigInt(idProceso);
         const id_caso_num = Number(caseId);
