@@ -9,7 +9,6 @@ export default function MemoCodeForm() {
   const [memoCode, setMemoCode] = useState("");
   const [loading, setLoading] = useState(false);
   // @ts-ignore
-
   const [error2, setError] = useState("");
   const bonita: BonitaUtilities = new BonitaUtilities();
 
@@ -54,6 +53,33 @@ export default function MemoCodeForm() {
   };
 
  
+
+  // 🔹 Obtener el usuario autenticado al montar el componente
+    useEffect(() => {
+      const fetchUser = async () => {
+        const userData = await obtenerUsuarioAutenticado();
+        if (userData) {
+          setUsuario(userData);
+        }
+      };
+      fetchUser();
+    }, [obtenerUsuarioAutenticado]);
+  
+    // 🔹 Obtener datos de Bonita una vez que se tenga el usuario
+    useEffect(() => {
+      if (!usuario) return;
+      const fetchData = async () => {
+        try {
+          const data = await obtenerDatosBonita(usuario.user_id);
+          if (data) {
+            setBonitaData(data);
+          }
+        } catch (error) {
+          console.error("❌ Error obteniendo datos de Bonita:", error);
+        }
+      };
+      fetchData();
+    }, [usuario, obtenerDatosBonita]);
 
   // 🔹 Obtener el usuario autenticado al montar el componente
     useEffect(() => {
