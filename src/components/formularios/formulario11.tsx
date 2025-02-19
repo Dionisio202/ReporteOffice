@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import CardContainer from "./components/CardContainer";
 import UploadFile from "./components/UploadFile";
 // @ts-ignore
-import BonitaUtilities  from "../bonita/bonita-utilities";
+import BonitaUtilities from "../bonita/bonita-utilities";
 import Button from "../UI/button";
 import Title from "./components/TitleProps";
 import { SERVER_BACK_URL } from "../../config.ts";
@@ -12,39 +12,43 @@ const Formulario11: React.FC = () => {
   const { obtenerUsuarioAutenticado, obtenerDatosBonita } = useBonitaService();
   const [file, setFile] = useState<File | null>(null);
   const bonita: BonitaUtilities = new BonitaUtilities();
+  const [notificaciones, setNotificaciones] = useState<string[]>([]);
 
-// Obtener datos del formulario
-      const [usuario, setUsuario] = useState<{
-        user_id: string;
-        user_name: string;
-      } | null>(null);
-      const [bonitaData, setBonitaData] = useState<{
-        processId: string;
-        taskId: string;
-        caseId: string;
-        processName: string;
-      } | null>(null);
-      useEffect(() => {
-        const fetchUser = async () => {
-          const userData = await obtenerUsuarioAutenticado();
-          if (userData) setUsuario(userData);
-        };
-        fetchUser();
-      }, []);
-      useEffect(() => {
-        if (!usuario) return;
-        const fetchData = async () => {
-          try {
-            const data = await obtenerDatosBonita(usuario.user_id);
-            if (data) {
-              setBonitaData(data);
-            }
-          } catch (error) {
-            console.error("❌ Error obteniendo datos de Bonita:", error);
-          }
-        };
-        fetchData();
-      }, [usuario, obtenerDatosBonita]);
+  // @ts-ignore
+  const [isSubmitted, setIsSubmitted] = useState(false); // Nuevo estado para controlar el envío
+
+  // Obtener datos del formulario
+  const [usuario, setUsuario] = useState<{
+    user_id: string;
+    user_name: string;
+  } | null>(null);
+  const [bonitaData, setBonitaData] = useState<{
+    processId: string;
+    taskId: string;
+    caseId: string;
+    processName: string;
+  } | null>(null);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await obtenerUsuarioAutenticado();
+      if (userData) setUsuario(userData);
+    };
+    fetchUser();
+  }, []);
+  useEffect(() => {
+    if (!usuario) return;
+    const fetchData = async () => {
+      try {
+        const data = await obtenerDatosBonita(usuario.user_id);
+        if (data) {
+          setBonitaData(data);
+        }
+      } catch (error) {
+        console.error("❌ Error obteniendo datos de Bonita:", error);
+      }
+    };
+    fetchData();
+  }, [usuario, obtenerDatosBonita]);
 
   const handleNext = async () => {
     try {
@@ -66,7 +70,8 @@ const Formulario11: React.FC = () => {
 
     const fileName = file.name;
     const dotIndex = fileName.lastIndexOf(".");
-    const baseName = dotIndex !== -1 ? fileName.substring(0, dotIndex) : fileName;
+    const baseName =
+      dotIndex !== -1 ? fileName.substring(0, dotIndex) : fileName;
 
     const fileBase64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -80,8 +85,10 @@ const Formulario11: React.FC = () => {
     });
 
     const payload = {
-      nombre: baseName+`_${bonitaData?.processId}-${bonitaData?.caseId}-${bonitaData?.taskId}`,
-      id_registro_per: `${bonitaData?.processId}-${bonitaData?.caseId}`,       // Ajusta según tu lógica
+      nombre:
+        baseName +
+        `_${bonitaData?.processId}-${bonitaData?.caseId}-${bonitaData?.taskId}`,
+      id_registro_per: `${bonitaData?.processId}-${bonitaData?.caseId}`, // Ajusta según tu lógica
       id_tipo_documento: "6",
       document: fileBase64,
     };
@@ -97,6 +104,9 @@ const Formulario11: React.FC = () => {
 
       const data = await response.json();
       console.log("Respuesta del servidor:", data);
+      setIsSubmitted(true);
+      setNotificaciones([...notificaciones, "Datos enviados correctamente."]);
+      alert("Datos enviados correctamente."); // Mensaje de confirmación
     } catch (error) {
       console.error("Error en la solicitud:", error);
     }
@@ -104,19 +114,50 @@ const Formulario11: React.FC = () => {
 
   return (
     <CardContainer title="Registro de Propiedad Intelectual">
-      <form onSubmit={handleSubmit} className="w-full max-w-lg p-6 rounded-lg shadow-lg">
-        <Title text="Comprobante de Pago Senadi" size="2xl" className="text-center mb-1" />
-       
-        <UploadFile id="document-file" onFileChange={setFile} label="Subir comprobante de pago  de la solucitud del registro de la propiedad intelectual" />
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-lg p-6 rounded-lg shadow-lg"
+      >
+        <Title
+          text="Comprobante de Pago Senadi"
+          size="2xl"
+          className="text-center mb-1"
+        />
 
-        <Button type="submit" className="mt-5 w-full bg-blue-600 text-white px-6 rounded hover:bg-blue-700">
+        <UploadFile
+          id="document-file"
+          onFileChange={setFile}
+          label="Subir comprobante de pago  de la solucitud del registro de la propiedad intelectual"
+        />
+
+        <Button
+          type="submit"
+          className="mt-5 w-full bg-blue-600 text-white px-6 rounded hover:bg-blue-700"
+        >
           Enviar Datos
         </Button>
 
-        <Button className="mt-5 bg-[#931D21] text-white rounded-lg px-6 min-w-full hover:bg-blue-700" onClick={handleNext}>
+        <Button
+          className="mt-5 bg-[#931D21] text-white rounded-lg px-6 min-w-full hover:bg-blue-700"
+          onClick={handleNext}
+        >
           Siguiente Proceso
         </Button>
       </form>
+      <div className="mt-6 w-full max-w-lg">
+        <h2 className="text-lg font-semibold">Notificaciones</h2>
+        <ul className="bg-white p-4 rounded-lg shadow">
+          {notificaciones.length === 0 ? (
+            <li className="text-gray-500">No hay notificaciones aún.</li>
+          ) : (
+            notificaciones.map((noti, index) => (
+              <li key={index} className="text-green-600">
+                {noti}
+              </li>
+            ))
+          )}
+        </ul>
+      </div>
     </CardContainer>
   );
 };
