@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect,} from "react";
 import { EmailInput } from "./components/EmailInput";
 import DocumentViewer from "../files/DocumentViewer";
 import Title from "./components/TitleProps";
 import io from "socket.io-client";
-import {Proceso, Tarea} from "../../interfaces/bonita.interface"
-import { SERVER_BACK_URL, SERVER_BONITA_URL } from "../../config.ts";
+import { SERVER_BACK_URL } from "../../config.ts";
+import { useBonitaService } from "../../services/bonita.service";
+
 // Fuera del componente, crea una única instancia de socket
 const socket = io(SERVER_BACK_URL);
 
@@ -15,7 +16,7 @@ type DocumentType = {
   nombre: string;
 };
 
-// Simulamos documentos precargados estáticamente (solo .docx)
+// Documentos precargados (estáticos)
 const staticDocuments: Record<string, DocumentType> = {
   datos: {
     key: "jfda-001",
@@ -30,13 +31,14 @@ const staticDocuments: Record<string, DocumentType> = {
 };
 
 export default function WebPage() {
-  const urlSaveDocument = SERVER_BACK_URL+"/api/save-document";
+  const urlSaveDocument = SERVER_BACK_URL + "/api/save-document";
   const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(null);
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
-  // @ts-ignore
   const [loading, setLoading] = useState<boolean>(false);
-  // @ts-ignore
   const [error, setError] = useState<string | null>(null);
+
+  // Usamos el servicio actualizado de Bonita (solo con las APIs públicas)
+  const { obtenerDatosBonita, obtenerUsuarioAutenticado, error: bonitaError } = useBonitaService();
 
   // Verificar conexión WebSocket
   useEffect(() => {
@@ -59,174 +61,60 @@ export default function WebPage() {
     };
   }, []);
 
-  // Función para obtener el ID y el nombre del proceso
-  const obtenerIdProceso = useCallback(async (): Promise<{ id: string; name: string } | null> => {
-    try {
-    
-
-      const response = await fetch(
-        `${SERVER_BONITA_URL}/bonita/API/bpm/process?p=0`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Bonita-API-Token": "tu_token_aqui",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-
-      const jsonData: Proceso[] = await response.json();
-
-      if (process.env.NODE_ENV === "development") {
-        console.log("Respuesta de la API de Bonita (procesos):", jsonData);
-      }
-
-      if (jsonData.length === 0) {
-        throw new Error("No se encontraron procesos.");
-      }
-
-      const proceso = jsonData[0];
-
-      if (process.env.NODE_ENV === "development") {
-        console.log("ID y nombre del proceso obtenido:", proceso.id, proceso.name);
-      }
-
-      return { id: proceso.id, name: proceso.name };
-    } catch (error) {
-      console.error("Error al obtener el ID y el nombre del proceso:", error);
-      setError(`Error al obtener el ID y el nombre del proceso: ${error instanceof Error ? error.message : "Error desconocido"}`);
-      return null;
-    }
-  }, []);
-
-  // Función para obtener las tareas relacionadas con el proceso
-  const obtenerTareas = useCallback(async (processId: string): Promise<Tarea[] | null> => {
-    try {
-    
-
-      const response = await fetch(
-        `${SERVER_BONITA_URL}/bonita/API/bpm/task?p=0&c=10&f=processId=${processId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Bonita-API-Token": "tu_token_aqui",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-
-      const jsonData: Tarea[] = await response.json();
-
-      
-
-      return jsonData;
-    } catch (error) {
-      console.error("Error al obtener las tareas:", error);
-      setError(`Error al obtener las tareas: ${error instanceof Error ? error.message : "Error desconocido"}`);
-      return null;
-    }
-  }, []);
-
-  // Función para enviar los datos al backend a través de WebSockets
-  const enviarDatosAlBackend = useCallback(
-    async (
-      idProceso: string,
-      name: string,
-      caseId: string,
-      assigned_id: string
-    ) => {
-      return new Promise((resolve, reject) => {
-        const id_proceso_bigint = BigInt(idProceso);
-        const id_caso_num = Number(caseId);
-        const id_funcionario_int = Number(assigned_id);
-
-        if (isNaN(id_caso_num) || isNaN(id_funcionario_int)) {
-          console.error("Error: Los datos no son números válidos");
-          reject("Error: Los datos no son números válidos");
-          return;
-        }
-
-        const datosParaEnviar = {
-          id_funcionario: id_funcionario_int,
-          id_proceso: id_proceso_bigint.toString(),
-          id_caso: id_caso_num,
-          nombre_proceso: name,
-        };
-
-       
-
-        socket.emit("iniciar_registro", datosParaEnviar, (response:any) => {
-          console.log("Respuesta completa del backend:", response);
-          if (response.success) {
-            resolve(response);
-          } else {
-            console.error("Error en el backend:", response.message);
-            reject(response.message);
-          }
-        });
-        
-      });
-    },
-    [socket]
-  );
-
-  // Llamar a la función al cargar el componente (solo una vez)
+  // Obtener datos de Bonita (usuario y tarea actual) y enviarlos al backend
   useEffect(() => {
     let isMounted = true;
 
-    const fetchData = async () => {
-      if (isMounted) {
+    const fetchBonitaData = async () => {
+      try {
         setLoading(true);
         setError(null);
 
-        try {
-          const proceso = await obtenerIdProceso();
-          if (proceso && isMounted) {
-            const tareas = await obtenerTareas(proceso.id);
-            if (tareas && tareas.length > 0 && isMounted) {
-              const primeraTarea = tareas[0];
-              if (process.env.NODE_ENV === "development") {
-                console.log("Enviando datos de la primera tarea:", primeraTarea);
-              }
-              await enviarDatosAlBackend(
-                proceso.id,
-                proceso.name,
-                primeraTarea.caseId,
-                primeraTarea.assigned_id
-              );
+        // 1. Obtener el usuario autenticado
+        const usuario = await obtenerUsuarioAutenticado();
+        if (usuario) {
+          // 2. Obtener la tarea actual y demás datos asociados (a través de obtenerDatosBonita)
+          const bonitaData = await obtenerDatosBonita(usuario.user_id);
+          if (bonitaData && isMounted) {
+            console.log("Datos de Bonita obtenidos:", bonitaData);
+            //Preparar el json de envio de datos al backend
+            const data = {
+              id_proceso: bonitaData.processId,
+              nombre_proceso: bonitaData.processName,
+              id_funcionario: usuario.user_id,
+              id_caso: bonitaData.caseId,
             }
+            // Enviar los datos al backend vía WebSocket
+            socket.emit("iniciar_registro", data, (response: any) => {
+              console.log("Respuesta completa del backend:", response);
+              if (response.success) {
+                console.log("Datos enviados correctamente.");
+              } else {
+                console.error("Error en el backend:", response.message);
+              }
+            });
           }
-        } catch (error) {
-          console.error("Error en la carga de datos:", error);
-          setError(
-            `Error en la carga de datos: ${
-              error instanceof Error ? error.message : "Error desconocido"
-            }`
-          );
-        } finally {
-          if (isMounted) {
-            setLoading(false);
-          }
+        }
+      } catch (error) {
+        console.error("Error en la carga de datos de Bonita:", error);
+        setError(
+          `Error en la carga de datos: ${
+            error instanceof Error ? error.message : "Error desconocido"
+          }`
+        );
+      } finally {
+        if (isMounted) {
+          setLoading(false);
         }
       }
     };
 
-    fetchData();
+    fetchBonitaData();
 
     return () => {
       isMounted = false;
     };
-  }, [obtenerIdProceso, obtenerTareas, enviarDatosAlBackend]);
+  }, [obtenerDatosBonita, obtenerUsuarioAutenticado]);
 
   // Seleccionar documento a visualizar
   const handleViewDocument = (documentType: keyof typeof staticDocuments) => {
@@ -276,14 +164,12 @@ export default function WebPage() {
                   <tr key={doc.type} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-1 text-xs">{doc.label}</td>
                     <td className="px-4 py-1 text-xs flex items-center space-x-4">
-                      {/* Checkbox */}
                       <input
                         type="checkbox"
                         checked={selectedDocs.has(doc.type)}
                         onChange={() => handleCheckboxChange(doc.type as keyof typeof staticDocuments)}
                         className="h-4 w-4"
                       />
-                      {/* Botón para visualizar */}
                       <button
                         onClick={() => handleViewDocument(doc.type as keyof typeof staticDocuments)}
                         className="bg-[#931D21] text-white py-1 px-4 rounded hover:bg-blue-500 transition duration-300"
@@ -306,13 +192,13 @@ export default function WebPage() {
         {/* Panel Derecho - Visor de documentos */}
         <div className="w-full h-full md:w-3/4 pl-6 mt-0.5">
           {selectedDocument ? (
-          <DocumentViewer
-          keyDocument={selectedDocument.key}
-          title={selectedDocument.title}
-          documentName={selectedDocument.nombre}
-          mode="edit"
-          callbackUrl= {urlSaveDocument}
-        />
+            <DocumentViewer
+              keyDocument={selectedDocument.key}
+              title={selectedDocument.title}
+              documentName={selectedDocument.nombre}
+              mode="edit"
+              callbackUrl={urlSaveDocument}
+            />
           ) : (
             <p className="text-center text-gray-500">
               Selecciona un documento para visualizarlo

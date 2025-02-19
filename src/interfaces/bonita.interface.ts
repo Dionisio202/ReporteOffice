@@ -29,8 +29,10 @@ export interface Proceso {
 
 export interface Tarea {
   id: string;
+  name: string;
   processId: string;
   caseId: string;
   displayName: string;
   assigned_id: string;
+  last_update_date : string;
 }

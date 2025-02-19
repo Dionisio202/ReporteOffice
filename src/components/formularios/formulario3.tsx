@@ -6,69 +6,53 @@ import Modal from "./components/Modal";
 import UploadFile from "./components/UploadFile";
 import { ModalData } from "../../interfaces/registros.interface"; // Asegúrate de que la ruta sea correcta
 // @ts-ignore
-import BonitaUtilities  from "../bonita/bonita-utilities";
+import BonitaUtilities from "../bonita/bonita-utilities";
 import { useBonitaService } from "../../services/bonita.service";
 import { SERVER_BACK_URL } from "../../config.ts";
+
 const socket = io(SERVER_BACK_URL); // Conecta con el backend
 
 export default function UploadForm() {
   const [intellectualPropertyFileBase64, setIntellectualPropertyFileBase64] =
     useState<string | null>(null);
-  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<
-    string | null
-  >(null);
+  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<string | null>(null);
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState<ModalData | null>(null);
   const [loading, setLoading] = useState(false); // Estado para el indicador de carga
   const bonita: BonitaUtilities = new BonitaUtilities();
-  const { obtenerIdProceso, obtenerTareas } = useBonitaService(); // Usa el servicio
+  
+  // Usamos el servicio modificado: únicamente obtenerDatosBonita y obtenerUsuarioAutenticado
+  const { obtenerDatosBonita, obtenerUsuarioAutenticado } = useBonitaService();
 
-  // Efecto para obtener el ID del proceso y las tareas (solo una vez)
+  // Efecto para obtener los datos de Bonita usando las APIs sin privilegios de admin
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Obtener el ID del proceso
-        const proceso = await obtenerIdProceso();
-        console.log("Proceso obtenido:", proceso);
-
-        if (proceso) {
-          // Obtener las tareas relacionadas con el proceso
-          const tareas = await obtenerTareas(proceso.id);
-          console.log("Tareas obtenidas:", tareas);
-
-          if (tareas && tareas.length > 0) {
-            // Crear un objeto JSON con la información obtenida
-            const bonitaData = {
-              id_proceso: proceso.id,
-              nombre_proceso: proceso.name,
-              id_tarea: tareas[0].id,
-              assigned_id: tareas[0].assigned_id,
-              caseId: tareas[0].caseId,
-            };
-
+        // 1. Obtener el usuario autenticado
+        const usuario = await obtenerUsuarioAutenticado();
+        if (usuario) {
+          // 2. Con el user_id, obtener la tarea actual y datos asociados
+          const bonitaData = await obtenerDatosBonita(usuario.user_id);
+          if (bonitaData) {
             console.log("Datos de Bonita:", bonitaData);
-
             // Enviar los datos al servidor a través del socket
-            socket.emit("guardar_datos_bonita", bonitaData, (response:any) => {
+            socket.emit("guardar_datos_bonita", bonitaData, (response: any) => {
               if (response && response.success) {
                 console.log("Respuesta del servidor:", response);
               } else {
-                console.error(
-                  "Error en la respuesta del servidor:",
-                  response?.message
-                );
+                console.error("Error en la respuesta del servidor:", response?.message);
               }
             });
           }
         }
       } catch (error) {
-        console.error("Error al obtener el proceso o las tareas:", error);
+        console.error("Error al obtener datos de Bonita:", error);
       }
     };
 
-    fetchData(); // Llamar a la función para obtener los datos
-  }, [obtenerIdProceso, obtenerTareas]); // Dependencias para evitar warnings de React
+    fetchData();
+  }, [obtenerDatosBonita, obtenerUsuarioAutenticado]);
 
   // Función para manejar cambios en los archivos
   const handleFileChange = useCallback(
@@ -276,11 +260,7 @@ export default function UploadForm() {
           <Button
             className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
             onClick={handleSave}
-            disabled={
-              !intellectualPropertyFileBase64 ||
-              !authorDataFileBase64 ||
-              loading
-            }
+            disabled={!intellectualPropertyFileBase64 || !authorDataFileBase64 || loading}
           >
             {loading ? "Procesando..." : "Guardar"}
           </Button>
