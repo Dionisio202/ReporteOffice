@@ -25,32 +25,7 @@ export default function MemoCodeForm() {
     caseId: string;
     processName: string;
   } | null>(null);
-  const handleSubmit = async () => {
-  
-    try {
-      setLoading(true);
-      setError("");
-  
-      const response = await fetch(`${SERVER_BACK_URL}/api/save-memorando?key=${memoCode}&id_tipo_documento=${id_tipo_documento}&id_registro=${bonitaData?.processId}-${bonitaData?.caseId}`);
-      
-      if (!response.ok) {
-        throw new Error('Error al guardar el memorando');
-      }
-      alert("Avanzando a la siguiente página...");
-      bonita.changeTask();
-      setLoading(false);
-
-      const data = await response.json();
-      console.log("Memorando guardado:", data);
-
-     
-    } catch (err) {
-      setError("Error al guardar el memorando. Verifica el código e intenta nuevamente.");
-      console.error("Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+ 
 
  
 
@@ -108,13 +83,38 @@ export default function MemoCodeForm() {
       fetchData();
     }, [usuario, obtenerDatosBonita]);
 
+    const handleSubmit = async () => {
+  
+      try {
+        setError("");
+        alert("Avanzando a la siguiente página...");
+        bonita.changeTask();
+  
+        const response = await fetch(`${SERVER_BACK_URL}/api/save-memorando?key=${memoCode}&id_tipo_documento=${id_tipo_documento}&id_registro=${bonitaData?.processId}-${bonitaData?.caseId}`);
+        
+        if (!response.ok) {
+          throw new Error('Error al guardar el memorando');
+        }
+        
+        const data = await response.json();
+        console.log("Memorando guardado:", data);
+  
+       
+      } catch (err) {
+        setError("Error al guardar el memorando. Verifica el código e intenta nuevamente.");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
   return (
     <CardContainer title="Contrato Cesión de Derechos Patrimoniales">
       <Title
         text="Solicitud para firma de Rector"
         className="text-center text-gray-800 mb-3 text-lg"
       />
-      <form  className="flex flex-col space-y-4">
+      <div  className="flex flex-col space-y-4">
         <div>
           <label htmlFor="memoCode" className="block font-semibold">
             Ingrese el código del memorando generado para solicitud
@@ -138,7 +138,7 @@ export default function MemoCodeForm() {
         >
           {loading ? "Enviando..." : "Siguiente"}
         </button>
-      </form>
+      </div>
     </CardContainer>
   );
 }
