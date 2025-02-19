@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import UploadFile from "./components/UploadFile"; // Componente para cargar archivos
 // @ts-ignore
-import BonitaUtilities  from "../bonita/bonita-utilities";
+import BonitaUtilities from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 import Button from "../UI/button";
 import { SERVER_BACK_URL } from "../../config.ts";
@@ -12,7 +12,41 @@ export default function UploadForm() {
   const [memoCode, setMemoCode] = useState("");
   const [notificaciones] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
+  const [usuario, setUsuario] = useState<{ user_id: string; user_name: string } | null>(null);
+  const [bonitaData, setBonitaData] = useState<{
+    processId: string;
+    taskId: string;
+    caseId: string;
+    processName: string;
+  } | null>(null);
+
+  // Instancia de BonitaUtilities
   const bonita: BonitaUtilities = new BonitaUtilities();
+
+  // Obtener usuario autenticado
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await obtenerUsuarioAutenticado();
+      if (userData) setUsuario(userData);
+    };
+    fetchUser();
+  }, [obtenerUsuarioAutenticado]);
+
+  // Obtener datos de Bonita cuando el usuario ya esté disponible
+  useEffect(() => {
+    if (!usuario) return;
+    const fetchData = async () => {
+      try {
+        const data = await obtenerDatosBonita(usuario.user_id);
+        if (data) {
+          setBonitaData(data);
+        }
+      } catch (error) {
+        console.error("❌ Error obteniendo datos de Bonita:", error);
+      }
+    };
+    fetchData();
+  }, [usuario, obtenerDatosBonita]);
 
   const handleNext = async () => {
     try {
@@ -37,18 +71,16 @@ export default function UploadForm() {
       return;
     }
 
-    // Extraer el nombre del archivo sin la extensión (por ejemplo, "edison202" de "edison202.pdf")
+    // Extraer el nombre del archivo sin la extensión
     const fileName = file.name;
     const dotIndex = fileName.lastIndexOf(".");
     const baseName = dotIndex !== -1 ? fileName.substring(0, dotIndex) : fileName;
 
     // Convertir el archivo a base64 usando FileReader
-    const fileBase64 = await new Promise((resolve, reject) => {
+    const fileBase64 = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        // El resultado viene en el formato: "data:<mime type>;base64,<base64String>"
-        // Separamos y tomamos solo la parte base64
         const result = reader.result as string;
         const base64String = result.split(",")[1];
         resolve(base64String);
@@ -56,47 +88,14 @@ export default function UploadForm() {
       reader.onerror = (error) => reject(error);
     });
 
-      // Obtener datos del formulario
-      const [usuario, setUsuario] = useState<{
-        user_id: string;
-        user_name: string;
-      } | null>(null);
-      const [bonitaData, setBonitaData] = useState<{
-        processId: string;
-        taskId: string;
-        caseId: string;
-        processName: string;
-      } | null>(null);
-      useEffect(() => {
-        const fetchUser = async () => {
-          const userData = await obtenerUsuarioAutenticado();
-          if (userData) setUsuario(userData);
-        };
-        fetchUser();
-      }, []);
-      useEffect(() => {
-        if (!usuario) return;
-        const fetchData = async () => {
-          try {
-            const data = await obtenerDatosBonita(usuario.user_id);
-            if (data) {
-              setBonitaData(data);
-            }
-          } catch (error) {
-            console.error("❌ Error obteniendo datos de Bonita:", error);
-          }
-        };
-        fetchData();
-      }, [usuario, obtenerDatosBonita]);
-
     // Construir el payload para enviar al back-end
     const payload = {
-      // "nombre" se usará para formar el nombre final del documento en el back-end (se agregará la extensión)
-      nombre: baseName+`_${bonitaData?.processId}-${bonitaData?.caseId}-${bonitaData?.taskId}`,
-      id_registro_per: `${bonitaData?.processId}-${bonitaData?.caseId}`,       // Ajusta según tu lógica
-      id_tipo_documento: "3",      // Ajusta según tu lógica
-      document: fileBase64,        // Archivo en base64
-      memorando: memoCode,         // Valor del código del memorando
+      // "nombre" se usará para formar el nombre final del documento (se agregará la extensión en el back-end)
+      nombre: baseName + `_${bonitaData?.processId}-${bonitaData?.caseId}-${bonitaData?.taskId}`,
+      id_registro_per: `${bonitaData?.processId}-${bonitaData?.caseId}`, // Ajusta según tu lógica
+      id_tipo_documento: "3", // Ajusta según tu lógica
+      document: fileBase64,   // Archivo en base64
+      memorando: memoCode,    // Valor del código del memorando
     };
 
     try {
@@ -117,10 +116,7 @@ export default function UploadForm() {
 
   return (
     <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg"
-      >
+      <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
         <Title
           text="Solicitud de Certificación Presupuestaria"
           size="2xl"
