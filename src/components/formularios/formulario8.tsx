@@ -1,19 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CardContainer from "./components/CardContainer";
 // @ts-ignore
 import BonitaUtilities  from "../bonita/bonita-utilities";
 import Title from "./components/TitleProps";
 import { SERVER_BACK_URL } from "../../config.ts";
+import { useBonitaService } from "../../services/bonita.service";
 export default function MemoCodeForm() {
   const [memoCode, setMemoCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error2, setError] = useState("");
   const bonita: BonitaUtilities = new BonitaUtilities();
 
   // Valores que deberías obtener de tu aplicación (pueden venir por props o contexto)
   const id_registro = "7540851946479253287-2001"; // Ejemplo, reemplazar con valor real
   const id_tipo_documento = 3; // Ejemplo, reemplazar con valor real
-
+  const { obtenerUsuarioAutenticado, obtenerDatosBonita, error } = useBonitaService();
+  const [usuario, setUsuario] = useState<{
+    user_id: string;
+    user_name: string;
+  } | null>(null);
+  const [bonitaData, setBonitaData] = useState<{
+    processId: string;
+    taskId: string;
+    caseId: string;
+    processName: string;
+  } | null>(null);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
@@ -42,6 +53,33 @@ export default function MemoCodeForm() {
     alert("Avanzando a la siguiente página...");
     bonita.changeTask();
   };
+
+  // 🔹 Obtener el usuario autenticado al montar el componente
+    useEffect(() => {
+      const fetchUser = async () => {
+        const userData = await obtenerUsuarioAutenticado();
+        if (userData) {
+          setUsuario(userData);
+        }
+      };
+      fetchUser();
+    }, [obtenerUsuarioAutenticado]);
+  
+    // 🔹 Obtener datos de Bonita una vez que se tenga el usuario
+    useEffect(() => {
+      if (!usuario) return;
+      const fetchData = async () => {
+        try {
+          const data = await obtenerDatosBonita(usuario.user_id);
+          if (data) {
+            setBonitaData(data);
+          }
+        } catch (error) {
+          console.error("❌ Error obteniendo datos de Bonita:", error);
+        }
+      };
+      fetchData();
+    }, [usuario, obtenerDatosBonita]);
 
   return (
     <CardContainer title="Contrato Cesión de Derechos Patrimoniales">

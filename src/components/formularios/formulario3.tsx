@@ -15,15 +15,21 @@ const socket = io(SERVER_BACK_URL); // Conecta con el backend
 export default function UploadForm() {
   const [intellectualPropertyFileBase64, setIntellectualPropertyFileBase64] =
     useState<string | null>(null);
-  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<string | null>(null);
+  const [authorDataFileBase64, setAuthorDataFileBase64] = useState<
+    string | null
+  >(null);
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState<ModalData | null>(null);
   const [loading, setLoading] = useState(false); // Estado para el indicador de carga
   const bonita: BonitaUtilities = new BonitaUtilities();
-  
+
   // Usamos el servicio modificado: únicamente obtenerDatosBonita y obtenerUsuarioAutenticado
   const { obtenerDatosBonita, obtenerUsuarioAutenticado } = useBonitaService();
+
+  const [bonitaData, setBonitaData] = useState<any>(null);
+  const [jsonAutroes, setJsonAutores] = useState<any>(null);
+  const [jsonProductos, setJsonProductos] = useState<any>(null);
 
   // Efecto para obtener los datos de Bonita usando las APIs sin privilegios de admin
   useEffect(() => {
@@ -36,14 +42,7 @@ export default function UploadForm() {
           const bonitaData = await obtenerDatosBonita(usuario.user_id);
           if (bonitaData) {
             console.log("Datos de Bonita:", bonitaData);
-            // Enviar los datos al servidor a través del socket
-            socket.emit("guardar_datos_bonita", bonitaData, (response: any) => {
-              if (response && response.success) {
-                console.log("Respuesta del servidor:", response);
-              } else {
-                console.error("Error en la respuesta del servidor:", response?.message);
-              }
-            });
+            setBonitaData(bonitaData);
           }
         }
       } catch (error) {
@@ -126,7 +125,8 @@ export default function UploadForm() {
           setLoading(false); // Desactivar el indicador de carga
 
           if (response && response.success) {
-            console.log("📢 Respuesta del servidor:", response);
+            setJsonAutores(JSON.parse(response.autores));
+            setJsonProductos(JSON.parse(response.productos));
             setModalData({
               success: response.success,
               message: response.message,
@@ -167,14 +167,36 @@ export default function UploadForm() {
       if (!authorDataFileBase64 || !intellectualPropertyFileBase64) {
         throw new Error("No se encontraron los archivos base64.");
       }
-
+      editedData.tipo = 1;
+      editedData.productos = jsonProductos.productos
+      console.log("Json de productos editados:", editedData);
+      console.log("Json de autores editados:", jsonAutroes);
       // Enviar los datos editados al backend
       socket.emit(
-        "procesar_documentos",
+        "agregar_producto_datos",
         {
-          documento_autores: authorDataFileBase64,
-          documento_productos: intellectualPropertyFileBase64,
-          editedData,
+          id_registro: bonitaData.processId + "-" + bonitaData.caseId,
+          jsonProductos: editedData,
+          memorando: editedData.codigoMemorando,
+        },
+        (response: any) => {
+          if (response.success) {
+            console.log("📢 Datos editados guardados correctamente:", response);
+            alert("Datos editados guardados correctamente.");
+          } else {
+            console.error(
+              "❌ Error al guardar los datos editados:",
+              response.message
+            );
+            alert("Error al guardar los datos editados.");
+          }
+        }
+      );
+      socket.emit(
+        "set_autores",
+        {
+          codigo: editedData.codigoMemorando,
+          autores: jsonAutroes
         },
         (response: any) => {
           if (response.success) {
@@ -260,7 +282,11 @@ export default function UploadForm() {
           <Button
             className="bg-[#931D21] text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-200"
             onClick={handleSave}
-            disabled={!intellectualPropertyFileBase64 || !authorDataFileBase64 || loading}
+            disabled={
+              !intellectualPropertyFileBase64 ||
+              !authorDataFileBase64 ||
+              loading
+            }
           >
             {loading ? "Procesando..." : "Guardar"}
           </Button>
