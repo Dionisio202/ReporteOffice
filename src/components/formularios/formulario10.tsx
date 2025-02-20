@@ -122,8 +122,8 @@ export default function ConfirmationScreen() {
           jsonData: JSON.stringify(selectedDocuments),
           id_funcionario: parseInt(usuario.user_id),
         });
+        await bonita.changeTask();
         alert("Avanzando a la siguiente página...");
-        bonita.changeTask();
       } catch (error) {
         console.error("Error guardando estado final:", error);
       }
@@ -171,7 +171,7 @@ export default function ConfirmationScreen() {
           className="w-full bg-[#931D21] hover:bg-[#7A171A] text-white py-2 rounded-lg font-semibold hover:scale-105 transition-transform duration-300"
           onClick={handleNext}
         >
-          Siguiente
+          Siguiente Proceso
         </button>
 
         {usuario && (

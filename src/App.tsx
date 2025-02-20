@@ -1,4 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+} from "react-router-dom";
 import Header from "./components/header/Header";
 import Formulario3 from "./components/formularios/formulario3";
 import Formulario4 from "./components/formularios/formulario4";
@@ -21,10 +25,14 @@ import Formulario17 from "./components/formularios/formulario17";
 import Formulario19 from "./components/formularios/formulario19";
 import Formulario20 from "./components/formularios/formulario20";
 import Formulario21 from "./components/formularios/formulario21";
+import Dashboard from "./pages/DashBoard-Informes/dashboard-informes";
+import Dash from "./pages/DashBoard-Informes/screens/dashboard"
+import Reports from "./pages/DashBoard-Informes/screens/reports"
+
 const App = () => {
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+       {!["/Reporteria", "/Dashboard", "/Reports"].includes(location.pathname) && <Header />}
       <main className="flex-grow p-6 space-y-4">
         <Router>
           <Routes>
@@ -41,18 +49,20 @@ const App = () => {
             <Route path="/Formulario10" element={<Formulario10 />} />
             <Route path="/Formulario16" element={<Formulario16 />} />
             <Route path="/Formulario2" element={<Formulario2 />} />
-            <Route path = "/Formulario6" element={<Formulario6/>}/>
-            <Route path = "/Formulario11" element={<Formulario11/>}/>
-            <Route path = "/Formulario12" element={<Formulario12/>}/>
-            <Route path = "/Formulario15" element={<Formulario15/>}/>
-            <Route path = "/Formulario17" element={<Formulario17/>}/>
-            <Route path = "/Formulario19" element={<Formulario19/>}/>
-            <Route path = "/Formulario20" element={<Formulario20/>}/>
-            <Route path = "/Formulario21" element={<Formulario21/>}/>
+            <Route path="/Formulario6" element={<Formulario6 />} />
+            <Route path="/Formulario11" element={<Formulario11 />} />
+            <Route path="/Formulario12" element={<Formulario12 />} />
+            <Route path="/Formulario15" element={<Formulario15 />} />
+            <Route path="/Formulario17" element={<Formulario17 />} />
+            <Route path="/Formulario19" element={<Formulario19 />} />
+            <Route path="/Formulario20" element={<Formulario20 />} />
+            <Route path="/Formulario21" element={<Formulario21 />} />
+            <Route path="/Reporteria" element={<Dashboard />} />
+            <Route path="/Dashboard" element={<Dash/>} />
+            <Route path="/Reports" element={<Reports />} />
           </Routes>
         </Router>
       </main>
-   
     </div>
   );
 };
