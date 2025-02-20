@@ -6,12 +6,13 @@ import {
 } from "../../../interfaces/registros.interface";
 import { SERVER_BACK_URL } from "../../../config.ts";
 const socket = io(SERVER_BACK_URL); // Conecta con el backend
-
 const Modal: React.FC<ModalProps> = ({
   showModal,
   closeModal,
   modalData,
   onSave,
+  tipoMemorando,
+  handleTipoMemorandoChange,
 }) => {
   const [editedData, setEditedData] = useState(modalData.productos);
   const [tiposProductos, setTiposProductos] = useState<TipoProducto[]>([]); // Estado para los tipos de productos
@@ -19,26 +20,40 @@ const Modal: React.FC<ModalProps> = ({
   const [error, setError] = useState<string | null>(null); // Estado para manejar errores
 
   // Cargar los tipos de productos al abrir el modal
+  // En el useEffect donde obtienes los tipos de productos
   useEffect(() => {
     if (showModal) {
-      setError(null); // Reiniciar el estado de error
-      setLoading(true); // Activar el indicador de carga
+      setError(null);
+      setLoading(true);
 
-      // Emitir el evento para obtener los tipos de productos
       socket.emit("obtener_tipos_productos", (response: any) => {
         if (response.success) {
-          setTiposProductos(response.data); // Guardar los tipos de productos en el estado
-          setTiposProductos(response.data); // Guardar los tipos de productos en el estado
+          // Mapear los resultados para crear un objeto con id y nombre
+          const tiposMapeados = response.data.map((tipo: any) => ({
+            id: tipo.id_tipo_producto,
+            nombre: tipo.nombre,
+          }));
+
+          setTiposProductos(tiposMapeados);
+
+          // Si hay datos previos, establecer el valor inicial del select
+          if (editedData.tipoMemorando) {
+            const tipoSeleccionado = tiposMapeados.find(
+              (t: any) => t.nombre === editedData.tipoMemorando
+            );
+            if (tipoSeleccionado) {
+              // @ts-ignore
+              setEditedData((prev) => ({
+                ...prev,
+                tipoMemorando: tipoSeleccionado.id.toString(),
+              }));
+            }
+          }
         } else {
-          console.error(
-            "Error al obtener los tipos de productos:",
-            response.message
-          );
-          setError(
-            "Error al obtener los tipos de productos. Inténtalo de nuevo."
-          ); // Mostrar un mensaje de error
+          console.error("Error al obtener tipos:", response.message);
+          setError("Error al cargar tipos de productos");
         }
-        setLoading(false); // Desactivar el indicador de carga
+        setLoading(false);
       });
     }
   }, [showModal]);
@@ -107,16 +122,14 @@ const Modal: React.FC<ModalProps> = ({
                   </label>
                   <select
                     id="tipoMemorando"
-                    value={editedData.tipoMemorando}
-                    onChange={(e) =>
-                      handleChange("tipoMemorando", e.target.value)
-                    }
+                    value={tipoMemorando}
+                    onChange={handleTipoMemorandoChange}
                     className="mt-1 text-xs block w-full p-1 border border-gray-300 rounded-md shadow-sm focus:ring-[#931D21] focus:border-[#931D21]"
                     disabled={loading}
                   >
                     <option value="">Seleccione una opción</option>
                     {tiposProductos.map((tipo) => (
-                      <option key={tipo.id} value={tipo.nombre}>
+                      <option key={tipo.id} value={tipo.id}>
                         {tipo.nombre}
                       </option>
                     ))}
@@ -238,8 +251,10 @@ const Modal: React.FC<ModalProps> = ({
                   <h4 className="text-xss font-semibold text-orange-700 ">
                     Productos:
                   </h4>
-                  {editedData.productos.map((producto:any, index:any) => (
-                    <div key={producto.id || index} className="mb-4"> {/* Clave única */}
+                  {editedData.productos.map((producto: any, index: any) => (
+                    <div key={producto.id || index} className="mb-4">
+                      {" "}
+                      {/* Clave única */}
                       <label className="block text-xs font-medium text-gray-700">
                         Nombre del Producto:
                       </label>

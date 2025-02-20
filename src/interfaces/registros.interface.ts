@@ -27,4 +27,6 @@ export interface ModalProps {
   closeModal: () => void;
   modalData: any; // Ajusta según tu interfaz
   onSave: (editedData: any) => void;
+  tipoMemorando: string;
+  handleTipoMemorandoChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }

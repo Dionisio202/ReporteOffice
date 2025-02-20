@@ -112,10 +112,19 @@ export default function DocumentForm() {
     }));
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("Código del memorando:", memoCode);
     console.log("Documentos seleccionados:", selectedDocuments);
+    const idtipoDocumento = 3;
+    const response = await fetch(`${SERVER_BACK_URL}/api/save-memorando?key=${memoCode}&id_tipo_documento=${idtipoDocumento}&id_registro=${bonitaData?.processId}-${bonitaData?.caseId}`);
+        
+    if (!response.ok) {
+      throw new Error('Error al guardar el memorando');
+    }
+    
+    const data = await response.json();
+    console.log("Memorando guardado:", data);
   };
 
   // 🔹 Guardado final al hacer clic en "Siguiente"
