@@ -252,7 +252,7 @@ export default function UploadForm() {
 
   return (
     <div className="flex flex-col items-center p-1 bg-gradient-to-r to-gray-100 min-h-screen">
-      <form className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-xl border border-gray-700">
+      <div className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-xl border border-gray-700">
         <Title
           text="Atención de Solicitud de Registro de Propiedad Intelectual"
           size="2xl"
@@ -312,7 +312,7 @@ export default function UploadForm() {
             handleTipoMemorandoChange={handleTipoMemorandoChange}
           />
         )}
-      </form>
+      </div>
     </div>
   );
 }

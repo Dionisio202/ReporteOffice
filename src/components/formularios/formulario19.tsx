@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import CardContainer from "./components/CardContainer";
 import UploadFile from "./components/UploadFile";
 // @ts-ignore
@@ -56,8 +56,7 @@ export default function ConfirmationScreen() {
           fetchData();
         }, [usuario, obtenerDatosBonita]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async () => {
 
     if (!file) {
       alert("Por favor, cargue un archivo.");
@@ -90,6 +89,7 @@ export default function ConfirmationScreen() {
     };
 
     try {
+      alert("Enviando datos al servidor...");
       const response = await fetch(`${SERVER_BACK_URL}/api/get-document`, {
         method: "POST",
         headers: {
@@ -106,19 +106,20 @@ export default function ConfirmationScreen() {
   };
 
   return (
-    <CardContainer title="Validación de Certificado">
-      <form onSubmit={handleSubmit} className="w-full max-w-lg p-6 rounded-lg shadow-lg">
-        <Title text="Comprobante de Pago" size="2xl" className="text-center mb-1" />
+    <CardContainer title="Certificado/Título de Registro">
+      <div  className="w-full max-w-lg p-6 rounded-lg shadow-lg">
+        <Title text="Certificado/Título de Registro" size="2xl" className="text-center mb-1" />
         
         <UploadFile
           id="document-file"
           onFileChange={setFile}
-          label="Subir comprobante de pago de la solicitud de certificado"
+          label="Subir el Certificado/Título de Registro"
         />
 
         <Button
           type="submit"
           className="mt-5 w-full bg-blue-600 text-white px-6 rounded hover:bg-blue-700"
+          onClick={handleSubmit}
         >
           Enviar Datos
         </Button>
@@ -129,7 +130,7 @@ export default function ConfirmationScreen() {
         >
           Siguiente Proceso
         </Button>
-      </form>
+      </div>
     </CardContainer>
   );
 }
